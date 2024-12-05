@@ -20,10 +20,16 @@ jobs:
     timeout-minutes: 360
     permissions:
       security-events: write
+      contents: read
+      actions: read
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: 1.23.x
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

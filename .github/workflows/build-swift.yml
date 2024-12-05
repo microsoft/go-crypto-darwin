@@ -1,0 +1,32 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths:
+            - '**/*.swift'
+            - '.github/workflows/build-swift.yml'
+            - 'gen-swift-bindings.sh'
+
+name: Build Swift
+jobs:
+    build:
+        permissions:
+            contents: write
+        runs-on: macos-13
+        steps:
+        - uses: actions/checkout@v4
+        - name: Setup Xcode
+          run: sudo xcode-select --switch /Applications/Xcode_14.1.app
+        - name: Build Swift
+          run: bash gen-swift-bindings.sh
+        - name: Commit changes
+          run: |
+            git config --local user.email "action@github.com"
+            git config --global user.name "GitHub Actions"
+            git add cryptokit/CryptoKit.o
+            git commit -m "Update CryptoKit Object file"
+            git push

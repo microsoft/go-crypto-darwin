@@ -1,0 +1,11 @@
+{
+    "go.useLanguageServer": true,
+    "go.vetFlags": [
+      "-unsafeptr=false"
+    ],
+    "gopls": {
+      "analyses": {
+        "unsafeptr": false
+      }
+    }
+}

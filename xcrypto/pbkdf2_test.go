@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"hash"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 type testVector struct {
@@ -152,7 +152,7 @@ var sha256TestVectors = []testVector{
 
 func testHash(t *testing.T, h func() hash.Hash, hashName string, vectors []testVector) {
 	for i, v := range vectors {
-		o, err := commoncrypto.PBKDF2([]byte(v.password), []byte(v.salt), v.iter, len(v.output), h)
+		o, err := xcrypto.PBKDF2([]byte(v.password), []byte(v.salt), v.iter, len(v.output), h)
 		if err != nil {
 			t.Errorf("%s %d: %s", hashName, i, err)
 			continue
@@ -164,16 +164,16 @@ func testHash(t *testing.T, h func() hash.Hash, hashName string, vectors []testV
 }
 
 func TestPBKDF2WithHMACSHA1(t *testing.T) {
-	testHash(t, commoncrypto.NewSHA1, "SHA1", sha1TestVectors)
+	testHash(t, xcrypto.NewSHA1, "SHA1", sha1TestVectors)
 }
 
 func TestPBKDF2WithHMACSHA256(t *testing.T) {
-	testHash(t, commoncrypto.NewSHA256, "SHA256", sha256TestVectors)
+	testHash(t, xcrypto.NewSHA256, "SHA256", sha256TestVectors)
 }
 
 func TestPBKDF2WithUnsupportedHash(t *testing.T) {
 	// Test that PBKDF2 returns an error for unsupported hashes instead of panicking.
-	_, err := commoncrypto.PBKDF2([]byte{1, 2}, []byte{3, 4}, 0, 2, newStubHash)
+	_, err := xcrypto.PBKDF2([]byte{1, 2}, []byte{3, 4}, 0, 2, newStubHash)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -184,7 +184,7 @@ func benchmark(b *testing.B, h func() hash.Hash) {
 	salt := make([]byte, 8)
 	var err error
 	for i := 0; i < b.N; i++ {
-		password, err = commoncrypto.PBKDF2(password, salt, 4096, len(password), h)
+		password, err = xcrypto.PBKDF2(password, salt, 4096, len(password), h)
 		if err != nil {
 			b.Fatal(err)
 		}

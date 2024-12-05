@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"crypto/ecdsa"
@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/bbig"
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 func testAllCurves(t *testing.T, f func(*testing.T, elliptic.Curve)) {
@@ -55,23 +55,23 @@ func testECDSASignAndVerify(t *testing.T, c elliptic.Curve) {
 		t.Fatal(err)
 	}
 	msg := []byte("hi!")
-	hashed := commoncrypto.SHA256(msg)
+	hashed := xcrypto.SHA256(msg)
 
-	priv, err := commoncrypto.NewPrivateKeyECDSA(key.Params().Name, bbig.Enc(key.X), bbig.Enc(key.Y), bbig.Enc(key.D))
+	priv, err := xcrypto.NewPrivateKeyECDSA(key.Params().Name, bbig.Enc(key.X), bbig.Enc(key.Y), bbig.Enc(key.D))
 	if err != nil {
 		t.Fatal(err)
 	}
-	pub, err := commoncrypto.NewPublicKeyECDSA(key.Params().Name, bbig.Enc(key.X), bbig.Enc(key.Y))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	signed, err := commoncrypto.SignMarshalECDSA(priv, hashed[:])
+	pub, err := xcrypto.NewPublicKeyECDSA(key.Params().Name, bbig.Enc(key.X), bbig.Enc(key.Y))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !commoncrypto.VerifyECDSA(pub, hashed[:], signed) {
+	signed, err := xcrypto.SignMarshalECDSA(priv, hashed[:])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !xcrypto.VerifyECDSA(pub, hashed[:], signed) {
 		t.Errorf("Verify failed")
 	}
 	// Alter the signature to intentionally make it invalid. Change the last
@@ -79,13 +79,13 @@ func testECDSASignAndVerify(t *testing.T, c elliptic.Curve) {
 	// would cause some OpenSSL providers, such as SymCrypt-OpenSSL, to write a
 	// noisy warning to stderr.
 	signed[len(signed)-1] ^= 0xff
-	if commoncrypto.VerifyECDSA(pub, hashed[:], signed) {
+	if xcrypto.VerifyECDSA(pub, hashed[:], signed) {
 		t.Errorf("Verify succeeded despite intentionally invalid hash!")
 	}
 }
 
 func generateKeycurve(c elliptic.Curve) (*ecdsa.PrivateKey, error) {
-	x, y, d, err := commoncrypto.GenerateKeyECDSA(c.Params().Name)
+	x, y, d, err := xcrypto.GenerateKeyECDSA(c.Params().Name)
 	if err != nil {
 		return nil, err
 	}

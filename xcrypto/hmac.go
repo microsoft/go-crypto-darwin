@@ -3,7 +3,7 @@
 
 //go:build darwin
 
-package commoncrypto
+package xcrypto
 
 // #include <CommonCrypto/CommonCrypto.h>
 import "C"
@@ -14,7 +14,7 @@ import (
 	"slices"
 )
 
-// commonCryptoHMAC encapsulates an HMAC using CommonCrypto.
+// commonCryptoHMAC encapsulates an HMAC using xcrypto.
 type commonCryptoHMAC struct {
 	ctx       C.CCHmacContext
 	alg       C.CCAlgorithm
@@ -24,9 +24,9 @@ type commonCryptoHMAC struct {
 	blockSize int
 }
 
-// NewHMAC returns a new HMAC using CommonCrypto.
+// NewHMAC returns a new HMAC using xcrypto.
 // The function h must return a hash implemented by
-// CommonCrypto (for example, h could be commoncrypto.NewSHA256).
+// CommonCrypto (for example, h could be xcrypto.NewSHA256).
 // If h is not recognized, NewHMAC returns nil.
 func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	h := fh()
@@ -49,7 +49,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 		blockSize: h.BlockSize(),
 	}
 
-	// Initialize the HMAC context with CommonCrypto.
+	// Initialize the HMAC context with xcrypto.
 	C.CCHmacInit(&hmac.ctx, hmac.alg, pbase(hmac.key), C.size_t(len(hmac.key)))
 
 	return hmac

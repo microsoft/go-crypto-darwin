@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 func TestRand(t *testing.T) {
-	_, err := commoncrypto.RandReader.Read(make([]byte, 5))
+	_, err := xcrypto.RandReader.Read(make([]byte, 5))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -19,7 +19,7 @@ func TestRand(t *testing.T) {
 func TestAllocations(t *testing.T) {
 	n := int(testing.AllocsPerRun(10, func() {
 		buf := make([]byte, 32)
-		commoncrypto.RandReader.Read(buf)
+		xcrypto.RandReader.Read(buf)
 		sink ^= buf[0]
 	}))
 	want := 1

@@ -5,7 +5,6 @@
 
 package cryptokit
 
-// #include <CommonCrypto/CommonCrypto.h>
 // #include "cryptokit.h"
 import "C"
 import (
@@ -16,8 +15,6 @@ import (
 
 //go:generate go run github.com/microsoft/go-crypto-darwin/cmd/gentestvectors -out vectors_test.go
 
-const aesBlockSize = C.kCCBlockSizeAES128 // AES block size is the same for all key sizes
-
 type cipherGCMTLS uint8
 
 const (
@@ -27,6 +24,7 @@ const (
 )
 
 const (
+	aesBlockSize         = 16
 	gcmTagSize           = 16
 	gcmStandardNonceSize = 12
 	// TLS 1.2 additional data is constructed as:

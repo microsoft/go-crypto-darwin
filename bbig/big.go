@@ -6,15 +6,15 @@ package bbig
 import (
 	"math/big"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
-func Enc(b *big.Int) commoncrypto.BigInt {
+func Enc(b *big.Int) xcrypto.BigInt {
 	// Return the input directly since BigInt is now *big.Int
 	return b
 }
 
-func Dec(b commoncrypto.BigInt) *big.Int {
+func Dec(b xcrypto.BigInt) *big.Int {
 	// Return the input directly since BigInt is now *big.Int
 	return b
 }

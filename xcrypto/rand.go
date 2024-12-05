@@ -3,7 +3,7 @@
 
 //go:build darwin
 
-package commoncrypto
+package xcrypto
 
 // #include <Security/SecRandom.h>
 import "C"

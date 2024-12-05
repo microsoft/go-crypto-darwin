@@ -3,10 +3,9 @@
 
 //go:build darwin
 
-package commoncrypto
+package xcrypto
 
 // #cgo CFLAGS: -Wno-deprecated-declarations
-// #cgo LDFLAGS: -framework CoreFoundation -framework Security
 import "C"
 import "unsafe"
 

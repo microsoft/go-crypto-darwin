@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"bytes"
@@ -11,33 +11,33 @@ import (
 	"io"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 func cryptoToHash(h crypto.Hash) func() hash.Hash {
 	switch h {
 	case crypto.MD4:
-		return commoncrypto.NewMD4
+		return xcrypto.NewMD4
 	case crypto.MD5:
-		return commoncrypto.NewMD5
+		return xcrypto.NewMD5
 	case crypto.SHA1:
-		return commoncrypto.NewSHA1
+		return xcrypto.NewSHA1
 	case crypto.SHA224:
-		return commoncrypto.NewSHA224
+		return xcrypto.NewSHA224
 	case crypto.SHA256:
-		return commoncrypto.NewSHA256
+		return xcrypto.NewSHA256
 	case crypto.SHA384:
-		return commoncrypto.NewSHA384
+		return xcrypto.NewSHA384
 	case crypto.SHA512:
-		return commoncrypto.NewSHA512
+		return xcrypto.NewSHA512
 		// case crypto.SHA3_224:
-		// 	return commoncrypto.NewSHA3_224
+		// 	return xcrypto.NewSHA3_224
 		// case crypto.SHA3_256:
-		// 	return commoncrypto.NewSHA3_256
+		// 	return xcrypto.NewSHA3_256
 		// case crypto.SHA3_384:
-		// 	return commoncrypto.NewSHA3_384
+		// 	return xcrypto.NewSHA3_384
 		// case crypto.SHA3_512:
-		// 	return commoncrypto.NewSHA3_512
+		// 	return xcrypto.NewSHA3_512
 	}
 	return nil
 }
@@ -61,7 +61,7 @@ func TestHash(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
 			h := cryptoToHash(ch)()
@@ -95,7 +95,7 @@ func TestHash_BinaryMarshaler(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("hash not supported")
 			}
 
@@ -135,7 +135,7 @@ func TestHash_BinaryAppender(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
 
@@ -194,7 +194,7 @@ func TestHash_Clone(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
 			h := cryptoToHash(ch)()
@@ -225,7 +225,7 @@ func TestHash_ByteWriter(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
 			bwh := cryptoToHash(ch)().(interface {
@@ -250,7 +250,7 @@ func TestHash_StringWriter(t *testing.T) {
 	for _, ch := range hashes {
 		t.Run(ch.String(), func(t *testing.T) {
 			t.Parallel()
-			if !commoncrypto.SupportsHash(ch) {
+			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
 			h := cryptoToHash(ch)()
@@ -272,45 +272,45 @@ func TestHash_OneShot(t *testing.T) {
 		oneShot func([]byte) []byte
 	}{
 		{crypto.SHA1, func(p []byte) []byte {
-			b := commoncrypto.SHA1(p)
+			b := xcrypto.SHA1(p)
 			return b[:]
 		}},
 		{crypto.SHA224, func(p []byte) []byte {
-			b := commoncrypto.SHA224(p)
+			b := xcrypto.SHA224(p)
 			return b[:]
 		}},
 		{crypto.SHA256, func(p []byte) []byte {
-			b := commoncrypto.SHA256(p)
+			b := xcrypto.SHA256(p)
 			return b[:]
 		}},
 		{crypto.SHA384, func(p []byte) []byte {
-			b := commoncrypto.SHA384(p)
+			b := xcrypto.SHA384(p)
 			return b[:]
 		}},
 		{crypto.SHA512, func(p []byte) []byte {
-			b := commoncrypto.SHA512(p)
+			b := xcrypto.SHA512(p)
 			return b[:]
 		}},
 		// {crypto.SHA3_224, func(p []byte) []byte {
-		// 	b := commoncrypto.SHA3_224(p)
+		// 	b := xcrypto.SHA3_224(p)
 		// 	return b[:]
 		// }},
 		// {crypto.SHA3_256, func(p []byte) []byte {
-		// 	b := commoncrypto.SHA3_256(p)
+		// 	b := xcrypto.SHA3_256(p)
 		// 	return b[:]
 		// }},
 		// {crypto.SHA3_384, func(p []byte) []byte {
-		// 	b := commoncrypto.SHA3_384(p)
+		// 	b := xcrypto.SHA3_384(p)
 		// 	return b[:]
 		// }},
 		// {crypto.SHA3_512, func(p []byte) []byte {
-		// 	b := commoncrypto.SHA3_512(p)
+		// 	b := xcrypto.SHA3_512(p)
 		// 	return b[:]
 		// }},
 	}
 	for _, tt := range tests {
 		t.Run(tt.h.String(), func(t *testing.T) {
-			if !commoncrypto.SupportsHash(tt.h) {
+			if !xcrypto.SupportsHash(tt.h) {
 				t.Skip("not supported")
 			}
 			got := tt.oneShot(msg)
@@ -339,16 +339,16 @@ func TestCgo(t *testing.T) {
 	}()
 	d := new(cgoData)
 	d.Ptr = d
-	h := commoncrypto.NewSHA256()
+	h := xcrypto.NewSHA256()
 	h.Write(d.Data[:])
 	h.Sum(nil)
 
-	commoncrypto.SHA256(d.Data[:])
+	xcrypto.SHA256(d.Data[:])
 }
 
 func BenchmarkHash8Bytes(b *testing.B) {
 	b.StopTimer()
-	h := commoncrypto.NewSHA256()
+	h := xcrypto.NewSHA256()
 	sum := make([]byte, h.Size())
 	size := 8
 	buf := make([]byte, size)
@@ -370,7 +370,7 @@ func BenchmarkSHA256(b *testing.B) {
 	b.SetBytes(int64(size))
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		commoncrypto.SHA256(buf)
+		xcrypto.SHA256(buf)
 	}
 }
 

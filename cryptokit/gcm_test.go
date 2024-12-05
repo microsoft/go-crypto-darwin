@@ -9,8 +9,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
 	"github.com/microsoft/go-crypto-darwin/cryptokit"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 var key = []byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D")
@@ -21,7 +21,7 @@ const (
 )
 
 func TestNewGCMNonce(t *testing.T) {
-	block, err := commoncrypto.NewAESCipher(key)
+	block, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +59,7 @@ func TestNewGCMNonce(t *testing.T) {
 func TestSealAndOpen(t *testing.T) {
 	for _, tt := range aesGCMTests {
 		t.Run(tt.description, func(t *testing.T) {
-			ci, err := commoncrypto.NewAESCipher(tt.key)
+			ci, err := xcrypto.NewAESCipher(tt.key)
 			if err != nil {
 				t.Fatalf("NewAESCipher() err = %v", err)
 			}
@@ -108,7 +108,7 @@ func TestSealAndOpen(t *testing.T) {
 
 func TestSealAndOpen_Empty(t *testing.T) {
 	key := []byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D")
-	ci, err := commoncrypto.NewAESCipher(key)
+	ci, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,16 +146,16 @@ func TestSealAndOpenTLS(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ci, err := commoncrypto.NewAESCipher(key)
+			ci, err := xcrypto.NewAESCipher(key)
 			if err != nil {
 				t.Fatal(err)
 			}
 			var gcm cipher.AEAD
 			switch tt.tls {
 			case "1.2":
-				gcm, err = commoncrypto.NewGCMTLS(ci)
+				gcm, err = xcrypto.NewGCMTLS(ci)
 			case "1.3":
-				gcm, err = commoncrypto.NewGCMTLS13(ci)
+				gcm, err = xcrypto.NewGCMTLS13(ci)
 			}
 			if err != nil {
 				t.Fatal(err)
@@ -214,7 +214,7 @@ func TestSealAndOpenTLS(t *testing.T) {
 }
 
 func TestSealAndOpenAuthenticationError(t *testing.T) {
-	ci, err := commoncrypto.NewAESCipher(key)
+	ci, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +243,7 @@ func assertPanic(t *testing.T, f func()) {
 }
 
 func TestSealPanic(t *testing.T) {
-	ci, err := commoncrypto.NewAESCipher([]byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D"))
+	ci, err := xcrypto.NewAESCipher([]byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -270,7 +270,7 @@ func BenchmarkAESGCM_Open(b *testing.B) {
 	key := make([]byte, keySize)
 	var nonce [12]byte
 	var ad [13]byte
-	c, _ := commoncrypto.NewAESCipher(key)
+	c, _ := xcrypto.NewAESCipher(key)
 	aesgcm, _ := cipher.NewGCM(c)
 	var out []byte
 
@@ -293,7 +293,7 @@ func BenchmarkAESGCM_Seal(b *testing.B) {
 	key := make([]byte, keySize)
 	var nonce [12]byte
 	var ad [13]byte
-	c, _ := commoncrypto.NewAESCipher(key)
+	c, _ := xcrypto.NewAESCipher(key)
 	aesgcm, _ := cipher.NewGCM(c)
 	var out []byte
 

@@ -36,6 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Ensure PR does not contain CryptoKit.o
         run: |
           if git diff --name-only HEAD^ | grep -q cryptokit/CryptoKit.o; then

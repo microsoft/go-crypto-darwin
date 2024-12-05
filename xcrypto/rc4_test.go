@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"bytes"
@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
 	"github.com/microsoft/go-crypto-darwin/internal/cryptotest"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 type rc4Test struct {
@@ -90,7 +90,7 @@ func TestRC4Golden(t *testing.T) {
 		}
 
 		for size := 1; size <= len(g.keystream); size++ {
-			c, err := commoncrypto.NewRC4Cipher(g.key)
+			c, err := xcrypto.NewRC4Cipher(g.key)
 			if err != nil {
 				t.Fatalf("#%d: NewCipher: %v", gi, err)
 			}
@@ -118,16 +118,16 @@ func TestRC4Golden(t *testing.T) {
 }
 
 func TestRC4Block(t *testing.T) {
-	c1a, _ := commoncrypto.NewRC4Cipher(golden[0].key)
-	c1b, _ := commoncrypto.NewRC4Cipher(golden[1].key)
+	c1a, _ := xcrypto.NewRC4Cipher(golden[0].key)
+	c1b, _ := xcrypto.NewRC4Cipher(golden[1].key)
 	data1 := make([]byte, 1<<20)
 	for i := range data1 {
 		c1a.XORKeyStream(data1[i:i+1], data1[i:i+1])
 		c1b.XORKeyStream(data1[i:i+1], data1[i:i+1])
 	}
 
-	c2a, _ := commoncrypto.NewRC4Cipher(golden[0].key)
-	c2b, _ := commoncrypto.NewRC4Cipher(golden[1].key)
+	c2a, _ := xcrypto.NewRC4Cipher(golden[0].key)
+	c2b, _ := xcrypto.NewRC4Cipher(golden[1].key)
 	data2 := make([]byte, 1<<20)
 	c2a.XORKeyStream(data2, data2)
 	c2b.XORKeyStream(data2, data2)
@@ -139,14 +139,14 @@ func TestRC4Block(t *testing.T) {
 
 func TestRC4Stream(t *testing.T) {
 	cryptotest.TestStream(t, func() cipher.Stream {
-		c, _ := commoncrypto.NewRC4Cipher(golden[0].key)
+		c, _ := xcrypto.NewRC4Cipher(golden[0].key)
 		return c
 	})
 }
 
 func benchmarkRC4(b *testing.B, size int64) {
 	buf := make([]byte, size)
-	c, err := commoncrypto.NewRC4Cipher(golden[0].key)
+	c, err := xcrypto.NewRC4Cipher(golden[0].key)
 	if err != nil {
 		panic(err)
 	}

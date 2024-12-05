@@ -3,7 +3,7 @@
 
 //go:build go1.24 && darwin
 
-package commoncrypto
+package xcrypto
 
 // The following noescape and nocallback directives are used to prevent the Go
 // compiler from allocating function parameters on the heap. See

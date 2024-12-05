@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"bytes"
 	"hash"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 type hkdfTest struct {
@@ -23,7 +23,7 @@ type hkdfTest struct {
 var hkdfTests = []hkdfTest{
 	// Tests from RFC 5869
 	{
-		commoncrypto.NewSHA256,
+		xcrypto.NewSHA256,
 		[]byte{
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
@@ -53,7 +53,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA256,
+		xcrypto.NewSHA256,
 		[]byte{
 			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -111,7 +111,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA256,
+		xcrypto.NewSHA256,
 		[]byte{
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
@@ -135,7 +135,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA256,
+		xcrypto.NewSHA256,
 		[]byte{
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
@@ -159,7 +159,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA1,
+		xcrypto.NewSHA1,
 		[]byte{
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
 			0x0b, 0x0b, 0x0b,
@@ -187,7 +187,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA1,
+		xcrypto.NewSHA1,
 		[]byte{
 			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -244,7 +244,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA1,
+		xcrypto.NewSHA1,
 		[]byte{
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
 			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
@@ -267,7 +267,7 @@ var hkdfTests = []hkdfTest{
 		},
 	},
 	{
-		commoncrypto.NewSHA1,
+		xcrypto.NewSHA1,
 		[]byte{
 			0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
 			0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
@@ -292,11 +292,11 @@ var hkdfTests = []hkdfTest{
 }
 
 func newHKDF(hash func() hash.Hash, secret, salt, info []byte) ([]byte, error) {
-	prk, err := commoncrypto.ExtractHKDF(hash, secret, salt)
+	prk, err := xcrypto.ExtractHKDF(hash, secret, salt)
 	if err != nil {
 		return nil, err
 	}
-	r, err := commoncrypto.ExpandHKDF(hash, prk, info, len(info))
+	r, err := xcrypto.ExpandHKDF(hash, prk, info, len(info))
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +305,7 @@ func newHKDF(hash func() hash.Hash, secret, salt, info []byte) ([]byte, error) {
 
 func TestHKDF(t *testing.T) {
 	for i, tt := range hkdfTests {
-		prk, err := commoncrypto.ExtractHKDF(tt.hash, tt.master, tt.salt)
+		prk, err := xcrypto.ExtractHKDF(tt.hash, tt.master, tt.salt)
 		if err != nil {
 			t.Errorf("test %d: error extracting HKDF: %v.", i, err)
 		}
@@ -313,7 +313,7 @@ func TestHKDF(t *testing.T) {
 			t.Errorf("test %d: incorrect PRK: have %v, need %v.", i, prk, tt.prk)
 		}
 
-		out, err := commoncrypto.ExpandHKDF(tt.hash, prk, tt.info, len(tt.out))
+		out, err := xcrypto.ExpandHKDF(tt.hash, prk, tt.info, len(tt.out))
 		if err != nil {
 			t.Errorf("test %d: error expanding HKDF: %v.", i, err)
 			continue
@@ -326,16 +326,16 @@ func TestHKDF(t *testing.T) {
 }
 
 func TestHKDFLimit(t *testing.T) {
-	hash := commoncrypto.NewSHA1
+	hash := xcrypto.NewSHA1
 	master := []byte{0x00, 0x01, 0x02, 0x03}
 	info := []byte{}
 
-	prk, err := commoncrypto.ExtractHKDF(hash, master, nil)
+	prk, err := xcrypto.ExtractHKDF(hash, master, nil)
 	if err != nil {
 		t.Fatalf("error extracting HKDF: %v.", err)
 	}
 	limit := hash().Size() * 255
-	out, err := commoncrypto.ExpandHKDF(hash, prk, info, limit)
+	out, err := xcrypto.ExpandHKDF(hash, prk, info, limit)
 	if err != nil {
 		t.Errorf("error expanding HKDF: %v.", err)
 	}
@@ -344,7 +344,7 @@ func TestHKDFLimit(t *testing.T) {
 	}
 
 	// Expanding one more byte should fail
-	_, err = commoncrypto.ExpandHKDF(hash, prk, info, limit+1)
+	_, err = xcrypto.ExpandHKDF(hash, prk, info, limit+1)
 	if err == nil {
 		t.Errorf("expected error for key expansion overflow")
 	}

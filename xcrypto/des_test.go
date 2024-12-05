@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"bytes"
 	"crypto/cipher"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/commoncrypto"
 	"github.com/microsoft/go-crypto-darwin/internal/cryptotest"
+	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
 type CryptTest struct {
@@ -1264,7 +1264,7 @@ var tableA4Tests = []CryptTest{
 }
 
 func newDESCipher(key []byte) cipher.Block {
-	c, err := commoncrypto.NewDESCipher(key)
+	c, err := xcrypto.NewDESCipher(key)
 	if err != nil {
 		panic("NewCipher failed: " + err.Error())
 	}
@@ -1340,7 +1340,7 @@ func TestDESDecryptBlock(t *testing.T) {
 
 func TestDESEncryptTripleDES(t *testing.T) {
 	for i, tt := range encryptTripleDESTests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 		out := make([]byte, len(tt.in))
 		c.Encrypt(out, tt.in)
 
@@ -1352,7 +1352,7 @@ func TestDESEncryptTripleDES(t *testing.T) {
 
 func TestDESDecryptTripleDES(t *testing.T) {
 	for i, tt := range encryptTripleDESTests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		plain := make([]byte, len(tt.in))
 		c.Decrypt(plain, tt.out)
@@ -1366,7 +1366,7 @@ func TestDESDecryptTripleDES(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESVariablePlaintextKnownAnswer(t *testing.T) {
 	for i, tt := range tableA1Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tableA1Key)
+		c, _ := xcrypto.NewTripleDESCipher(tableA1Key)
 
 		out := make([]byte, len(tt.in))
 		c.Encrypt(out, tt.in)
@@ -1380,7 +1380,7 @@ func TestDESVariablePlaintextKnownAnswer(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESVariableCiphertextKnownAnswer(t *testing.T) {
 	for i, tt := range tableA1Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tableA1Key)
+		c, _ := xcrypto.NewTripleDESCipher(tableA1Key)
 
 		plain := make([]byte, len(tt.out))
 		c.Decrypt(plain, tt.out)
@@ -1396,7 +1396,7 @@ func TestDESVariableCiphertextKnownAnswer(t *testing.T) {
 // 0x01... key produces the original plaintext
 func TestDESInversePermutationKnownAnswer(t *testing.T) {
 	for i, tt := range tableA1Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tableA1Key)
+		c, _ := xcrypto.NewTripleDESCipher(tableA1Key)
 
 		plain := make([]byte, len(tt.in))
 		c.Encrypt(plain, tt.out)
@@ -1412,7 +1412,7 @@ func TestDESInversePermutationKnownAnswer(t *testing.T) {
 // 0x01... key produces the corresponding ciphertext
 func TestDESInitialPermutationKnownAnswer(t *testing.T) {
 	for i, tt := range tableA1Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tableA1Key)
+		c, _ := xcrypto.NewTripleDESCipher(tableA1Key)
 
 		out := make([]byte, len(tt.in))
 		c.Decrypt(out, tt.in)
@@ -1426,7 +1426,7 @@ func TestDESInitialPermutationKnownAnswer(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESVariableKeyKnownAnswerEncrypt(t *testing.T) {
 	for i, tt := range tableA2Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tableA2Plaintext))
 		c.Encrypt(out, tableA2Plaintext)
@@ -1440,7 +1440,7 @@ func TestDESVariableKeyKnownAnswerEncrypt(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESVariableKeyKnownAnswerDecrypt(t *testing.T) {
 	for i, tt := range tableA2Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tt.out))
 		c.Decrypt(out, tt.out)
@@ -1454,7 +1454,7 @@ func TestDESVariableKeyKnownAnswerDecrypt(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESPermutationOperationKnownAnswerEncrypt(t *testing.T) {
 	for i, tt := range tableA3Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tableA3Plaintext))
 		c.Encrypt(out, tableA3Plaintext)
@@ -1468,7 +1468,7 @@ func TestDESPermutationOperationKnownAnswerEncrypt(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESPermutationOperationKnownAnswerDecrypt(t *testing.T) {
 	for i, tt := range tableA3Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tt.out))
 		c.Decrypt(out, tt.out)
@@ -1482,7 +1482,7 @@ func TestDESPermutationOperationKnownAnswerDecrypt(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESSubstitutionTableKnownAnswerEncrypt(t *testing.T) {
 	for i, tt := range tableA4Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tt.in))
 		c.Encrypt(out, tt.in)
@@ -1496,7 +1496,7 @@ func TestDESSubstitutionTableKnownAnswerEncrypt(t *testing.T) {
 // Defined in Pub 800-20
 func TestDESSubstitutionTableKnownAnswerDecrypt(t *testing.T) {
 	for i, tt := range tableA4Tests {
-		c, _ := commoncrypto.NewTripleDESCipher(tt.key)
+		c, _ := xcrypto.NewTripleDESCipher(tt.key)
 
 		out := make([]byte, len(tt.out))
 		c.Decrypt(out, tt.out)
@@ -1519,7 +1519,7 @@ func TestDESCBCBlobEncryptBasicBlockEncryption(t *testing.T) {
 	key := []byte{0x24, 0xcd, 0x8b, 0x13, 0x37, 0xc5, 0xc1, 0xb1}
 	iv := []byte{0x91, 0xc7, 0xa7, 0x54, 0x52, 0xef, 0x10, 0xdb}
 
-	block, err := commoncrypto.NewDESCipher(key)
+	block, err := xcrypto.NewDESCipher(key)
 	if err != nil {
 		t.Fatalf("expected no error for aes.NewCipher, got: %s", err)
 	}
@@ -1564,7 +1564,7 @@ func TestDESCBCBlobEncryptBasicBlockEncryption(t *testing.T) {
 func TestDESCBCDecryptSimple(t *testing.T) {
 	key := []byte{0x24, 0xcd, 0x8b, 0x13, 0x37, 0xc5, 0xc1, 0xb1}
 
-	block, err := commoncrypto.NewDESCipher(key)
+	block, err := xcrypto.NewDESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1619,7 +1619,7 @@ func TestTripleDESCBCDecryptSimple(t *testing.T) {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	}
 
-	block, err := commoncrypto.NewTripleDESCipher(key)
+	block, err := xcrypto.NewTripleDESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1670,17 +1670,17 @@ func TestTripleDESCBCDecryptSimple(t *testing.T) {
 // Test DES against the general cipher.Block interface tester.
 func TestDESBlock(t *testing.T) {
 	t.Run("DES", func(t *testing.T) {
-		cryptotest.TestBlock(t, 8, commoncrypto.NewDESCipher)
+		cryptotest.TestBlock(t, 8, xcrypto.NewDESCipher)
 	})
 
 	t.Run("TripleDES", func(t *testing.T) {
-		cryptotest.TestBlock(t, 24, commoncrypto.NewTripleDESCipher)
+		cryptotest.TestBlock(t, 24, xcrypto.NewTripleDESCipher)
 	})
 }
 
 func BenchmarkEncrypt(b *testing.B) {
 	tt := encryptDESTests[0]
-	c, err := commoncrypto.NewDESCipher(tt.key)
+	c, err := xcrypto.NewDESCipher(tt.key)
 	if err != nil {
 		b.Fatal("NewCipher:", err)
 	}
@@ -1694,7 +1694,7 @@ func BenchmarkEncrypt(b *testing.B) {
 
 func BenchmarkDecrypt(b *testing.B) {
 	tt := encryptDESTests[0]
-	c, err := commoncrypto.NewDESCipher(tt.key)
+	c, err := xcrypto.NewDESCipher(tt.key)
 	if err != nil {
 		b.Fatal("NewCipher:", err)
 	}
@@ -1708,7 +1708,7 @@ func BenchmarkDecrypt(b *testing.B) {
 
 func BenchmarkTripleDESEncrypt(b *testing.B) {
 	tt := encryptTripleDESTests[0]
-	c, err := commoncrypto.NewTripleDESCipher(tt.key)
+	c, err := xcrypto.NewTripleDESCipher(tt.key)
 	if err != nil {
 		b.Fatal("NewCipher:", err)
 	}
@@ -1722,7 +1722,7 @@ func BenchmarkTripleDESEncrypt(b *testing.B) {
 
 func BenchmarkTripleDESDecrypt(b *testing.B) {
 	tt := encryptTripleDESTests[0]
-	c, err := commoncrypto.NewTripleDESCipher(tt.key)
+	c, err := xcrypto.NewTripleDESCipher(tt.key)
 	if err != nil {
 		b.Fatal("NewCipher:", err)
 	}

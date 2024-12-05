@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package commoncrypto_test
+package xcrypto_test
 
 import (
 	"go/version"

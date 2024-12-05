@@ -3,7 +3,7 @@
 
 //go:build darwin
 
-package commoncrypto
+package xcrypto
 
 // #cgo CFLAGS: -Wno-deprecated-declarations
 import "C"

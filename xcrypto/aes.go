@@ -276,6 +276,14 @@ func NewGCMTLS13(block cipher.Block) (cipher.AEAD, error) {
 	return &aesGCM{key: cipher.key, tls: cipherGCMTLS13}, nil
 }
 
+func (c *aesCipher) NewCBCEncrypter(iv []byte) cipher.BlockMode {
+	return newCBC(C.kCCEncrypt, c.kind, c.key, iv)
+}
+
+func (c *aesCipher) NewCBCDecrypter(iv []byte) cipher.BlockMode {
+	return newCBC(C.kCCDecrypt, c.kind, c.key, iv)
+}
+
 // sliceForAppend is a mirror of crypto/cipher.sliceForAppend.
 func sliceForAppend(in []byte, n int) (head, tail []byte) {
 	if total := len(in) + n; cap(in) >= total {

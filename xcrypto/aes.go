@@ -140,7 +140,7 @@ type noGCM struct {
 	cipher.Block
 }
 
-// NewGCM constructs a generic GCM AEAD cipher.
+// NewGCM constructs a GCM block mode for AES using the cryptokit package
 func (c *aesCipher) NewGCM(nonceSize, tagSize int) (cipher.AEAD, error) {
 	if nonceSize != gcmStandardNonceSize && tagSize != gcmTagSize {
 		return nil, errors.New("crypto/aes: GCM tag and nonce sizes can't be non-standard at the same time")
@@ -258,7 +258,8 @@ func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, er
 	return ret, nil
 }
 
-// NewGCMTLS returns a GCM cipher specific to TLS 1.2.
+// NewGCMTLS returns a GCM cipher specific to TLS
+// and should not be used for non-TLS purposes.
 func NewGCMTLS(block cipher.Block) (cipher.AEAD, error) {
 	cipher, ok := block.(*aesCipher)
 	if !ok {
@@ -267,7 +268,8 @@ func NewGCMTLS(block cipher.Block) (cipher.AEAD, error) {
 	return &aesGCM{key: cipher.key, tls: cipherGCMTLS12}, nil
 }
 
-// NewGCMTLS13 returns a GCM cipher specific to TLS 1.3.
+// NewGCMTLS13 returns a GCM cipher specific to TLS 1.3 and should not be used
+// for non-TLS purposes.
 func NewGCMTLS13(block cipher.Block) (cipher.AEAD, error) {
 	cipher, ok := block.(*aesCipher)
 	if !ok {

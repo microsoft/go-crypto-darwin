@@ -4,13 +4,15 @@
 
 set -e
 
+rm -f internal/cryptokit/CryptoKit.o
+
 cd cryptokit
 
-rm -rf ./*.o .build
+rm -rf .build
 
 echo "Building Swift bindings..."
 xcrun swift build -c release --arch arm64 --arch x86_64
 
-cp .build/apple/Products/Release/CryptoKitSrc.o CryptoKit.o
+cp .build/apple/Products/Release/CryptoKitSrc.o ../internal/cryptokit/CryptoKit.o
 
 echo "Build complete."

@@ -8,7 +8,7 @@ package xcrypto
 import (
 	"hash"
 
-	"github.com/microsoft/go-crypto-darwin/cryptokit"
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 // ExtractHKDF performs the extract step of HKDF using the specified hash function.

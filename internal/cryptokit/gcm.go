@@ -24,13 +24,13 @@ func EncryptAESGCM(key, plaintext, nonce, additionalData, ciphertext, tag []byte
 // DecryptAESGCM performs AES-GCM decryption using Swift.
 func DecryptAESGCM(key, ciphertext, nonce, additionalData, tag, plaintext []byte) (int, int) {
 	var decSize C.size_t
-	err := (C.decryptAESGCM(
+	err := C.decryptAESGCM(
 		base(key), C.size_t(len(key)),
 		base(ciphertext), C.size_t(len(ciphertext)),
 		base(nonce), C.size_t(len(nonce)),
 		base(additionalData), C.size_t(len(additionalData)),
 		base(tag), C.size_t(len(tag)),
 		base(plaintext), &decSize,
-	))
+	)
 	return int(decSize), int(err)
 }

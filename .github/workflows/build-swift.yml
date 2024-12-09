@@ -27,6 +27,6 @@ jobs:
           run: |
             git config --local user.email "action@github.com"
             git config --global user.name "GitHub Actions"
-            git add cryptokit/CryptoKit.o
+            git add internal/cryptokit/CryptoKit.o
             git commit -m "Update CryptoKit Object file"
             git push

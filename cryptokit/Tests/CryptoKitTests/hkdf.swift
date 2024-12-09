@@ -2,17 +2,17 @@
 // Licensed under the MIT License.
 
 import XCTest
+
 @testable import CryptoKitSrc
 
-class HKDFTests: XCTestCase {
-
+final class HKDFTests: XCTestCase {
     func testExtractHKDF_SHA256() {
         let secret = "TestSecret".data(using: .utf8)!
         let salt = "TestSalt".data(using: .utf8)!
-        var prk = [UInt8](repeating: 0, count: 32) // Expected size for SHA256 PRK
+        var prk = [UInt8](repeating: 0, count: 32)  // Expected size for SHA256 PRK
 
         let result = extractHKDF(
-            hashFunction: 2, // SHA256
+            hashFunction: 2,  // SHA256
             secretPointer: Array(secret),
             secretLength: secret.count,
             saltPointer: Array(salt),
@@ -31,7 +31,7 @@ class HKDFTests: XCTestCase {
         var prk = [UInt8](repeating: 0, count: 32)
 
         let result = extractHKDF(
-            hashFunction: 0, // Unsupported hash function
+            hashFunction: 0,  // Unsupported hash function
             secretPointer: Array(secret),
             secretLength: secret.count,
             saltPointer: Array(salt),
@@ -44,12 +44,12 @@ class HKDFTests: XCTestCase {
     }
 
     func testExpandHKDF_SHA512() {
-        let prk = Data(repeating: 0xAA, count: 64) // Mocked PRK for SHA512
+        let prk = Data(repeating: 0xAA, count: 64)  // Mocked PRK for SHA512
         let info = "TestInfo".data(using: .utf8)!
-        var derivedKey = [UInt8](repeating: 0, count: 64) // Derived key size
+        var derivedKey = [UInt8](repeating: 0, count: 64)  // Derived key size
 
         let result = expandHKDF(
-            hashFunction: 4, // SHA512
+            hashFunction: 4,  // SHA512
             prkPointer: Array(prk),
             prkLength: prk.count,
             infoPointer: Array(info),
@@ -68,7 +68,7 @@ class HKDFTests: XCTestCase {
         var derivedKey = [UInt8](repeating: 0, count: 32)
 
         let result = expandHKDF(
-            hashFunction: 0, // Unsupported hash function
+            hashFunction: 0,  // Unsupported hash function
             prkPointer: Array(prk),
             prkLength: prk.count,
             infoPointer: Array(info),

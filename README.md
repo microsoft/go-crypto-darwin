@@ -2,7 +2,7 @@
 
 The `xcypto` package implements Go crypto primitives on macOS using [CommonCrypto](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/Common%20Crypto.3cc.html) and [CryptoKit](https://developer.apple.com/documentation/cryptokit). When configured correctly, CommonCrypto can be executed in FIPS mode, making the `xcypto` package FIPS compliant.
 
-The packages are designed to be used as a drop-in replacement for the [boring](https://pkg.go.dev/crypto/internal/borings) package in order to facilitate integrating commoncrypto inside a forked Go toolchain.
+The package is designed to be used as a drop-in replacement for the [boring](https://pkg.go.dev/crypto/internal/borings) package in order to facilitate integrating commoncrypto inside a forked Go toolchain.
 
 Visit the [FIPS documentation in the microsoft/go repository](https://github.com/microsoft/go/tree/microsoft/main/eng/doc/fips) for more information about FIPS, enabling FIPS mode, and writing a FIPS compliant Go application.
 
@@ -12,7 +12,7 @@ A program directly or indirectly using this package in FIPS mode can claim it is
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
@@ -26,8 +26,8 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 ## Trademarks
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
+trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.

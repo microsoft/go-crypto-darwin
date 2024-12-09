@@ -7,9 +7,12 @@ import Foundation
 @_cdecl("extractHKDF")
 public func extractHKDF(
     hashFunction: Int32,
-    secretPointer: UnsafePointer<UInt8>, secretLength: Int,
-    saltPointer: UnsafePointer<UInt8>, saltLength: Int,
-    prkPointer: UnsafeMutablePointer<UInt8>, prkLength: Int
+    secretPointer: UnsafePointer<UInt8>,
+    secretLength: Int,
+    saltPointer: UnsafePointer<UInt8>,
+    saltLength: Int,
+    prkPointer: UnsafeMutablePointer<UInt8>,
+    prkLength: Int
 ) -> Int {
     // Convert input pointers to Data
     let secretData: SymmetricKey = SymmetricKey(data: Data(bytes: secretPointer, count: secretLength))
@@ -39,7 +42,7 @@ public func extractHKDF(
             salt: saltData
         )
     default:
-        return -1 // Unsupported hash function
+        return -1  // Unsupported hash function
     }
 
     // Convert prk to Data
@@ -53,9 +56,12 @@ public func extractHKDF(
 @_cdecl("expandHKDF")
 public func expandHKDF(
     hashFunction: Int32,
-    prkPointer: UnsafePointer<UInt8>, prkLength: Int,
-    infoPointer: UnsafePointer<UInt8>, infoLength: Int,
-    derivedKeyPointer: UnsafeMutablePointer<UInt8>, derivedKeyLength: Int
+    prkPointer: UnsafePointer<UInt8>,
+    prkLength: Int,
+    infoPointer: UnsafePointer<UInt8>,
+    infoLength: Int,
+    derivedKeyPointer: UnsafeMutablePointer<UInt8>,
+    derivedKeyLength: Int
 ) -> Int {
     // Convert input pointers to Data
     let prkData: SymmetricKey = SymmetricKey(data: Data(bytes: prkPointer, count: prkLength))
@@ -89,7 +95,7 @@ public func expandHKDF(
             outputByteCount: derivedKeyLength
         )
     default:
-        return -1 // Unsupported hash function
+        return -1  // Unsupported hash function
     }
 
     // Convert derivedKey to Data

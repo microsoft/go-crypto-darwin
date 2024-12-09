@@ -1,6 +1,6 @@
 # Go macOS Crypto bindings for FIPS compliance
 
-The `commoncrypto` and `cryptokit` packages implements Go crypto primitives on macOS using [CommonCrypto](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/Common%20Crypto.3cc.html) and[CryptoKit](https://developer.apple.com/documentation/cryptokit). When configured correctly, CommonCrypto can be executed in FIPS mode, making the `commoncrypto` package FIPS compliant.
+The `xcypto` package implements Go crypto primitives on macOS using [CommonCrypto](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/Common%20Crypto.3cc.html) and[CryptoKit](https://developer.apple.com/documentation/cryptokit). When configured correctly, CommonCrypto can be executed in FIPS mode, making the `xcypto` package FIPS compliant.
 
 The packages are designed to be used as a drop-in replacement for the [boring](https://pkg.go.dev/crypto/internal/borings) package in order to facilitate integrating commoncrypto inside a forked Go toolchain.
 

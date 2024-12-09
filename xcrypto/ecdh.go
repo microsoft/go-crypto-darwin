@@ -124,6 +124,7 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	}
 	bytes, err := extractPrivateComponent(privKeyDER, keySize)
 	if err != nil {
+		C.CFRelease(C.CFTypeRef(privKeyRef))
 		return nil, nil, err
 	}
 	k := &PrivateKeyECDH{privKeyRef}

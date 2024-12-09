@@ -22,7 +22,8 @@ func GenerateKeyRSA(bits int) (N, E, D, P, Q, Dp, Dq, Qinv BigInt, err error) {
 		return nil, nil, nil, nil, nil, nil, nil, nil, e
 	}
 
-	privKeyDER, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
+	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 	if err != nil {
 		return bad(err)
 	}

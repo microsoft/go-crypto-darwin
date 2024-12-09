@@ -259,7 +259,7 @@ func cfRelease(ref unsafe.Pointer) {
 func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*C.SecKeyRef, error) {
 	encodedKeyCF := C.CFDataCreate(C.kCFAllocatorDefault, base(encodedKey), C.CFIndex(len(encodedKey)))
 	if encodedKeyCF == 0 {
-		return nil, errors.New("crypto/ecdsa: failed to create CFData for private key")
+		return nil, errors.New("xcrypto: failed to create CFData for private key")
 	}
 	defer C.CFRelease(C.CFTypeRef(encodedKeyCF))
 
@@ -283,7 +283,7 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*
 		nil,
 	)
 	if attrDict == 0 {
-		return nil, errors.New("crypto/rsa: failed to create attributes dictionary")
+		return nil, errors.New("xcrypto: failed to create attributes dictionary")
 	}
 	defer C.CFRelease(C.CFTypeRef(attrDict))
 
@@ -297,10 +297,10 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*
 }
 
 // createSecKeyRandom creates a new SecKey with the provided attributes dictionary.
-func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, error) {
+func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, C.SecKeyRef, error) {
 	keyAttrs := C.CFDictionaryCreateMutable(C.kCFAllocatorDefault, 0, nil, nil)
 	if keyAttrs == 0 {
-		return nil, errors.New("failed to create key attributes dictionary")
+		return nil, 0, errors.New("failed to create key attributes dictionary")
 	}
 	defer C.CFRelease(C.CFTypeRef(keyAttrs))
 
@@ -320,20 +320,19 @@ func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, error) {
 	var errorRef C.CFErrorRef
 	var privKeyRef C.SecKeyRef = C.SecKeyCreateRandomKey(C.CFDictionaryRef(keyAttrs), &errorRef)
 	if goCFErrorRef(errorRef) != nil {
-		return nil, goCFErrorRef(errorRef)
+		return nil, 0, goCFErrorRef(errorRef)
 	}
-	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 
 	// Export the private key as DER
 	privData := C.SecKeyCopyExternalRepresentation(privKeyRef, &errorRef)
 	if goCFErrorRef(errorRef) != nil {
-		return nil, goCFErrorRef(errorRef)
+		return nil, 0, goCFErrorRef(errorRef)
 	}
 	defer C.CFRelease(C.CFTypeRef(privData))
 
 	privKeyDER := cfDataToBytes(privData)
 	if privKeyDER == nil {
-		return nil, errors.New("failed to convert CFData to bytes")
+		return nil, 0, errors.New("failed to convert CFData to bytes")
 	}
-	return privKeyDER, nil
+	return privKeyDER, privKeyRef, nil
 }

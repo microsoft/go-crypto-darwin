@@ -22,10 +22,11 @@ func GenerateKeyRSA(bits int) (N, E, D, P, Q, Dp, Dq, Qinv BigInt, err error) {
 		return nil, nil, nil, nil, nil, nil, nil, nil, e
 	}
 
-	privKeyDER, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
 	if err != nil {
 		return bad(err)
 	}
+	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 
 	var parsedKey pkcs1PrivateKey
 	_, err = asn1.Unmarshal(privKeyDER, &parsedKey)

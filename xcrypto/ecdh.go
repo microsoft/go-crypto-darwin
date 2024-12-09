@@ -44,9 +44,9 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 	if err != nil {
 		return nil, err
 	}
-	k := &PublicKeyECDH{*pubKeyRef, slices.Clone(bytes)}
-	runtime.SetFinalizer(k, (*PublicKeyECDH).finalize)
-	return k, nil
+	pubKey := &PublicKeyECDH{*pubKeyRef, slices.Clone(bytes)}
+	runtime.SetFinalizer(pubKey, (*PublicKeyECDH).finalize)
+	return pubKey, nil
 }
 
 func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
@@ -60,9 +60,9 @@ func NewPrivateKeyECDH(curve string, bytes []byte) (*PrivateKeyECDH, error) {
 	if err != nil {
 		return nil, err
 	}
-	k := &PrivateKeyECDH{*privKeyRef}
-	runtime.SetFinalizer(k, (*PrivateKeyECDH).finalize)
-	return k, nil
+	privKey := &PrivateKeyECDH{*privKeyRef}
+	runtime.SetFinalizer(privKey, (*PrivateKeyECDH).finalize)
+	return privKey, nil
 }
 
 func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
@@ -71,17 +71,12 @@ func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
 	if pubKeyRef == 0 {
 		return nil, errors.New("failed to extract public key")
 	}
-
 	pubBytes, err := getEncodedECDHPublicKey(pubKeyRef)
 	if err != nil {
 		C.CFRelease(C.CFTypeRef(pubKeyRef))
 		return nil, err
 	}
-
-	pubKey := &PublicKeyECDH{
-		_pkey: pubKeyRef,
-		bytes: pubBytes,
-	}
+	pubKey := &PublicKeyECDH{pubKeyRef, pubBytes}
 	runtime.SetFinalizer(pubKey, (*PublicKeyECDH).finalize)
 	return pubKey, nil
 }
@@ -98,7 +93,6 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	}
 
 	var cfErr C.CFErrorRef
-
 	// Perform the key exchange
 	sharedSecretRef := C.SecKeyCopyKeyExchangeResult(
 		priv._pkey,
@@ -123,18 +117,15 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	}
 
 	keySizeInBits := curveToKeySizeInBits(curve)
-
 	// Generate the private key and get its DER representation
 	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, err
 	}
-
 	bytes, err := extractPrivateComponent(privKeyDER, keySize)
 	if err != nil {
 		return nil, nil, err
 	}
-
 	k := &PrivateKeyECDH{privKeyRef}
 	runtime.SetFinalizer(k, (*PrivateKeyECDH).finalize)
 	return k, bytes, nil
@@ -146,7 +137,6 @@ func getEncodedECDHPublicKey(key C.SecKeyRef) ([]byte, error) {
 		return nil, errors.New("xcrypto: failed to encode public key")
 	}
 	defer C.CFRelease(C.CFTypeRef(pubDataRef))
-
 	pubBytes := cfDataToBytes(pubDataRef)
 	return pubBytes, nil
 }
@@ -157,19 +147,16 @@ func extractPrivateComponent(der []byte, keySize int) ([]byte, error) {
 	if len(der) < keySize*3 {
 		return nil, errors.New("invalid key length: insufficient data for private component")
 	}
-
 	// Extract the private component
 	privateComponent := der[keySize*2 : keySize*3]
-
 	return privateComponent, nil
 }
 
 func encodePrivateComponent(privateComponent []byte, curve string) ([]byte, error) {
 	keySize := curveToKeySizeInBytes(curve)
 	if len(privateComponent) != keySize {
-		return nil, errors.New("invalid key length: private component size does not match key size")
+		return nil, errors.New("invalid key length: private component size does not match expected key size for the given curve")
 	}
-
 	// generate public key from privateComponent
 	var p elliptic.Curve
 	switch curve {
@@ -189,6 +176,5 @@ func encodePrivateComponent(privateComponent []byte, curve string) ([]byte, erro
 	if err != nil {
 		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
 	}
-
 	return encodedKey, nil
 }

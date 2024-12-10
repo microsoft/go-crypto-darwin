@@ -9,42 +9,20 @@ package xcrypto
 import "C"
 import (
 	"crypto"
-	"encoding/asn1"
-	"errors"
 	"hash"
 	"runtime"
 	"strconv"
 )
 
 // GenerateKeyRSA generates an RSA key pair on macOS.
-func GenerateKeyRSA(bits int) (N, E, D, P, Q, Dp, Dq, Qinv BigInt, err error) {
-	bad := func(e error) (N, E, D, P, Q, Dp, Dq, Qinv BigInt, err error) {
-		return nil, nil, nil, nil, nil, nil, nil, nil, e
-	}
-
+// asn1Data is encoded as PKCS#1 ASN1 DER.
+func GenerateKeyRSA(bits int) (asn1Data []byte, err error) {
 	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
 	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 	if err != nil {
-		return bad(err)
+		return nil, err
 	}
-
-	var parsedKey pkcs1PrivateKey
-	_, err = asn1.Unmarshal(privKeyDER, &parsedKey)
-	if err != nil {
-		return bad(err)
-	}
-
-	// Assign values
-	N = parsedKey.Modulus
-	E = parsedKey.PublicExponent
-	D = parsedKey.PrivateExponent
-	P = parsedKey.Prime1
-	Q = parsedKey.Prime2
-	Dp = parsedKey.Exponent1
-	Dq = parsedKey.Exponent2
-	Qinv = parsedKey.Coefficient
-
-	return
+	return privKeyDER, nil
 }
 
 type PublicKeyRSA struct {
@@ -58,26 +36,13 @@ func (k *PublicKeyRSA) finalize() {
 	}
 }
 
-func NewPublicKeyRSA(N, E BigInt) (*PublicKeyRSA, error) {
-	// Construct ASN.1 DER encoding for the public key
-	type RSAPublicKey struct {
-		Modulus  BigInt
-		Exponent BigInt
-	}
-	asn1Data, err := asn1.Marshal(RSAPublicKey{
-		Modulus:  N,
-		Exponent: E,
-	})
-	if err != nil {
-		return nil, errors.New("crypto/rsa: failed to encode public key: " + err.Error())
-	}
-
+// NewPublicKeyRSA creates a new RSA public key from ASN1 DER encoded data.
+func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
 	pubKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create and return the PublicKeyRSA object
 	key := &PublicKeyRSA{_pkey: *pubKeyRef}
 	runtime.SetFinalizer(key, (*PublicKeyRSA).finalize)
 	return key, nil
@@ -96,48 +61,19 @@ type PrivateKeyRSA struct {
 	_pkey C.SecKeyRef
 }
 
-// Construct ASN.1 DER encoding for the private key
-type pkcs1PrivateKey struct {
-	Version         int
-	Modulus         BigInt
-	PublicExponent  BigInt
-	PrivateExponent BigInt
-	Prime1          BigInt
-	Prime2          BigInt
-	Exponent1       BigInt
-	Exponent2       BigInt
-	Coefficient     BigInt
-}
-
 func (k *PrivateKeyRSA) finalize() {
 	if k._pkey != 0 {
 		C.CFRelease(C.CFTypeRef(k._pkey))
 	}
 }
 
-func NewPrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv BigInt) (*PrivateKeyRSA, error) {
-	// Marshal ASN.1 data for the RSA private key
-	asn1Data, err := asn1.Marshal(pkcs1PrivateKey{
-		Version:         0, // PKCS#1 specifies version 0 for RSA private keys
-		Modulus:         N,
-		PublicExponent:  E,
-		PrivateExponent: D,
-		Prime1:          P,
-		Prime2:          Q,
-		Exponent1:       Dp,
-		Exponent2:       Dq,
-		Coefficient:     Qinv,
-	})
-	if err != nil {
-		return nil, errors.New("crypto/rsa: failed to encode private key: " + err.Error())
-	}
-
+// NewPrivateKeyRSA creates a new RSA private key from ASN1 DER encoded data.
+func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 	privKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create and return the PrivateKeyRSA object
 	key := &PrivateKeyRSA{_pkey: *privKeyRef}
 	runtime.SetFinalizer(key, (*PrivateKeyRSA).finalize)
 	return key, nil

@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/rsa"
+	"encoding/asn1"
 	"math/big"
 	"strconv"
 	"testing"
@@ -19,7 +20,7 @@ func TestRSAKeyGeneration(t *testing.T) {
 	for _, size := range []int{2048, 3072} {
 		t.Run(strconv.Itoa(size), func(t *testing.T) {
 			t.Parallel()
-			_, _, _, _, _, _, _, _, err := xcrypto.GenerateKeyRSA(size)
+			_, err := xcrypto.GenerateKeyRSA(size)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -197,41 +198,99 @@ func TestRSASignVerifyRSAPSS(t *testing.T) {
 	}
 }
 
+type pkcs1PrivateKey struct {
+	Version         int
+	Modulus         *big.Int
+	PublicExponent  int
+	PrivateExponent *big.Int
+	Prime1          *big.Int
+	Prime2          *big.Int
+	Exponent1       *big.Int
+	Exponent2       *big.Int
+	Coefficient     *big.Int
+}
+
+type pkcs1PublicKey struct {
+	Modulus  *big.Int
+	Exponent int
+}
+
 func newRSAKey(t *testing.T, size int) (*xcrypto.PrivateKeyRSA, *xcrypto.PublicKeyRSA) {
 	t.Helper()
-	N, E, D, P, Q, Dp, Dq, Qinv, err := xcrypto.GenerateKeyRSA(size)
+	privKeyDER, err := xcrypto.GenerateKeyRSA(size)
 	if err != nil {
 		t.Fatalf("GenerateKeyRSA(%d): %v", size, err)
 	}
-	return newRSAKeyFromParams(t, N, E, D, P, Q, Dp, Dq, Qinv)
-}
+	var parsedKey pkcs1PrivateKey
+	_, err = asn1.Unmarshal(privKeyDER, &parsedKey)
+	if err != nil {
+		t.Fatalf("asn1.Unmarshal: %v", err)
+	}
+	// Assign values
+	N := parsedKey.Modulus
+	E := parsedKey.PublicExponent
+	D := parsedKey.PrivateExponent
+	P := parsedKey.Prime1
+	Q := parsedKey.Prime2
+	Dp := parsedKey.Exponent1
+	Dq := parsedKey.Exponent2
+	Qinv := parsedKey.Coefficient
 
-func newRSAKeyFromParams(t *testing.T, N, E, D, P, Q, Dp, Dq, Qinv xcrypto.BigInt) (*xcrypto.PrivateKeyRSA, *xcrypto.PublicKeyRSA) {
-	t.Helper()
-	priv, err := xcrypto.NewPrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv)
+	pk := rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
+			N: bbig.Dec(N),
+			E: E,
+		},
+		D:      bbig.Dec(D),
+		Primes: []*big.Int{bbig.Dec(P), bbig.Dec(Q)},
+		Precomputed: rsa.PrecomputedValues{
+			Dp:   bbig.Dec(Dp),
+			Dq:   bbig.Dec(Dq),
+			Qinv: bbig.Dec(Qinv),
+		},
+	}
+	// Verify the key
+	if err := pk.Validate(); err != nil {
+		t.Fatalf("rsa.PrivateKey.Validate: %v", err)
+	}
+	priv, err := xcrypto.NewPrivateKeyRSA(privKeyDER)
 	if err != nil {
 		t.Fatalf("NewPrivateKeyRSA: %v", err)
 	}
-	pub, err := xcrypto.NewPublicKeyRSA(N, E)
+	asn1Data, err := asn1.Marshal(pkcs1PublicKey{
+		Modulus:  N,
+		Exponent: E,
+	})
+	if err != nil {
+		t.Fatalf("asn1.Marshal: %v", err)
+	}
+	pub, err := xcrypto.NewPublicKeyRSA(asn1Data)
 	if err != nil {
 		t.Fatalf("NewPublicKeyRSA: %v", err)
 	}
 	return priv, pub
 }
 
-func fromBase36(base36 string) *big.Int {
-	i, ok := new(big.Int).SetString(base36, 36)
-	if !ok {
-		panic("bad number: " + base36)
-	}
-	return i
-}
-
 func BenchmarkEncryptRSAPKCS1(b *testing.B) {
 	b.StopTimer()
 	// Public key length should be at least of 2048 bits, else OpenSSL will report an error when running in FIPS mode.
-	n := fromBase36("14314132931241006650998084889274020608918049032671858325988396851334124245188214251956198731333464217832226406088020736932173064754214329009979944037640912127943488972644697423190955557435910767690712778463524983667852819010259499695177313115447116110358524558307947613422897787329221478860907963827160223559690523660574329011927531289655711860504630573766609239332569210831325633840174683944553667352219670930408593321661375473885147973879086994006440025257225431977751512374815915392249179976902953721486040787792801849818254465486633791826766873076617116727073077821584676715609985777563958286637185868165868520557")
-	test2048PubKey, err := xcrypto.NewPublicKeyRSA(bbig.Enc(n), bbig.Enc(big.NewInt(3)))
+	pkey, err := xcrypto.GenerateKeyRSA(2048)
+	if err != nil {
+		b.Fatal(err)
+	}
+	var parsedKey pkcs1PrivateKey
+	_, err = asn1.Unmarshal(pkey, &parsedKey)
+	if err != nil {
+		b.Fatalf("asn1.Unmarshal: %v", err)
+	}
+	encodedKey, err := asn1.Marshal(pkcs1PublicKey{
+		Modulus:  parsedKey.Modulus,
+		Exponent: parsedKey.PublicExponent,
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+	test2048PubKey, err := xcrypto.NewPublicKeyRSA(encodedKey)
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -247,7 +306,7 @@ func BenchmarkEncryptRSAPKCS1(b *testing.B) {
 func BenchmarkGenerateKeyRSA(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_, _, _, _, _, _, _, _, err := xcrypto.GenerateKeyRSA(2048)
+		_, err := xcrypto.GenerateKeyRSA(2048)
 		if err != nil {
 			b.Fatal(err)
 		}

@@ -1,11 +1,15 @@
 {
-    "go.useLanguageServer": true,
-    "go.vetFlags": [
-      "-unsafeptr=false"
-    ],
-    "gopls": {
-      "analyses": {
-        "unsafeptr": false
-      }
+  "go.useLanguageServer": true,
+  "go.vetFlags": [
+    "-unsafeptr=false"
+  ],
+  "gopls": {
+    "analyses": {
+      "unsafeptr": false
     }
+  },
+  "editor.formatOnSave": true,
+  "[swift]": {
+    "editor.defaultFormatter": "vknabel.vscode-apple-swift-format",
+  },
 }

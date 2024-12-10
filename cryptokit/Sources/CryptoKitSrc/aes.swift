@@ -6,22 +6,32 @@ import Foundation
 
 @_cdecl("encryptAESGCM")
 public func encryptAESGCM(
-    keyPointer: UnsafePointer<UInt8>, keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>, dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>, nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>, aadLength: Int,
-    cipherTextPointer: UnsafeMutablePointer<UInt8>, cipherTextLength: Int,
+    keyPointer: UnsafePointer<UInt8>,
+    keyLength: Int,
+    dataPointer: UnsafePointer<UInt8>,
+    dataLength: Int,
+    noncePointer: UnsafePointer<UInt8>,
+    nonceLength: Int,
+    aadPointer: UnsafePointer<UInt8>,
+    aadLength: Int,
+    cipherTextPointer: UnsafeMutablePointer<UInt8>,
+    cipherTextLength: Int,
     tagPointer: UnsafeMutablePointer<UInt8>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let data = Data(bytes: dataPointer, count: dataLength)
     let nonce = try! AES.GCM.Nonce(data: Data(bytes: noncePointer, count: nonceLength))
-    
+
     let symmetricKey = SymmetricKey(data: keyData)
     let aad: Data = Data(bytes: aadPointer, count: aadLength)
-    
+
     do {
-        let sealedBox: AES.GCM.SealedBox = try AES.GCM.seal(data, using: symmetricKey, nonce: nonce, authenticating: aad)
+        let sealedBox: AES.GCM.SealedBox = try AES.GCM.seal(
+            data,
+            using: symmetricKey,
+            nonce: nonce,
+            authenticating: aad
+        )
         let result = sealedBox.ciphertext
         result.copyBytes(to: cipherTextPointer, count: result.count)
         let resultTag = Data(sealedBox.tag)
@@ -35,12 +45,18 @@ public func encryptAESGCM(
 
 @_cdecl("decryptAESGCM")
 public func decryptAESGCM(
-    keyPointer: UnsafePointer<UInt8>, keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>, dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>, nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>, aadLength: Int,
-    tagPointer: UnsafePointer<UInt8>, tagLength: Int,
-    outPointer: UnsafeMutablePointer<UInt8>, outLength: UnsafeMutablePointer<Int>
+    keyPointer: UnsafePointer<UInt8>,
+    keyLength: Int,
+    dataPointer: UnsafePointer<UInt8>,
+    dataLength: Int,
+    noncePointer: UnsafePointer<UInt8>,
+    nonceLength: Int,
+    aadPointer: UnsafePointer<UInt8>,
+    aadLength: Int,
+    tagPointer: UnsafePointer<UInt8>,
+    tagLength: Int,
+    outPointer: UnsafeMutablePointer<UInt8>,
+    outLength: UnsafeMutablePointer<Int>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let nonceData = Data(bytes: noncePointer, count: nonceLength)

@@ -9,15 +9,15 @@ let package = Package(
         .macOS(.v11)
     ],
     products: [
-        .library(name: "CryptoKitSrc", type: .static, targets: ["CryptoKitSrc"]),
+        .library(name: "CryptoKitSrc", type: .static, targets: ["CryptoKitSrc"])
     ],
     targets: [
         .target(
             name: "CryptoKitSrc"
         ),
-        .testTarget (
+        .testTarget(
             name: "CryptoKitTests",
             dependencies: ["CryptoKitSrc"]
-        )
+        ),
     ]
 )

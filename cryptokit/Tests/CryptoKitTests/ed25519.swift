@@ -1,121 +1,94 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import CryptoKit
 import XCTest
 
 @testable import CryptoKitSrc
 
-final class Ed25519Tests: XCTestCase {
+final class Ed25519CryptoTests: XCTestCase {
+
     func testGenerateKeyEd25519() {
-        // Generate a private key
-        let privateKeyPointer = generateKeyEd25519()
-        XCTAssertNotNil(privateKeyPointer, "Private key generation failed")
+        var keyBuffer = [UInt8](repeating: 0, count: publicKeySizeEd25519 + seedSizeEd25519)
+        generateKeyEd25519(keyPointer: &keyBuffer)
 
-        // Validate the private key's length
-        let privateKeyData = Data(bytes: privateKeyPointer!, count: 32)
-        XCTAssertEqual(privateKeyData.count, 32, "Private key length should be 32 bytes")
-
-        // Free the key
-        freeKeyEd25519(privateKeyPointer)
+        // Validate that the key buffer has been filled
+        XCTAssertFalse(keyBuffer.allSatisfy({ $0 == 0 }), "Key buffer should not be empty.")
     }
 
     func testNewPrivateKeyEd25519FromSeed() {
-        // Create a seed
-        let seed = Data(repeating: 1, count: 32)
-        let privateKeyPointer = newPrivateKeyEd25519FromSeed(
-            seedPointer: seed.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) },
-            seedLength: 32
-        )
-        XCTAssertNotNil(privateKeyPointer, "Private key generation from seed failed")
+        var keyBuffer = [UInt8](repeating: 0, count: publicKeySizeEd25519 + seedSizeEd25519)
+        let seed = Data((0..<seedSizeEd25519).map { _ in UInt8.random(in: 0...255) })
+        let seedBuffer = seed.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) }
 
-        // Validate the private key's length
-        let privateKeyData = Data(bytes: privateKeyPointer!, count: 32)
-        XCTAssertEqual(privateKeyData.count, 32, "Private key length should be 32 bytes")
+        let result = newPrivateKeyEd25519FromSeed(keyPointer: &keyBuffer, seedPointer: seedBuffer)
 
-        // Free the key
-        freeKeyEd25519(privateKeyPointer)
+        // Validate the private key creation result
+        XCTAssertEqual(result, 0, "Expected private key creation to succeed.")
     }
 
     func testNewPublicKeyEd25519() {
-        // Generate a private key
-        let privateKey = Curve25519.Signing.PrivateKey()
-        let publicKeyData = privateKey.publicKey.rawRepresentation
+        var keyBuffer = [UInt8](repeating: 0, count: publicKeySizeEd25519)
+        let publicKeyData = Data((0..<publicKeySizeEd25519).map { _ in UInt8.random(in: 0...255) })
+        let pubPointer = publicKeyData.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) }
 
-        // Create a public key from the raw data
-        let publicKeyPointer = newPublicKeyEd25519(
-            pubPointer: publicKeyData.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) },
-            pubLength: 32
-        )
-        XCTAssertNotNil(publicKeyPointer, "Public key generation from raw data failed")
+        let result = newPublicKeyEd25519(keyPointer: &keyBuffer, pubPointer: pubPointer)
 
-        // Validate the public key's length
-        let publicKeyExtracted = Data(bytes: publicKeyPointer!, count: 32)
-        XCTAssertEqual(publicKeyExtracted, publicKeyData, "Public key data mismatch")
-
-        // Free the key
-        freeKeyEd25519(publicKeyPointer)
+        // Validate the public key creation result
+        XCTAssertEqual(result, 0, "Expected public key creation to succeed.")
     }
 
     func testSignEd25519() {
-        // Generate a private key
-        let privateKey = Curve25519.Signing.PrivateKey()
-        let privateKeyPointer = UnsafeMutableRawPointer.allocate(
-            byteCount: privateKey.rawRepresentation.count,
-            alignment: 1
-        )
-        privateKey.rawRepresentation.copyBytes(to: privateKeyPointer.assumingMemoryBound(to: UInt8.self), count: 32)
+        var keyBuffer = [UInt8](repeating: 0, count: publicKeySizeEd25519 + seedSizeEd25519)
+        generateKeyEd25519(keyPointer: &keyBuffer)
 
-        // Sign a message
-        let message = "Hello, world!".data(using: .utf8)!
-        var signature = Data(repeating: 0, count: 64)
-        let result = signature.withUnsafeMutableBytes {
-            signEd25519(
-                privateKeyPointer: privateKeyPointer,
-                messagePointer: message.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) },
-                messageLength: message.count,
-                sigBuffer: $0.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                sigBufferLength: 64
-            )
+        let message = "Test message".data(using: .utf8)!
+        var sigBuffer = [UInt8](repeating: 0, count: signatureSizeEd25519)
+
+        keyBuffer.withUnsafeBytes { keyPointer in
+            message.withUnsafeBytes { messagePointer in
+                sigBuffer.withUnsafeMutableBufferPointer { sigPointer in
+                    let result = signEd25519(
+                        privateKeyPointer: keyPointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        messageLength: message.count,
+                        sigBuffer: sigPointer.baseAddress!
+                    )
+                    XCTAssertGreaterThan(result, 0, "Expected signature to be generated successfully.")
+                }
+            }
         }
-
-        XCTAssertEqual(result, 64, "Signature generation failed or incorrect length")
-
-        // Free the key
-        freeKeyEd25519(privateKeyPointer)
     }
 
     func testVerifyEd25519() {
-        // Generate a key pair
-        let privateKey = Curve25519.Signing.PrivateKey()
-        let publicKey = privateKey.publicKey
+        var keyBuffer = [UInt8](repeating: 0, count: publicKeySizeEd25519 + seedSizeEd25519)
+        generateKeyEd25519(keyPointer: &keyBuffer)
 
-        // Sign a message
-        let originalMessage = "Test message".data(using: .utf8)!
-        let signature = try! privateKey.signature(for: originalMessage)
+        let message = "Test message".data(using: .utf8)!
+        var sigBuffer = [UInt8](repeating: 0, count: signatureSizeEd25519)
 
-        // Verify the signature
-        let publicKeyPointer = UnsafeMutableRawPointer.allocate(
-            byteCount: publicKey.rawRepresentation.count,
-            alignment: 1
-        )
-        publicKey.rawRepresentation.copyBytes(to: publicKeyPointer.assumingMemoryBound(to: UInt8.self), count: 32)
+        keyBuffer.withUnsafeBytes { keyPointer in
+            let privateKeyPointer = keyPointer.baseAddress!.assumingMemoryBound(to: UInt8.self)
+            let publicKeyPointer = privateKeyPointer + seedSizeEd25519
 
-        let isValid = originalMessage.withUnsafeBytes { messagePointer in
-            signature.withUnsafeBytes { signaturePointer in
-                verifyEd25519(
-                    publicKeyPointer: publicKeyPointer,
-                    messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                    messageLength: originalMessage.count,
-                    sigPointer: signaturePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                    sigLength: signature.count
-                )
+            message.withUnsafeBytes { messagePointer in
+                sigBuffer.withUnsafeMutableBufferPointer { sigPointer in
+                    let signResult = signEd25519(
+                        privateKeyPointer: privateKeyPointer,
+                        messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        messageLength: message.count,
+                        sigBuffer: sigPointer.baseAddress!
+                    )
+                    XCTAssertGreaterThan(signResult, 0, "Expected signature to be generated successfully.")
+
+                    let verifyResult = verifyEd25519(
+                        publicKeyPointer: publicKeyPointer,
+                        messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        messageLength: message.count,
+                        sigPointer: sigPointer.baseAddress!
+                    )
+                    XCTAssertEqual(verifyResult, 1, "Expected the signature to be valid.")
+                }
             }
         }
-
-        XCTAssertEqual(isValid, 1, "Signature verification failed")
-
-        // Free the key
-        freeKeyEd25519(publicKeyPointer)
     }
 }

@@ -13,42 +13,28 @@ import (
 
 func TestNewKeyFromSeedEd25519(t *testing.T) {
 	seed := bytes.Repeat([]byte{0x01}, ed25519.SeedSize)
-	priv, err := xcrypto.NewPrivateKeyEd25519FromSeed(seed)
-	if err != nil {
-		t.Fatal(err)
-	}
-	data, err := priv.Bytes()
+	data, err := xcrypto.NewPrivateKeyEd25519FromSeed(seed)
 	if err != nil {
 		t.Fatal(err)
 	}
 	priv2 := ed25519.NewKeyFromSeed(seed)
 	if !bytes.Equal(data, []byte(priv2)) {
-		t.Errorf("private key mismatch")
+		t.Errorf("private key mismatch got %x want %x", data, priv2)
 	}
 }
 
 func TestEd25519SignVerify(t *testing.T) {
-	private, err := xcrypto.GenerateKeyEd25519()
-	if err != nil {
-		t.Fatal(err)
-	}
-	public, err := private.Public()
-	if err != nil {
-		t.Fatal(err)
-	}
+	private := xcrypto.GenerateKeyEd25519()
+	public := private.Public()
 	message := []byte("test message")
 	sig, err := xcrypto.SignEd25519(private, message)
-	if err != nil {
-		t.Fatal(err)
-	}
-	privData, err := private.Bytes()
 	if err != nil {
 		t.Fatal(err)
 	}
 	if xcrypto.VerifyEd25519(public, message, sig) != nil {
 		t.Errorf("valid signature rejected")
 	}
-	if ed25519.Verify(privData[32:], message, sig) != true {
+	if ed25519.Verify(ed25519.PublicKey(public), message, sig) != true {
 		t.Errorf("valid signature rejected")
 	}
 	wrongMessage := []byte("wrong message")
@@ -88,10 +74,7 @@ func TestEd25519Malleability(t *testing.T) {
 
 func BenchmarkEd25519GenerateKey(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := xcrypto.GenerateKeyEd25519()
-		if err != nil {
-			b.Fatal(err)
-		}
+		xcrypto.GenerateKeyEd25519()
 	}
 }
 
@@ -106,10 +89,7 @@ func BenchmarkEd25519NewKeyFromSeed(b *testing.B) {
 }
 
 func BenchmarkEd25519Signing(b *testing.B) {
-	priv, err := xcrypto.GenerateKeyEd25519()
-	if err != nil {
-		b.Fatal(err)
-	}
+	priv := xcrypto.GenerateKeyEd25519()
 	message := []byte("Hello, world!")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -118,14 +98,8 @@ func BenchmarkEd25519Signing(b *testing.B) {
 }
 
 func BenchmarkEd25519Verification(b *testing.B) {
-	priv, err := xcrypto.GenerateKeyEd25519()
-	if err != nil {
-		b.Fatal(err)
-	}
-	pub, err := priv.Public()
-	if err != nil {
-		b.Fatal(err)
-	}
+	priv := xcrypto.GenerateKeyEd25519()
+	pub := priv.Public()
 	message := []byte("Hello, world!")
 	signature, err := xcrypto.SignEd25519(priv, message)
 	if err != nil {

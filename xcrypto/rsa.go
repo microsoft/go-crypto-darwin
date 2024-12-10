@@ -9,11 +9,13 @@ package xcrypto
 import "C"
 import (
 	"crypto"
-	"encoding/asn1"
 	"errors"
 	"hash"
 	"runtime"
 	"strconv"
+
+	"golang.org/x/crypto/cryptobyte"
+	"golang.org/x/crypto/cryptobyte/asn1"
 )
 
 // GenerateKeyRSA generates an RSA key pair on macOS.
@@ -28,21 +30,25 @@ func GenerateKeyRSA(bits int) (N, E, D, P, Q, Dp, Dq, Qinv BigInt, err error) {
 		return bad(err)
 	}
 
-	var parsedKey pkcs1PrivateKey
-	_, err = asn1.Unmarshal(privKeyDER, &parsedKey)
-	if err != nil {
-		return bad(err)
+	var key cryptobyte.String = privKeyDER
+
+	var version int
+	if !key.ReadASN1(&key, asn1.SEQUENCE) ||
+		!key.ReadASN1Integer(&version) ||
+		version != 0 {
+		return bad(errors.New("invalid RSA private key version"))
 	}
 
-	// Assign values
-	N = parsedKey.Modulus
-	E = parsedKey.PublicExponent
-	D = parsedKey.PrivateExponent
-	P = parsedKey.Prime1
-	Q = parsedKey.Prime2
-	Dp = parsedKey.Exponent1
-	Dq = parsedKey.Exponent2
-	Qinv = parsedKey.Coefficient
+	if !key.ReadASN1BigInt(&N) ||
+		!key.ReadASN1BigInt(&E) ||
+		!key.ReadASN1BigInt(&D) ||
+		!key.ReadASN1BigInt(&P) ||
+		!key.ReadASN1BigInt(&Q) ||
+		!key.ReadASN1BigInt(&Dp) ||
+		!key.ReadASN1BigInt(&Dq) ||
+		!key.ReadASN1BigInt(&Qinv) {
+		return bad(errors.New("failed to parse RSA private key components"))
+	}
 
 	return
 }
@@ -59,15 +65,7 @@ func (k *PublicKeyRSA) finalize() {
 }
 
 func NewPublicKeyRSA(N, E BigInt) (*PublicKeyRSA, error) {
-	// Construct ASN.1 DER encoding for the public key
-	type RSAPublicKey struct {
-		Modulus  BigInt
-		Exponent BigInt
-	}
-	asn1Data, err := asn1.Marshal(RSAPublicKey{
-		Modulus:  N,
-		Exponent: E,
-	})
+	asn1Data, err := encodePublicKeyRSA(N, E)
 	if err != nil {
 		return nil, errors.New("crypto/rsa: failed to encode public key: " + err.Error())
 	}
@@ -77,7 +75,6 @@ func NewPublicKeyRSA(N, E BigInt) (*PublicKeyRSA, error) {
 		return nil, err
 	}
 
-	// Create and return the PublicKeyRSA object
 	key := &PublicKeyRSA{_pkey: *pubKeyRef}
 	runtime.SetFinalizer(key, (*PublicKeyRSA).finalize)
 	return key, nil
@@ -116,18 +113,7 @@ func (k *PrivateKeyRSA) finalize() {
 }
 
 func NewPrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv BigInt) (*PrivateKeyRSA, error) {
-	// Marshal ASN.1 data for the RSA private key
-	asn1Data, err := asn1.Marshal(pkcs1PrivateKey{
-		Version:         0, // PKCS#1 specifies version 0 for RSA private keys
-		Modulus:         N,
-		PublicExponent:  E,
-		PrivateExponent: D,
-		Prime1:          P,
-		Prime2:          Q,
-		Exponent1:       Dp,
-		Exponent2:       Dq,
-		Coefficient:     Qinv,
-	})
+	asn1Data, err := encodePrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv)
 	if err != nil {
 		return nil, errors.New("crypto/rsa: failed to encode private key: " + err.Error())
 	}
@@ -137,7 +123,6 @@ func NewPrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv BigInt) (*PrivateKeyRSA, error
 		return nil, err
 	}
 
-	// Create and return the PrivateKeyRSA object
 	key := &PrivateKeyRSA{_pkey: *privKeyRef}
 	runtime.SetFinalizer(key, (*PrivateKeyRSA).finalize)
 	return key, nil
@@ -206,6 +191,50 @@ func DecryptRSANoPadding(priv *PrivateKeyRSA, ciphertext []byte) ([]byte, error)
 
 func EncryptRSANoPadding(pub *PublicKeyRSA, msg []byte) ([]byte, error) {
 	return evpEncrypt(pub.withKey, algorithmTypeRAW, msg, nil)
+}
+
+func encodePublicKeyRSA(N, E BigInt) ([]byte, error) {
+	var b cryptobyte.Builder
+	b.AddASN1(asn1.SEQUENCE, func(b *cryptobyte.Builder) {
+		addASN1BigInt(b, N)
+		addASN1BigInt(b, E)
+	})
+	return b.Bytes()
+}
+
+func encodePrivateKeyRSA(N, E, D, P, Q, Dp, Dq, Qinv BigInt) ([]byte, error) {
+	var b cryptobyte.Builder
+	b.AddASN1(asn1.SEQUENCE, func(b *cryptobyte.Builder) {
+		b.AddASN1(asn1.INTEGER, func(b *cryptobyte.Builder) {
+			b.AddUint8(0) // PKCS#1 version is 0
+		})
+		addASN1BigInt(b, N)
+		addASN1BigInt(b, E)
+		addASN1BigInt(b, D)
+		addASN1BigInt(b, P)
+		addASN1BigInt(b, Q)
+		addASN1BigInt(b, Dp)
+		addASN1BigInt(b, Dq)
+		addASN1BigInt(b, Qinv)
+	})
+	return b.Bytes()
+}
+
+func addASN1BigInt(b *cryptobyte.Builder, bigInt BigInt) {
+	bigIntBytes := bigInt.Bytes()
+	if len(bigIntBytes) == 0 {
+		bigIntBytes = []byte{0}
+	}
+	// ASN.1 INTEGER values must be encoded in two's complement form
+	if bigIntBytes[0]&0x80 != 0 {
+		b.AddASN1(asn1.INTEGER, func(b *cryptobyte.Builder) {
+			b.AddBytes(append([]byte{0}, bigIntBytes...))
+		})
+	} else {
+		b.AddASN1(asn1.INTEGER, func(b *cryptobyte.Builder) {
+			b.AddBytes(bigIntBytes)
+		})
+	}
 }
 
 // Helper functions

@@ -41,7 +41,7 @@ func GenerateKeyEd25519() PrivateKeyEd25519 {
 	return pkeyPriv
 }
 
-func NewPrivateKeyEd25119(priv []byte) (PrivateKeyEd25519, error) {
+func NewPrivateKeyEd25519(priv []byte) (PrivateKeyEd25519, error) {
 	if len(priv) != privateKeySizeEd25519 {
 		panic("ed25519: bad private key length: " + strconv.Itoa(len(priv)))
 	}

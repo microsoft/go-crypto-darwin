@@ -5,7 +5,7 @@
 
 package cryptokit
 
-// #include "cryptokit.h"
+// #include "CryptoKit.h"
 import "C"
 import (
 	"crypto"
@@ -25,9 +25,9 @@ func ExtractHKDF(hash crypto.Hash, secret, salt []byte) ([]byte, error) {
 	// Call Swift function
 	result := C.extractHKDF(
 		h,
-		base(secret), C.size_t(len(secret)),
-		base(salt), C.size_t(len(salt)),
-		base(prk), C.size_t(len(prk)),
+		base(secret), C.long(len(secret)),
+		base(salt), C.long(len(salt)),
+		base(prk), C.long(len(prk)),
 	)
 
 	if result != 0 {
@@ -49,9 +49,9 @@ func ExpandHKDF(hash crypto.Hash, pseudorandomKey, info []byte, keyLength int) (
 	// Call Swift function
 	result := C.expandHKDF(
 		h,
-		base(pseudorandomKey), C.size_t(len(pseudorandomKey)),
-		base(info), C.size_t(len(info)),
-		base(expandedKey), C.size_t(len(expandedKey)),
+		base(pseudorandomKey), C.long(len(pseudorandomKey)),
+		base(info), C.long(len(info)),
+		base(expandedKey), C.long(len(expandedKey)),
 	)
 
 	if result != 0 {

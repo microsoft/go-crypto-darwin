@@ -5,17 +5,17 @@
 
 package cryptokit
 
-// #include "cryptokit.h"
+// #include "CryptoKit.h"
 import "C"
 
 // EncryptAESGCM performs AES-GCM encryption using Swift.
 func EncryptAESGCM(key, plaintext, nonce, additionalData, ciphertext, tag []byte) int {
 	err := C.encryptAESGCM(
-		base(key), C.size_t(len(key)),
-		base(plaintext), C.size_t(len(plaintext)),
-		base(nonce), C.size_t(len(nonce)),
-		base(additionalData), C.size_t(len(additionalData)),
-		base(ciphertext), C.size_t(len(ciphertext)),
+		base(key), C.long(len(key)),
+		base(plaintext), C.long(len(plaintext)),
+		base(nonce), C.long(len(nonce)),
+		base(additionalData), C.long(len(additionalData)),
+		base(ciphertext), C.long(len(ciphertext)),
 		base(tag),
 	)
 	return int(err)
@@ -23,13 +23,13 @@ func EncryptAESGCM(key, plaintext, nonce, additionalData, ciphertext, tag []byte
 
 // DecryptAESGCM performs AES-GCM decryption using Swift.
 func DecryptAESGCM(key, ciphertext, nonce, additionalData, tag, plaintext []byte) (int, int) {
-	var decSize C.size_t
+	var decSize C.long
 	err := C.decryptAESGCM(
-		base(key), C.size_t(len(key)),
-		base(ciphertext), C.size_t(len(ciphertext)),
-		base(nonce), C.size_t(len(nonce)),
-		base(additionalData), C.size_t(len(additionalData)),
-		base(tag), C.size_t(len(tag)),
+		base(key), C.long(len(key)),
+		base(ciphertext), C.long(len(ciphertext)),
+		base(nonce), C.long(len(nonce)),
+		base(additionalData), C.long(len(additionalData)),
+		base(tag), C.long(len(tag)),
 		base(plaintext), &decSize,
 	)
 	return int(decSize), int(err)

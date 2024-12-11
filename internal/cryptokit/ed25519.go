@@ -5,7 +5,7 @@
 
 package cryptokit
 
-// #include "cryptokit.h"
+// #include "CryptoKit.h"
 import "C"
 import (
 	"errors"
@@ -36,7 +36,7 @@ func NewPublicKeyEd25519(key, pub []byte) error {
 
 // SignEd25519 signs a message using the provided private key.
 func SignEd25519(sig, privateKey, message []byte) error {
-	result := C.signEd25519(base(privateKey), base(message), C.size_t(len(message)), base(sig))
+	result := C.signEd25519(base(privateKey), base(message), C.long(len(message)), base(sig))
 	if result < 0 {
 		switch result {
 		case -1:
@@ -56,7 +56,7 @@ func SignEd25519(sig, privateKey, message []byte) error {
 
 // VerifyEd25519 verifies a signature using the provided public key and message.
 func VerifyEd25519(publicKey, message, sig []byte) error {
-	result := C.verifyEd25519(base(publicKey), base(message), C.size_t(len(message)), base(sig))
+	result := C.verifyEd25519(base(publicKey), base(message), C.long(len(message)), base(sig))
 	switch result {
 	case 1:
 		return nil // Valid signature

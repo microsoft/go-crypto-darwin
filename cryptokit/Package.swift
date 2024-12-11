@@ -13,11 +13,21 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "CryptoKitSrc"
+            name: "CryptoKitSrc",
+            swiftSettings: [
+                .unsafeFlags([
+                    "-cxx-interoperability-mode=default"
+                ])
+            ]
         ),
         .testTarget(
             name: "CryptoKitTests",
-            dependencies: ["CryptoKitSrc"]
+            dependencies: ["CryptoKitSrc"],
+            swiftSettings: [
+                .unsafeFlags([
+                    "-cxx-interoperability-mode=default"
+                ])
+            ]
         ),
     ]
 )

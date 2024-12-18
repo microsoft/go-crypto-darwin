@@ -92,6 +92,20 @@ func (x *cbcCipher) CryptBlocks(dst, src []byte) {
 	runtime.KeepAlive(x)
 }
 
+func (x *cbcCipher) SetIV(iv []byte) {
+	if len(iv) != x.blockSize {
+		panic("crypto/cipher: incorrect IV length")
+	}
+	status := C.CCCryptorReset(
+		x.cryptor, // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
+		pbase(iv), // Pointer to the new IV to be set.
+	)
+	if status != C.kCCSuccess {
+		panic("crypto/cipher: CCCryptorReset failed")
+	}
+	runtime.KeepAlive(x)
+}
+
 // The following two functions are a mirror of golang.org/x/crypto/internal/subtle.
 
 func anyOverlap(x, y []byte) bool {

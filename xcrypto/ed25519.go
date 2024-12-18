@@ -48,6 +48,10 @@ func NewPrivateKeyEd25519(priv []byte) (PrivateKeyEd25519, error) {
 	return NewPrivateKeyEd25519FromSeed(priv[:seedSizeEd25519])
 }
 
+func (k PrivateKeyEd25519) Bytes() []byte {
+	return k
+}
+
 func NewPublicKeyEd25519(pub []byte) (PublicKeyEd25519, error) {
 	if len(pub) != publicKeySizeEd25519 {
 		panic("ed25519: bad public key length: " + strconv.Itoa(len(pub)))
@@ -58,6 +62,10 @@ func NewPublicKeyEd25519(pub []byte) (PublicKeyEd25519, error) {
 		return nil, err
 	}
 	return pkey, nil
+}
+
+func (k PublicKeyEd25519) Bytes() []byte {
+	return k
 }
 
 // NewPrivateKeyEd25519FromSeed calculates a private key from a seed. It will panic if

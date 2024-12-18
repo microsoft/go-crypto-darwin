@@ -13,10 +13,11 @@ import (
 
 func TestNewKeyFromSeedEd25519(t *testing.T) {
 	seed := bytes.Repeat([]byte{0x01}, ed25519.SeedSize)
-	data, err := xcrypto.NewPrivateKeyEd25519FromSeed(seed)
+	priv, err := xcrypto.NewPrivateKeyEd25519FromSeed(seed)
 	if err != nil {
 		t.Fatal(err)
 	}
+	data := priv.Bytes()
 	priv2 := ed25519.NewKeyFromSeed(seed)
 	if !bytes.Equal(data, []byte(priv2)) {
 		t.Errorf("private key mismatch got %x want %x", data, priv2)

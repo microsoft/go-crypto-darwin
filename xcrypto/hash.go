@@ -93,24 +93,32 @@ func SHA512(p []byte) (sum [64]byte) {
 }
 
 type evpHash struct {
-	ctx       unsafe.Pointer // Pointer to the algorithm-specific context
+	ctx unsafe.Pointer
+	// ctx2 is used in evpHash.sum to avoid changing
+	// the state of ctx. Having it here allows reusing the
+	// same allocated object multiple times.
+	ctx2      unsafe.Pointer
 	init      func(ctx unsafe.Pointer) C.int
 	update    func(ctx unsafe.Pointer, data []byte) C.int
 	final     func(ctx unsafe.Pointer, digest []byte) C.int
 	blockSize int
 	size      int
+	ctxSize   int
 }
 
-func newEvpHash(init func(ctx unsafe.Pointer) C.int, update func(ctx unsafe.Pointer, data []byte) C.int, final func(ctx unsafe.Pointer, digest []byte) C.int, ctxSize int, blockSize int, size int) *evpHash {
+func newEvpHash(init func(ctx unsafe.Pointer) C.int, update func(ctx unsafe.Pointer, data []byte) C.int, final func(ctx unsafe.Pointer, digest []byte) C.int, ctxSize, blockSize, size int) *evpHash {
 	ctx := C.malloc(C.size_t(ctxSize))
+	ctx2 := C.malloc(C.size_t(ctxSize))
 	init(ctx)
 	h := &evpHash{
 		ctx:       ctx,
+		ctx2:      ctx2,
 		init:      init,
 		update:    update,
 		final:     final,
 		blockSize: blockSize,
 		size:      size,
+		ctxSize:   ctxSize,
 	}
 	runtime.SetFinalizer(h, (*evpHash).finalize)
 	return h
@@ -118,9 +126,12 @@ func newEvpHash(init func(ctx unsafe.Pointer) C.int, update func(ctx unsafe.Poin
 
 func (h *evpHash) finalize() {
 	C.free(h.ctx)
+	C.free(h.ctx2)
 }
 
 func (h *evpHash) Reset() {
+	// There is no need to reset h.ctx2 because it is always reset after
+	// use in evpHash.sum.
 	h.init(h.ctx)
 	runtime.KeepAlive(h)
 }
@@ -165,7 +176,8 @@ func (h *evpHash) BlockSize() int {
 
 func (h *evpHash) Sum(b []byte) []byte {
 	digest := make([]byte, h.size)
-	h.final(h.ctx, digest)
+	C.memcpy(h.ctx2, h.ctx, C.size_t(h.ctxSize))
+	h.final(h.ctx2, digest)
 	return append(b, digest...)
 }
 

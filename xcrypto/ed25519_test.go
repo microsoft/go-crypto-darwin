@@ -17,7 +17,10 @@ func TestNewKeyFromSeedEd25519(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	data := priv.Bytes()
+	data, err := priv.Bytes()
+	if err != nil {
+		t.Fatal(err)
+	}
 	priv2 := ed25519.NewKeyFromSeed(seed)
 	if !bytes.Equal(data, []byte(priv2)) {
 		t.Errorf("private key mismatch got %x want %x", data, priv2)

@@ -75,9 +75,7 @@ public func signEd25519(
     messageLength: Int,
     sigBuffer: UnsafeMutablePointer<UInt8>?
 ) -> Int {
-    guard let messagePointer = messagePointer,
-        let sigBuffer = sigBuffer
-    else {
+    guard let sigBuffer = sigBuffer else {
         return -1  // Invalid inputs
     }
 
@@ -93,7 +91,12 @@ public func signEd25519(
     }
 
     // Convert the message to Data
-    let messageData = Data(bytes: messagePointer, count: messageLength)
+    let messageData: Data
+    if let messagePointer = messagePointer, messageLength > 0 {
+        messageData = Data(bytes: messagePointer, count: messageLength)
+    } else {
+        messageData = Data()  // Empty message
+    }
 
     // Sign the message
     let signature: Data
@@ -121,10 +124,8 @@ public func verifyEd25519(
     messageLength: Int,
     sigPointer: UnsafePointer<UInt8>?
 ) -> Int {
-    guard let messagePointer = messagePointer,
-        let sigPointer = sigPointer
-    else {
-        return -1  // Error: invalid inputs
+    guard let sigPointer = sigPointer else {
+        return -1  // Invalid inputs
     }
 
     // Convert the raw public key back to a Data object
@@ -136,7 +137,12 @@ public func verifyEd25519(
     }
 
     // Convert the message and signature to Data
-    let rawMessage = Data(bytes: messagePointer, count: messageLength)
+    let rawMessage: Data
+    if let messagePointer = messagePointer, messageLength > 0 {
+        rawMessage = Data(bytes: messagePointer, count: messageLength)
+    } else {
+        rawMessage = Data()  // Empty message
+    }
     let signatureData = Data(bytes: sigPointer, count: signatureSizeEd25519)
 
     // Verify the signature

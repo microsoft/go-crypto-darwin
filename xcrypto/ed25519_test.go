@@ -45,6 +45,14 @@ func TestEd25519SignVerify(t *testing.T) {
 	if xcrypto.VerifyEd25519(public, wrongMessage, sig) == nil {
 		t.Errorf("signature of different message accepted")
 	}
+	message = []byte("")
+	sig, err = xcrypto.SignEd25519(private, message)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if xcrypto.VerifyEd25519(public, message, sig) != nil {
+		t.Errorf("valid signature rejected")
+	}
 }
 
 func TestEd25519Malleability(t *testing.T) {

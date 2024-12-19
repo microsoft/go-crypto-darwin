@@ -36,7 +36,7 @@ var (
 		crypto.SHA256: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
 		crypto.SHA384: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384,
 		crypto.SHA512: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512,
-		0:             C.kSecKeyAlgorithmRSASignatureRaw,
+		0:             C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw,
 	}
 	rsaPSSAlgorithms = map[crypto.Hash]C.CFStringRef{
 		crypto.SHA1:   C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1,

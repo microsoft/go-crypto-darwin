@@ -101,11 +101,19 @@ func (k *PrivateKeyRSA) withKey(f func(C.SecKeyRef) C.int) C.int {
 
 // DecryptRSAOAEP decrypts data using RSA-OAEP.
 func DecryptRSAOAEP(h hash.Hash, priv *PrivateKeyRSA, ciphertext, label []byte) ([]byte, error) {
+	if len(label) > 0 {
+		// https://github.com/microsoft/go-crypto-darwin/issues/22
+		panic("crypto/rsa: label is not supported on macOS")
+	}
 	return evpDecrypt(priv.withKey, algorithmTypeOAEP, ciphertext, h)
 }
 
 // EncryptRSAOAEP encrypts data using RSA-OAEP.
 func EncryptRSAOAEP(h hash.Hash, pub *PublicKeyRSA, msg, label []byte) ([]byte, error) {
+	if len(label) > 0 {
+		// https://github.com/microsoft/go-crypto-darwin/issues/22
+		panic("crypto/rsa: label is not supported on macOS")
+	}
 	return evpEncrypt(pub.withKey, algorithmTypeOAEP, msg, h)
 }
 

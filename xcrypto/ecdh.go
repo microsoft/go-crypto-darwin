@@ -44,7 +44,7 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 	if err != nil {
 		return nil, err
 	}
-	pubKey := &PublicKeyECDH{*pubKeyRef, slices.Clone(bytes)}
+	pubKey := &PublicKeyECDH{pubKeyRef, slices.Clone(bytes)}
 	runtime.SetFinalizer(pubKey, (*PublicKeyECDH).finalize)
 	return pubKey, nil
 }
@@ -60,7 +60,7 @@ func NewPrivateKeyECDH(curve string, bytes []byte) (*PrivateKeyECDH, error) {
 	if err != nil {
 		return nil, err
 	}
-	privKey := &PrivateKeyECDH{*privKeyRef}
+	privKey := &PrivateKeyECDH{privKeyRef}
 	runtime.SetFinalizer(privKey, (*PrivateKeyECDH).finalize)
 	return privKey, nil
 }

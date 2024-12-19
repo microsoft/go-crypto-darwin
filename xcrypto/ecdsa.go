@@ -58,7 +58,7 @@ func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
 		return nil, err
 	}
 
-	pubKey := &PublicKeyECDSA{_pkey: *pubKeyRef}
+	pubKey := &PublicKeyECDSA{_pkey: pubKeyRef}
 	runtime.SetFinalizer(pubKey, (*PublicKeyECDSA).finalize)
 	return pubKey, nil
 }
@@ -80,7 +80,7 @@ func NewPrivateKeyECDSA(curve string, x, y, d BigInt) (*PrivateKeyECDSA, error) 
 	}
 
 	// Wrap and finalize
-	k := &PrivateKeyECDSA{_pkey: *privKeyRef}
+	k := &PrivateKeyECDSA{_pkey: privKeyRef}
 	runtime.SetFinalizer(k, (*PrivateKeyECDSA).finalize)
 	return k, nil
 }

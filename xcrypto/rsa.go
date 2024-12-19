@@ -9,6 +9,7 @@ package xcrypto
 import "C"
 import (
 	"crypto"
+	"errors"
 	"hash"
 	"runtime"
 	"strconv"
@@ -123,6 +124,15 @@ func SignRSAPKCS1v15(priv *PrivateKeyRSA, h crypto.Hash, hashed []byte) ([]byte,
 }
 
 func VerifyRSAPKCS1v15(pub *PublicKeyRSA, h crypto.Hash, hashed, sig []byte) error {
+	if pub.withKey(func(key C.SecKeyRef) C.int {
+		size := C.SecKeyGetBlockSize(key)
+		if len(sig) < int(size) {
+			return 0
+		}
+		return 1
+	}) == 0 {
+		return errors.New("crypto/rsa: verification error")
+	}
 	return evpVerify(pub.withKey, algorithmTypePKCS1v15Sig, h, hashed, sig)
 }
 

@@ -240,7 +240,13 @@ func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, er
 	tag := ciphertext[len(ciphertext)-gcmTagSize:]
 	ciphertext = ciphertext[:len(ciphertext)-gcmTagSize]
 
+	// Make room in dst to append ciphertext without tag.
 	ret, out := sliceForAppend(dst, len(ciphertext))
+
+	// Check delayed until now to make sure len(dst) is accurate.
+	if inexactOverlap(out, ciphertext) {
+		panic("cipher: invalid buffer overlap")
+	}
 
 	decSize, err := cryptokit.DecryptAESGCM(g.key, ciphertext, nonce, additionalData, tag, out)
 	if err != 0 {

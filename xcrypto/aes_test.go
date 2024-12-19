@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"crypto/cipher"
 	"fmt"
-	"math"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptotest"
@@ -20,15 +20,6 @@ const (
 	gcmTagSize           = 16
 	gcmStandardNonceSize = 12
 )
-
-// Test AES against the general cipher.Block interface tester.
-func TestAESBlock(t *testing.T) {
-	for _, keylen := range []int{128, 192, 256} {
-		t.Run(fmt.Sprintf("AES-%d", keylen), func(t *testing.T) {
-			cryptotest.TestBlock(t, keylen/8, xcrypto.NewAESCipher)
-		})
-	}
-}
 
 func TestNewGCMNonce(t *testing.T) {
 	ci, err := xcrypto.NewAESCipher(key)
@@ -57,78 +48,37 @@ func TestNewGCMNonce(t *testing.T) {
 }
 
 func TestSealAndOpen(t *testing.T) {
-	for _, tt := range aesGCMTests {
-		t.Run(tt.description, func(t *testing.T) {
-			ci, err := xcrypto.NewAESCipher(tt.key)
-			if err != nil {
-				t.Fatalf("NewAESCipher() err = %v", err)
-			}
-			gcm, err := cipher.NewGCM(ci)
-			if err != nil {
-				t.Fatalf("cipher.NewGCM() err = %v", err)
-			}
-
-			sealed := gcm.Seal(nil, tt.nonce, tt.plaintext, tt.aad)
-			if !bytes.Equal(sealed, tt.ciphertext) {
-				t.Errorf("unexpected sealed result\ngot: %#v\nexp: %#v", sealed, tt.ciphertext)
-			}
-
-			decrypted, err := gcm.Open(nil, tt.nonce, tt.ciphertext, tt.aad)
-			if err != nil {
-				t.Errorf("gcm.Open() err = %v", err)
-			}
-			if !bytes.Equal(decrypted, tt.plaintext) {
-				t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, tt.plaintext)
-			}
-
-			// Test that open fails if the ciphertext is modified.
-			tt.ciphertext[0] ^= 0x80
-			_, err = gcm.Open(nil, tt.nonce, tt.ciphertext, tt.aad)
-			if err != xcrypto.ErrOpen {
-				t.Errorf("expected authentication error for tampered message\ngot: %#v", err)
-			}
-			tt.ciphertext[0] ^= 0x80
-
-			// Test that the ciphertext can be opened using a fresh context
-			// which was not previously used to seal the same message.
-			gcm, err = cipher.NewGCM(ci)
-			if err != nil {
-				t.Fatalf("cipher.NewGCM() err = %v", err)
-			}
-			decrypted, err = gcm.Open(nil, tt.nonce, tt.ciphertext, tt.aad)
-			if err != nil {
-				t.Errorf("fresh GCM instance: gcm.Open() err = %v", err)
-			}
-			if !bytes.Equal(decrypted, tt.plaintext) {
-				t.Errorf("fresh GCM instance: unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, tt.plaintext)
-			}
-		})
-	}
-}
-
-func TestSealAndOpen_Empty(t *testing.T) {
-	key := []byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D")
 	ci, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gcm, err := cipher.NewGCM(ci)
+	gcm, err := cipher.NewGCMWithTagSize(ci, gcmTagSize)
 	if err != nil {
 		t.Fatal(err)
 	}
 	nonce := []byte{0x91, 0xc7, 0xa7, 0x54, 0x52, 0xef, 0x10, 0xdb, 0x91, 0xa8, 0x6c, 0xf9}
-	sealed := gcm.Seal(nil, nonce, []byte{}, []byte{})
-	decrypted, err := gcm.Open(nil, nonce, sealed, []byte{})
+	plainText := []byte{0x01, 0x02, 0x03}
+	additionalData := []byte{0x05, 0x05, 0x07}
+	sealed := gcm.Seal(nil, nonce, plainText, additionalData)
+	decrypted, err := gcm.Open(nil, nonce, sealed, additionalData)
 	if err != nil {
 		t.Error(err)
 	}
-	if !bytes.Equal(decrypted, []byte{}) {
-		t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, []byte{})
+	if !bytes.Equal(decrypted, plainText) {
+		t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, plainText)
+	}
+	// Test with no additional data.
+	sealed = gcm.Seal(nil, nonce, plainText, []byte{})
+	decrypted, err = gcm.Open(nil, nonce, sealed, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	if !bytes.Equal(decrypted, plainText) {
+		t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, plainText)
 	}
 }
 
 func TestSealAndOpenTLS(t *testing.T) {
-	key := []byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D")
 	tests := []struct {
 		name string
 		tls  string
@@ -215,12 +165,11 @@ func TestSealAndOpenTLS(t *testing.T) {
 }
 
 func TestSealAndOpenAuthenticationError(t *testing.T) {
-	key := []byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D")
 	ci, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gcm, err := cipher.NewGCM(ci)
+	gcm, err := cipher.NewGCMWithTagSize(ci, gcmTagSize)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +178,7 @@ func TestSealAndOpenAuthenticationError(t *testing.T) {
 	additionalData := []byte{0x05, 0x05, 0x07}
 	sealed := gcm.Seal(nil, nonce, plainText, additionalData)
 	_, err = gcm.Open(nil, nonce, sealed, nil)
-	if err != xcrypto.ErrOpen {
+	if !strings.Contains(err.Error(), "cipher: message authentication failed") {
 		t.Errorf("expected authentication error, got: %#v", err)
 	}
 }
@@ -245,23 +194,51 @@ func assertPanic(t *testing.T, f func()) {
 }
 
 func TestSealPanic(t *testing.T) {
-	ci, err := xcrypto.NewAESCipher([]byte("D249BF6DEC97B1EBD69BC4D6B3A3C49D"))
+	ci, err := xcrypto.NewAESCipher(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gcm, err := cipher.NewGCM(ci)
+	gcm, err := cipher.NewGCMWithTagSize(ci, gcmTagSize)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assertPanic(t, func() {
-		gcm.Seal(nil, make([]byte, gcm.NonceSize()-1), []byte{0x01, 0x02, 0x03}, nil)
+		gcm.Seal(nil, make([]byte, gcmStandardNonceSize-1), []byte{0x01, 0x02, 0x03}, nil)
 	})
 	assertPanic(t, func() {
-		gcm.Seal(nil, make([]byte, gcm.NonceSize()), make([]byte, math.MaxInt), nil)
+		// maxInt is implemented as math.MaxInt, but this constant
+		// is only available since go1.17.
+		// TODO: use math.MaxInt once go1.16 is no longer supported.
+		maxInt := int((^uint(0)) >> 1)
+		gcm.Seal(nil, make([]byte, gcmStandardNonceSize), make([]byte, maxInt), nil)
 	})
 }
 
-func TestBlobEncryptBasicBlockEncryption(t *testing.T) {
+func TestAESInvalidKeySize(t *testing.T) {
+	_, err := xcrypto.NewAESCipher([]byte{1})
+	if err == nil {
+		t.Error("error expected")
+	}
+}
+
+func TestEncryptAndDecrypt(t *testing.T) {
+	ci, err := xcrypto.NewAESCipher(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	plainText := make([]byte, ci.BlockSize())
+	plainText[1] = 1
+	plainText[15] = 15
+	cipherText := make([]byte, ci.BlockSize())
+	decrypted := make([]byte, ci.BlockSize())
+	ci.Encrypt(cipherText, plainText)
+	ci.Decrypt(decrypted, cipherText)
+	if !bytes.Equal(decrypted, plainText) {
+		t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", decrypted, plainText)
+	}
+}
+
+func TestCBCBlobEncryptBasicBlockEncryption(t *testing.T) {
 	key := []byte{0x24, 0xcd, 0x8b, 0x13, 0x37, 0xc5, 0xc1, 0xb1, 0x0, 0xbb, 0x27, 0x40, 0x4f, 0xab, 0x5f, 0x7b, 0x2d, 0x0, 0x20, 0xf5, 0x1, 0x84, 0x4, 0xbf, 0xe3, 0xbd, 0xa1, 0xc4, 0xbf, 0x61, 0x2f, 0xc5}
 	iv := []byte{0x91, 0xc7, 0xa7, 0x54, 0x52, 0xef, 0x10, 0xdb, 0x91, 0xa8, 0x6c, 0xf9, 0x79, 0xd5, 0xac, 0x74}
 
@@ -274,12 +251,14 @@ func TestBlobEncryptBasicBlockEncryption(t *testing.T) {
 	if blockSize != 16 {
 		t.Errorf("unexpected block size, expected 16 got: %d", blockSize)
 	}
-	encryptor := cipher.NewCBCEncrypter(block, iv)
+
+	encrypter := cipher.NewCBCEncrypter(block, iv)
+
 	encrypted := make([]byte, 32)
 
 	// First block. 16 bytes.
 	srcBlock1 := bytes.Repeat([]byte{0x01}, 16)
-	encryptor.CryptBlocks(encrypted, srcBlock1)
+	encrypter.CryptBlocks(encrypted, srcBlock1)
 	if !bytes.Equal([]byte{
 		0x14, 0xb7, 0x3e, 0x2f, 0xd9, 0xe7, 0x69, 0x7e, 0xb7, 0xd2, 0xc3, 0x5b, 0x31, 0x9c, 0xf0, 0x59,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -289,7 +268,7 @@ func TestBlobEncryptBasicBlockEncryption(t *testing.T) {
 
 	// Second block. 16 bytes.
 	srcBlock2 := bytes.Repeat([]byte{0x02}, 16)
-	encryptor.CryptBlocks(encrypted[16:], srcBlock2)
+	encrypter.CryptBlocks(encrypted[16:], srcBlock2)
 	if !bytes.Equal([]byte{
 		0x14, 0xb7, 0x3e, 0x2f, 0xd9, 0xe7, 0x69, 0x7e, 0xb7, 0xd2, 0xc3, 0x5b, 0x31, 0x9c, 0xf0, 0x59,
 		0xbb, 0xd4, 0x95, 0x25, 0x21, 0x56, 0x87, 0x3b, 0xe6, 0x22, 0xe8, 0xd0, 0x19, 0xa8, 0xed, 0xcd,
@@ -307,7 +286,7 @@ func TestBlobEncryptBasicBlockEncryption(t *testing.T) {
 	}
 }
 
-func testDecrypt(t *testing.T, resetNonce bool) {
+func TestCBCDecryptSimple(t *testing.T) {
 	key := []byte{
 		0x24, 0xcd, 0x8b, 0x13, 0x37, 0xc5, 0xc1, 0xb1,
 		0x0, 0xbb, 0x27, 0x40, 0x4f, 0xab, 0x5f, 0x7b,
@@ -317,20 +296,16 @@ func testDecrypt(t *testing.T, resetNonce bool) {
 
 	block, err := xcrypto.NewAESCipher(key)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	iv := []byte{
 		0x91, 0xc7, 0xa7, 0x54, 0x52, 0xef, 0x10, 0xdb,
 		0x91, 0xa8, 0x6c, 0xf9, 0x79, 0xd5, 0xac, 0x74,
 	}
+
 	encrypter := cipher.NewCBCEncrypter(block, iv)
 	decrypter := cipher.NewCBCDecrypter(block, iv)
-	if resetNonce {
-		for i := range iv {
-			iv[i] = 0
-		}
-	}
 
 	plainText := []byte{
 		0x54, 0x68, 0x65, 0x72, 0x65, 0x20, 0x69, 0x73,
@@ -369,6 +344,7 @@ func testDecrypt(t *testing.T, resetNonce bool) {
 		111, 184, 94, 169, 188, 93, 38, 150,
 		3, 208, 185, 201, 212, 246, 238, 181,
 	}
+
 	if !bytes.Equal(expectedCipherText, cipherText) {
 		t.Fail()
 	}
@@ -387,160 +363,66 @@ func testDecrypt(t *testing.T, resetNonce bool) {
 	}
 }
 
-func TestDecryptSimple(t *testing.T) {
-	testDecrypt(t, false)
-}
-
-func TestDecryptInvariantReusableNonce(t *testing.T) {
-	// Test that changing the iv slice after creating the encrypter
-	// and decrypter doesn't change the encrypter/decrypter state."
-	testDecrypt(t, true)
-}
-
-func TestCipherEncryptDecrypt(t *testing.T) {
-	key := []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
-	pt := []byte{0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34}
-	c, err := xcrypto.NewAESCipher(key)
-	if err != nil {
-		t.Fatal(err)
-	}
-	ct := make([]byte, len(pt))
-	c.Encrypt(ct, pt)
-
-	pt2 := make([]byte, len(pt))
-	c.Decrypt(pt2, ct)
-
-	if !bytes.Equal(pt2, pt) {
-		t.Errorf("unexpected decrypted result\ngot: %#v\nexp: %#v", pt2, pt)
+// Test AES against the general cipher.Block interface tester.
+func TestAESBlock(t *testing.T) {
+	for _, keylen := range []int{128, 192, 256} {
+		t.Run(fmt.Sprintf("AES-%d", keylen), func(t *testing.T) {
+			cryptotest.TestBlock(t, keylen/8, xcrypto.NewAESCipher)
+		})
 	}
 }
 
-func TestNewCTR(t *testing.T) {
-	// AES-128-CTR test vector (NIST SP 800-38A pp 55-58)
-	// Copied from crypto/cipher/common_test.go
-	key := []byte{
-		0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
-	}
-	counter := []byte{
-		0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
-	}
-	input := []byte{
-		0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
-		0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c, 0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51,
-		0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
-		0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10,
-	}
-	output := []byte{
-		0x87, 0x4d, 0x61, 0x91, 0xb6, 0x20, 0xe3, 0x26, 0x1b, 0xef, 0x68, 0x64, 0x99, 0x0d, 0xb6, 0xce,
-		0x98, 0x06, 0xf6, 0x6b, 0x79, 0x70, 0xfd, 0xff, 0x86, 0x17, 0x18, 0x7b, 0xb9, 0xff, 0xfd, 0xff,
-		0x5a, 0xe4, 0xdf, 0x3e, 0xdb, 0xd5, 0xd3, 0x5e, 0x5b, 0x4f, 0x09, 0x02, 0x0d, 0xb0, 0x3e, 0xab,
-		0x1e, 0x03, 0x1d, 0xda, 0x2f, 0xbe, 0x03, 0xd1, 0x79, 0x21, 0x70, 0xa0, 0xf3, 0x00, 0x9c, 0xee,
-	}
-	c, err := xcrypto.NewAESCipher(key)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for j := 0; j <= 5; j += 5 {
-		pt := input[0 : len(input)-j]
-		ctr := cipher.NewCTR(c, counter)
-		ct := make([]byte, len(pt))
-		ctr.XORKeyStream(ct, pt)
-		if out := output[0:len(pt)]; !bytes.Equal(out, ct) {
-			t.Errorf("CTR\ninpt %x\nhave %x\nwant %x", pt, ct, out)
-		}
+func TestAESBlockMode(t *testing.T) {
+	for _, keylen := range []int{128, 192, 256} {
+		t.Run(fmt.Sprintf("AES-%d", keylen), func(t *testing.T) {
+			rng := newRandReader(t)
+
+			key := make([]byte, keylen/8)
+			rng.Read(key)
+
+			block, err := xcrypto.NewAESCipher(key)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			cryptotest.TestBlockMode(t, block, cipher.NewCBCEncrypter, cipher.NewCBCDecrypter)
+		})
 	}
 }
 
-func TestCipherEncryptDecryptSharedBuffer(t *testing.T) {
-	key := []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
-	pt := []byte{0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34}
-	c, err := xcrypto.NewAESCipher(key)
-	if err != nil {
-		t.Fatal(err)
-	}
+// Test GCM against the general cipher.AEAD interface tester.
+func TestAESGCMAEAD(t *testing.T) {
+	minTagSize := 12
 
-	b := append(pt, make([]byte, len(pt))...)
-	// Keep b's length for the shared-buffer plaintext.
-	// This test verifies that Encrypt and Decrypt only check for overlap in the
-	// first block-length of the args, matching Go standard library behavior.
-	bPt := b
-	bCt := b[len(pt):]
-	c.Encrypt(bCt, bPt)
-	c.Decrypt(bPt, bCt)
-}
+	for _, keySize := range []int{128, 192, 256} {
+		// Use AES as underlying block cipher at different key sizes for GCM.
+		t.Run(fmt.Sprintf("AES-%d", keySize), func(t *testing.T) {
+			rng := newRandReader(t)
 
-func BenchmarkAES_Encrypt(b *testing.B) {
-	key := []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
-	in := []byte{0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34}
-	c, err := xcrypto.NewAESCipher(key)
-	if err != nil {
-		b.Fatal("NewCipher:", err)
-	}
-	out := make([]byte, len(in))
-	b.SetBytes(int64(len(out)))
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		c.Encrypt(out, in)
-	}
-}
+			key := make([]byte, keySize/8)
+			rng.Read(key)
 
-func BenchmarkAES_Decrypt(b *testing.B) {
-	key := []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
-	in := []byte{0x39, 0x25, 0x84, 0x1d, 0x02, 0xdc, 0x09, 0xfb, 0xdc, 0x11, 0x85, 0x97, 0x19, 0x6a, 0x0b, 0x32}
-	c, err := xcrypto.NewAESCipher(key)
-	if err != nil {
-		b.Fatal("NewCipher:", err)
-	}
-	out := make([]byte, len(in))
-	b.SetBytes(int64(len(in)))
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		c.Decrypt(out, in)
-	}
-}
+			block, err := xcrypto.NewAESCipher(key)
+			if err != nil {
+				panic(err)
+			}
 
-func BenchmarkAESGCM_Open(b *testing.B) {
-	const length = 64
-	const keySize = 128 / 8
-	buf := make([]byte, length)
+			// Test GCM with the current AES block with the standard nonce and tag
+			// sizes.
+			cryptotest.TestAEAD(t, func() (cipher.AEAD, error) { return cipher.NewGCM(block) })
 
-	b.ReportAllocs()
-	b.SetBytes(int64(len(buf)))
+			// Test non-standard tag sizes.
+			t.Run("MinTagSize", func(t *testing.T) {
+				cryptotest.TestAEAD(t, func() (cipher.AEAD, error) { return cipher.NewGCMWithTagSize(block, minTagSize) })
+			})
 
-	key := make([]byte, keySize)
-	var nonce [12]byte
-	var ad [13]byte
-	c, _ := xcrypto.NewAESCipher(key)
-	aesgcm, _ := cipher.NewGCM(c)
-	var out []byte
+			// Test non-standard nonce sizes.
+			for _, nonceSize := range []int{1, 16, 100} {
+				t.Run(fmt.Sprintf("NonceSize-%d", nonceSize), func(t *testing.T) {
 
-	ct := aesgcm.Seal(nil, nonce[:], buf, ad[:])
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		out, _ = aesgcm.Open(out[:0], nonce[:], ct, ad[:])
-	}
-}
-
-func BenchmarkAESGCM_Seal(b *testing.B) {
-	const length = 64
-	const keySize = 128 / 8
-	buf := make([]byte, length)
-
-	b.ReportAllocs()
-	b.SetBytes(int64(len(buf)))
-
-	key := make([]byte, keySize)
-	var nonce [12]byte
-	var ad [13]byte
-	c, _ := xcrypto.NewAESCipher(key)
-	aesgcm, _ := cipher.NewGCM(c)
-	var out []byte
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		out = aesgcm.Seal(out[:0], nonce[:], buf, ad[:])
+					cryptotest.TestAEAD(t, func() (cipher.AEAD, error) { return cipher.NewGCMWithNonceSize(block, nonceSize) })
+				})
+			}
+		})
 	}
 }

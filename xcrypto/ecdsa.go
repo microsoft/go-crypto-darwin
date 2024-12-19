@@ -93,10 +93,10 @@ func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
 
 	keySizeInBits := curveToKeySizeInBits(curve)
 	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
-	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 	return decodeFromUncompressedAnsiX963Key(privKeyDER, keySize)
 }
 

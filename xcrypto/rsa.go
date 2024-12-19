@@ -18,10 +18,10 @@ import (
 // asn1Data is encoded as PKCS#1 ASN1 DER.
 func GenerateKeyRSA(bits int) (asn1Data []byte, err error) {
 	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
-	defer C.CFRelease(C.CFTypeRef(privKeyRef))
 	if err != nil {
 		return nil, err
 	}
+	C.CFRelease(C.CFTypeRef(privKeyRef))
 	return privKeyDER, nil
 }
 

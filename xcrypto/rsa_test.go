@@ -58,7 +58,7 @@ func TestRSAEncryptDecryptPKCS1(t *testing.T) {
 func TestRSAEncryptDecryptOAEP(t *testing.T) {
 	sha256 := xcrypto.NewSHA256()
 	msg := []byte("hi!")
-	label := []byte("ho!")
+	label := []byte("") // Set label to empty as CommonCrypto does not support custom label
 	priv, pub := newRSAKey(t, 2048)
 	enc, err := xcrypto.EncryptRSAOAEP(sha256, pub, msg, label)
 	if err != nil {

@@ -101,8 +101,8 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 		C.CFDictionaryRef(0),
 		&cfErr,
 	)
-	if goCFErrorRef(cfErr) != nil {
-		return nil, goCFErrorRef(cfErr)
+	if err := goCFErrorRef(cfErr); err != nil {
+		return nil, err
 	}
 	defer C.CFRelease(C.CFTypeRef(sharedSecretRef))
 

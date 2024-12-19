@@ -151,7 +151,7 @@ type cfError struct {
 	message string
 }
 
-func (e cfError) Error() string {
+func (e *cfError) Error() string {
 	if e.message == "" {
 		return "CFError(" + strconv.Itoa(e.code) + "): unknown error"
 	}

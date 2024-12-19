@@ -123,8 +123,8 @@ func evpDecrypt(withKey withKeyFunc, algorithmType algorithmType, ciphertext []b
 		return 0 // Success
 	})
 
-	if goCFErrorRef(cfErr) != nil {
-		return nil, goCFErrorRef(cfErr)
+	if err := goCFErrorRef(cfErr); err != nil {
+		return nil, err
 	}
 
 	if result != 0 || decryptedDataRef == 0 {
@@ -154,8 +154,8 @@ func evpSign(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Hash,
 		return 0 // Success
 	})
 
-	if goCFErrorRef(cfErr) != nil {
-		return nil, goCFErrorRef(cfErr)
+	if err := goCFErrorRef(cfErr); err != nil {
+		return nil, err
 	}
 
 	if result != 0 || signedDataRef == 0 {
@@ -183,8 +183,8 @@ func evpVerify(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Has
 		return 0 // Success
 	})
 
-	if goCFErrorRef(cfErr) != nil {
-		return goCFErrorRef(cfErr)
+	if err := goCFErrorRef(cfErr); err != nil {
+		return err
 	}
 
 	if result != 0 {
@@ -290,8 +290,8 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*
 	// Generate the SecKey
 	var errorRef C.CFErrorRef
 	key := C.SecKeyCreateWithData(encodedKeyCF, attrDict, &errorRef)
-	if goCFErrorRef(errorRef) != nil {
-		return nil, goCFErrorRef(errorRef)
+	if err := goCFErrorRef(errorRef); err != nil {
+		return nil, err
 	}
 	return &key, nil
 }
@@ -319,14 +319,14 @@ func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, C.SecKeyRef
 	// Generate the private key
 	var errorRef C.CFErrorRef
 	var privKeyRef C.SecKeyRef = C.SecKeyCreateRandomKey(C.CFDictionaryRef(keyAttrs), &errorRef)
-	if goCFErrorRef(errorRef) != nil {
-		return nil, 0, goCFErrorRef(errorRef)
+	if err := goCFErrorRef(errorRef); err != nil {
+		return nil, 0, err
 	}
 
 	// Export the private key as DER
 	privData := C.SecKeyCopyExternalRepresentation(privKeyRef, &errorRef)
-	if goCFErrorRef(errorRef) != nil {
-		return nil, 0, goCFErrorRef(errorRef)
+	if err := goCFErrorRef(errorRef); err != nil {
+		return nil, 0, err
 	}
 	defer C.CFRelease(C.CFTypeRef(privData))
 

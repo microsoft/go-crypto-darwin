@@ -256,10 +256,10 @@ func cfRelease(ref unsafe.Pointer) {
 }
 
 // createSecKeyWithData creates a SecKey from the provided encoded key and attributes dictionary.
-func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*C.SecKeyRef, error) {
+func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (C.SecKeyRef, error) {
 	encodedKeyCF := C.CFDataCreate(C.kCFAllocatorDefault, base(encodedKey), C.CFIndex(len(encodedKey)))
 	if encodedKeyCF == 0 {
-		return nil, errors.New("xcrypto: failed to create CFData for private key")
+		return 0, errors.New("xcrypto: failed to create CFData for private key")
 	}
 	defer C.CFRelease(C.CFTypeRef(encodedKeyCF))
 
@@ -283,7 +283,7 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*
 		nil,
 	)
 	if attrDict == 0 {
-		return nil, errors.New("xcrypto: failed to create attributes dictionary")
+		return 0, errors.New("xcrypto: failed to create attributes dictionary")
 	}
 	defer C.CFRelease(C.CFTypeRef(attrDict))
 
@@ -291,9 +291,9 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (*
 	var errorRef C.CFErrorRef
 	key := C.SecKeyCreateWithData(encodedKeyCF, attrDict, &errorRef)
 	if err := goCFErrorRef(errorRef); err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &key, nil
+	return key, nil
 }
 
 // createSecKeyRandom creates a new SecKey with the provided attributes dictionary.

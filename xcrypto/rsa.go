@@ -44,7 +44,7 @@ func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
 		return nil, err
 	}
 
-	key := &PublicKeyRSA{_pkey: *pubKeyRef}
+	key := &PublicKeyRSA{_pkey: pubKeyRef}
 	runtime.SetFinalizer(key, (*PublicKeyRSA).finalize)
 	return key, nil
 }
@@ -75,7 +75,7 @@ func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 		return nil, err
 	}
 
-	key := &PrivateKeyRSA{_pkey: *privKeyRef}
+	key := &PrivateKeyRSA{_pkey: privKeyRef}
 	runtime.SetFinalizer(key, (*PrivateKeyRSA).finalize)
 	return key, nil
 }

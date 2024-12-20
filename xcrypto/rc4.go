@@ -11,6 +11,7 @@ import (
 	"errors"
 	"runtime"
 	"slices"
+	"unsafe"
 )
 
 // RC4Cipher is an instance of RC4 using a particular key.
@@ -68,8 +69,8 @@ func (c *RC4Cipher) XORKeyStream(dst, src []byte) {
 	var outLen C.size_t
 	status := C.CCCryptorUpdate(
 		c.ctx,
-		pbase(src), C.size_t(len(src)), // Input
-		pbase(dst), C.size_t(len(dst)), // Output
+		unsafe.Pointer(&*addr(src)), C.size_t(len(src)), // Input
+		unsafe.Pointer(&*addr(dst)), C.size_t(len(dst)), // Output
 		&outLen,
 	)
 	if status != C.kCCSuccess {

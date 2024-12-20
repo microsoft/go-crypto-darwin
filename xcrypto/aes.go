@@ -249,18 +249,13 @@ func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, er
 	}
 
 	decSize, err := cryptokit.DecryptAESGCM(g.key, ciphertext, nonce, additionalData, tag, out)
-	if err != 0 {
-		return nil, errOpen
-	}
-
-	if decSize != len(ciphertext) {
+	if err != 0 || int(decSize) != len(ciphertext) {
 		// If the decrypted data size does not match, zero out `out` and return `errOpen`
 		for i := range out {
 			out[i] = 0
 		}
 		return nil, errOpen
 	}
-
 	return ret, nil
 }
 

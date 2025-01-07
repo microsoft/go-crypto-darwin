@@ -155,6 +155,10 @@ func (h *evpHash) initialize() {
 }
 
 func (h *evpHash) Reset() {
+	if h.ctx == nil {
+		// The hash is not initialized yet, no need to reset.
+		return
+	}
 	// There is no need to reset h.ctx2 because it is always reset after
 	// use in evpHash.sum.
 	h.init(h.ctx)

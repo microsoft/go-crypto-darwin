@@ -8,9 +8,7 @@ package xcrypto
 // #include <Security/Security.h>
 import "C"
 import (
-	"crypto/elliptic"
 	"errors"
-	"math/big"
 	"runtime"
 	"slices"
 )
@@ -28,6 +26,7 @@ func (k *PublicKeyECDH) finalize() {
 
 type PrivateKeyECDH struct {
 	_pkey C.SecKeyRef
+	pub   []byte
 }
 
 func (k *PrivateKeyECDH) finalize() {
@@ -51,16 +50,14 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 
 func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
 
-func NewPrivateKeyECDH(curve string, bytes []byte) (*PrivateKeyECDH, error) {
-	encodedKey, err := encodePrivateComponent(bytes, curve)
+// bytes expects the public key to be in uncompressed ANSI X9.63 format
+func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) {
+	key := append(slices.Clone(pub), priv...)
+	privKeyRef, err := createSecKeyWithData(key, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
-	privKeyRef, err := createSecKeyWithData(encodedKey, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
-	if err != nil {
-		return nil, err
-	}
-	privKey := &PrivateKeyECDH{privKeyRef}
+	privKey := &PrivateKeyECDH{privKeyRef, pub}
 	runtime.SetFinalizer(privKey, (*PrivateKeyECDH).finalize)
 	return privKey, nil
 }
@@ -71,12 +68,7 @@ func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
 	if pubKeyRef == 0 {
 		return nil, errors.New("failed to extract public key")
 	}
-	pubBytes, err := getEncodedECDHPublicKey(pubKeyRef)
-	if err != nil {
-		C.CFRelease(C.CFTypeRef(pubKeyRef))
-		return nil, err
-	}
-	pubKey := &PublicKeyECDH{pubKeyRef, pubBytes}
+	pubKey := &PublicKeyECDH{pubKeyRef, k.pub}
 	runtime.SetFinalizer(pubKey, (*PublicKeyECDH).finalize)
 	return pubKey, nil
 }
@@ -115,67 +107,29 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	if keySize == 0 {
 		return nil, nil, errors.New("unsupported curve")
 	}
-
 	keySizeInBits := curveToKeySizeInBits(curve)
 	// Generate the private key and get its DER representation
 	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, err
 	}
-	bytes, err := extractPrivateComponent(privKeyDER, keySize)
+	pub, priv, err := extractECDHComponents(privKeyDER, keySize)
 	if err != nil {
 		C.CFRelease(C.CFTypeRef(privKeyRef))
 		return nil, nil, err
 	}
-	k := &PrivateKeyECDH{privKeyRef}
+	k := &PrivateKeyECDH{privKeyRef, pub}
 	runtime.SetFinalizer(k, (*PrivateKeyECDH).finalize)
-	return k, bytes, nil
+	return k, priv, nil
 }
 
-func getEncodedECDHPublicKey(key C.SecKeyRef) ([]byte, error) {
-	pubDataRef := C.SecKeyCopyExternalRepresentation(key, nil)
-	if pubDataRef == 0 {
-		return nil, errors.New("xcrypto: failed to encode public key")
-	}
-	defer C.CFRelease(C.CFTypeRef(pubDataRef))
-	pubBytes := cfDataToBytes(pubDataRef)
-	return pubBytes, nil
-}
-
-func extractPrivateComponent(der []byte, keySize int) ([]byte, error) {
+func extractECDHComponents(der []byte, keySize int) (pub, priv []byte, err error) {
 	// The private component is the last of the three equally-sized chunks
 	// for the elliptic curve private key.
-	if len(der) < keySize*3 {
-		return nil, errors.New("invalid key length: insufficient data for private component")
+	if len(der) != 1+keySize*3 {
+		return nil, nil, errors.New("invalid key length: insufficient data for private component")
 	}
-	// Extract the private component
-	privateComponent := der[keySize*2 : keySize*3]
-	return privateComponent, nil
-}
-
-func encodePrivateComponent(privateComponent []byte, curve string) ([]byte, error) {
-	keySize := curveToKeySizeInBytes(curve)
-	if len(privateComponent) != keySize {
-		return nil, errors.New("invalid key length: private component size does not match expected key size for the given curve")
-	}
-	// generate public key from privateComponent
-	var p elliptic.Curve
-	switch curve {
-	case "P-256":
-		p = elliptic.P256()
-	case "P-384":
-		p = elliptic.P384()
-	case "P-521":
-		p = elliptic.P521()
-	default:
-		return nil, errors.New("unsupported curve")
-	}
-
-	// curve.ScalarBaseMult is deprecated unless using the built-in curves namely P-256, P-384, P-521.
-	x, y := p.ScalarBaseMult(privateComponent)
-	encodedKey, err := encodeToUncompressedAnsiX963Key(x, y, new(big.Int).SetBytes(privateComponent), keySize)
-	if err != nil {
-		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
-	}
-	return encodedKey, nil
+	pub = der[:1+keySize*2]
+	priv = der[1+keySize*2:]
+	return
 }

@@ -3,4 +3,6 @@
 
 package xcrypto
 
+var CurveToKeySizeInBytes = curveToKeySizeInBytes
+var EncodeToUncompressedAnsiX963Key = encodeToUncompressedAnsiX963Key
 var ErrOpen = errOpen

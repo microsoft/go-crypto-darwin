@@ -170,7 +170,7 @@ func encodeBigInt(data []byte, ints []sizedBigInt) error {
 		}
 		normalized := normalizeBigInt(v.b)
 		// b might be shorter than size if the original big number contained leading zeros.
-		leadingZeros := int(v.size) - (len(normalized))
+		leadingZeros := int(v.size) - len(normalized)
 		if leadingZeros < 0 {
 			return errors.New("commoncrypto: invalid parameters")
 		}

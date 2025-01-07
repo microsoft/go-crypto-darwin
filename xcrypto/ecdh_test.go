@@ -344,7 +344,9 @@ func encodeECDHComponents(curve string, privateComponent []byte) (*xcrypto.Priva
 	}
 	// curve.ScalarBaseMult is deprecated unless using the built-in curves namely P-256, P-384, P-521.
 	x, y := p.ScalarBaseMult(privateComponent)
-	encodedKey, err := xcrypto.EncodeToUncompressedAnsiX963Key(x, y, nil, keySize)
+	xBytes := xcrypto.NormalizeBigInt(x.Bytes())
+	yBytes := xcrypto.NormalizeBigInt(y.Bytes())
+	encodedKey, err := xcrypto.EncodeToUncompressedAnsiX963Key(xBytes, yBytes, nil, keySize)
 	if err != nil {
 		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
 	}

@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/bbig"
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
@@ -200,7 +199,7 @@ func TestRSASignVerifyRSAPSS(t *testing.T) {
 }
 
 type PublicKey struct {
-	N *big.Int
+	N xcrypto.BigInt
 	E int
 }
 
@@ -291,15 +290,15 @@ func newRSAKey(t *testing.T, size int) (*xcrypto.PrivateKeyRSA, *xcrypto.PublicK
 
 	pk := rsa.PrivateKey{
 		PublicKey: rsa.PublicKey{
-			N: bbig.Dec(N),
+			N: N,
 			E: E,
 		},
-		D:      bbig.Dec(D),
-		Primes: []*big.Int{bbig.Dec(P), bbig.Dec(Q)},
+		D:      D,
+		Primes: []*big.Int{P, Q},
 		Precomputed: rsa.PrecomputedValues{
-			Dp:   bbig.Dec(Dp),
-			Dq:   bbig.Dec(Dq),
-			Qinv: bbig.Dec(Qinv),
+			Dp:   Dp,
+			Dq:   Dq,
+			Qinv: Qinv,
 		},
 	}
 	// Verify the key

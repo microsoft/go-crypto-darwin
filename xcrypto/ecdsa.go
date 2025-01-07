@@ -9,7 +9,6 @@ package xcrypto
 import "C"
 import (
 	"errors"
-	"math/big"
 	"runtime"
 )
 
@@ -137,13 +136,21 @@ func decodeFromUncompressedAnsiX963Key(key []byte, keySize int) (x, y, d BigInt,
 	if len(key) < 1+keySize*2 {
 		return nil, nil, nil, errors.New("invalid key length")
 	}
-	x = new(big.Int).SetBytes(key[1 : 1+keySize])
-	y = new(big.Int).SetBytes(key[1+keySize : 1+keySize*2])
+	x = normalizeBigInt(key[1 : 1+keySize])
+	y = normalizeBigInt(key[1+keySize : 1+keySize*2])
 	if len(key) > 1+keySize*2 {
-		d := new(big.Int).SetBytes(key[1+keySize*2:])
+		d = normalizeBigInt(key[1+keySize*2:])
 		return x, y, d, nil
 	}
 	return x, y, nil, nil
+}
+
+func normalizeBigInt(b []byte) BigInt {
+	// Remove leading zero bytes
+	for len(b) > 0 && b[0] == 0 {
+		b = b[1:]
+	}
+	return b
 }
 
 // sizedBigInt defines a big integer with
@@ -161,12 +168,13 @@ func encodeBigInt(data []byte, ints []sizedBigInt) error {
 		if v.b == nil {
 			return nil
 		}
+		normalized := normalizeBigInt(v.b)
 		// b might be shorter than size if the original big number contained leading zeros.
-		leadingZeros := int(v.size) - (v.b.BitLen()+7)/8
+		leadingZeros := int(v.size) - len(normalized)
 		if leadingZeros < 0 {
 			return errors.New("commoncrypto: invalid parameters")
 		}
-		copy(data[leadingZeros:], v.b.Bytes())
+		copy(data[leadingZeros:], normalized)
 		data = data[v.size:]
 	}
 	return nil

@@ -242,7 +242,7 @@ func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringR
 // bytesToCFData turns a byte slice into a CFDataRef. Caller then "owns" the
 // CFDataRef and must CFRelease the CFDataRef when done.
 func bytesToCFData(buf []byte) C.CFDataRef {
-	return C.CFDataCreate(C.kCFAllocatorDefault, (*C.UInt8)(unsafe.Pointer(&buf[0])), C.CFIndex(len(buf)))
+	return C.CFDataCreate(C.kCFAllocatorDefault, base(buf), C.CFIndex(len(buf)))
 }
 
 // cfDataToBytes turns a CFDataRef into a byte slice.

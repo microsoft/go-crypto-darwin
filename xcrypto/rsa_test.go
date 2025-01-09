@@ -43,6 +43,21 @@ func testRSAEncryptDecryptPKCS1(t *testing.T, priv *xcrypto.PrivateKeyRSA, pub *
 	}
 }
 
+func testRSAEncryptDecryptPKCS1Empty(t *testing.T, priv *xcrypto.PrivateKeyRSA, pub *xcrypto.PublicKeyRSA) {
+	msg := []byte("")
+	enc, err := xcrypto.EncryptRSAPKCS1(pub, msg)
+	if err != nil {
+		t.Fatalf("EncryptPKCS1v15: %v", err)
+	}
+	dec, err := xcrypto.DecryptRSAPKCS1(priv, enc)
+	if err != nil {
+		t.Fatalf("DecryptPKCS1v15: %v", err)
+	}
+	if !bytes.Equal(dec, msg) {
+		t.Fatalf("got:%x want:%x", dec, msg)
+	}
+}
+
 func TestRSAEncryptDecryptPKCS1(t *testing.T) {
 	for _, size := range []int{2048, 3072} {
 		size := size
@@ -50,6 +65,7 @@ func TestRSAEncryptDecryptPKCS1(t *testing.T) {
 			t.Parallel()
 			priv, pub := newRSAKey(t, size)
 			testRSAEncryptDecryptPKCS1(t, priv, pub)
+			testRSAEncryptDecryptPKCS1Empty(t, priv, pub)
 		})
 	}
 }

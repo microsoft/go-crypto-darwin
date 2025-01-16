@@ -214,6 +214,18 @@ func (h *evpHash) Sum(b []byte) []byte {
 	return append(b, digest...)
 }
 
+func (h *evpHash) MarshalBinary() ([]byte, error) {
+	return nil, errors.New("xcrypto: hash state is not marshallable")
+}
+
+func (h *evpHash) AppendBinary(b []byte) ([]byte, error) {
+	return nil, errors.New("xcrypto: hash state is not marshallable")
+}
+
+func (h *evpHash) UnmarshalBinary(data []byte) error {
+	return errors.New("xcrypto: hash state is not marshallable")
+}
+
 // Clone returns a new evpHash object that is a deep clone of itself.
 // The duplicate object contains all state and data contained in the
 // original object at the point of duplication.

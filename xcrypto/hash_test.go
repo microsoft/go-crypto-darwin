@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
@@ -144,9 +145,6 @@ func TestHash_BinaryAppender(t *testing.T) {
 				hash.Hash
 				AppendBinary(b []byte) ([]byte, error)
 			})
-			if !ok {
-				t.Skip("not supported")
-			}
 
 			// Create a slice with 10 elements
 			prebuiltSlice := make([]byte, 10)
@@ -161,6 +159,9 @@ func TestHash_BinaryAppender(t *testing.T) {
 			// Append binary data to the prebuilt slice
 			state, err := hashWithBinaryAppender.AppendBinary(prebuiltSlice)
 			if err != nil {
+				if strings.Contains(err.Error(), "hash state is not marshallable") {
+					t.Skip("AppendBinary not supported")
+				}
 				t.Errorf("could not append binary: %v", err)
 			}
 

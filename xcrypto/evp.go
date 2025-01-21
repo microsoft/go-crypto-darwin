@@ -190,15 +190,15 @@ func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringR
 	case algorithmTypePSS:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA512
 		default:
 			return 0, errors.New("unsupported PSS hash: " + hash.String())
 		}

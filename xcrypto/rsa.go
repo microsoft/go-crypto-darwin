@@ -18,7 +18,7 @@ import (
 // GenerateKeyRSA generates an RSA key pair on macOS.
 // asn1Data is encoded as PKCS#1 ASN1 DER.
 func GenerateKeyRSA(bits int) (asn1Data []byte, err error) {
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(kSecAttrKeyTypeRSA, bits)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (k *PublicKeyRSA) finalize() {
 
 // NewPublicKeyRSA creates a new RSA public key from ASN1 DER encoded data.
 func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
-	pubKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(asn1Data, kSecAttrKeyTypeRSA, kSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (k *PrivateKeyRSA) finalize() {
 
 // NewPrivateKeyRSA creates a new RSA private key from ASN1 DER encoded data.
 func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
-	privKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(asn1Data, kSecAttrKeyTypeRSA, kSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}

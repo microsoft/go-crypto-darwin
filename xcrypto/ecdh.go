@@ -39,7 +39,7 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 	if len(bytes) < 1 {
 		return nil, errors.New("NewPublicKeyECDH: missing key")
 	}
-	pubKeyRef, err := createSecKeyWithData(bytes, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(bytes, kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
 // bytes expects the public key to be in uncompressed ANSI X9.63 format
 func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) {
 	key := append(slices.Clone(pub), priv...)
-	privKeyRef, err := createSecKeyWithData(key, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(key, kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	defer runtime.KeepAlive(priv)
 	defer runtime.KeepAlive(pub)
 
-	var algorithm C.CFStringRef = C.kSecKeyAlgorithmECDHKeyExchangeStandard
+	var algorithm C.CFStringRef = kSecKeyAlgorithmECDHKeyExchangeStandard
 
 	supported := C.SecKeyIsAlgorithmSupported(priv._pkey, C.kSecKeyOperationTypeKeyExchange, algorithm)
 	if supported == 0 {
@@ -109,7 +109,7 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	}
 	keySizeInBits := curveToKeySizeInBits(curve)
 	// Generate the private key and get its DER representation
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, err
 	}

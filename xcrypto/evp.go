@@ -11,6 +11,7 @@ import (
 	"crypto"
 	"errors"
 	"hash"
+	"strconv"
 	"unsafe"
 )
 
@@ -23,35 +24,6 @@ const (
 	algorithmTypePKCS1v15Sig
 	algorithmTypeOAEP
 	algorithmTypeECDSA
-)
-
-// Algorithm maps for translating crypto.Hash to SecKeyAlgorithm.
-var (
-	rsaRaw = map[crypto.Hash]C.CFStringRef{
-		0: C.kSecKeyAlgorithmRSAEncryptionRaw,
-	}
-	rsaPKCS1v15Algorithms = map[crypto.Hash]C.CFStringRef{
-		crypto.SHA1:   C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1,
-		crypto.SHA224: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224,
-		crypto.SHA256: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
-		crypto.SHA384: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384,
-		crypto.SHA512: C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512,
-		0:             C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw,
-	}
-	rsaPSSAlgorithms = map[crypto.Hash]C.CFStringRef{
-		crypto.SHA1:   C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1,
-		crypto.SHA224: C.kSecKeyAlgorithmRSASignatureDigestPSSSHA224,
-		crypto.SHA256: C.kSecKeyAlgorithmRSASignatureDigestPSSSHA256,
-		crypto.SHA384: C.kSecKeyAlgorithmRSASignatureDigestPSSSHA384,
-		crypto.SHA512: C.kSecKeyAlgorithmRSASignatureDigestPSSSHA512,
-	}
-	rsaOAEPAlgorithms = map[crypto.Hash]C.CFStringRef{
-		crypto.SHA1:   C.kSecKeyAlgorithmRSAEncryptionOAEPSHA1,
-		crypto.SHA224: C.kSecKeyAlgorithmRSAEncryptionOAEPSHA224,
-		crypto.SHA256: C.kSecKeyAlgorithmRSAEncryptionOAEPSHA256,
-		crypto.SHA384: C.kSecKeyAlgorithmRSAEncryptionOAEPSHA384,
-		crypto.SHA512: C.kSecKeyAlgorithmRSAEncryptionOAEPSHA512,
-	}
 )
 
 type withKeyFunc func(func(C.SecKeyRef) C.int) C.int
@@ -213,30 +185,65 @@ func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
 
 // selectAlgorithm selects the appropriate SecKeyAlgorithm based on hash and algorithm type.
 func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringRef, error) {
-	var algorithmMap map[crypto.Hash]C.CFStringRef
+	var algo C.CFStringRef
 	switch algorithmType {
 	case algorithmTypePSS:
-		algorithmMap = rsaPSSAlgorithms
+		switch hash {
+		case crypto.SHA1:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1
+		case crypto.SHA224:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA224
+		case crypto.SHA256:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA256
+		case crypto.SHA384:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA384
+		case crypto.SHA512:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA512
+		default:
+			return 0, errors.New("unsupported PSS hash: " + hash.String())
+		}
 	case algorithmTypeRAW:
-		algorithmMap = rsaRaw
+		algo = C.kSecKeyAlgorithmRSAEncryptionRaw
 	case algorithmTypePKCS1v15Enc:
 		return C.kSecKeyAlgorithmRSAEncryptionPKCS1, nil
 	case algorithmTypePKCS1v15Sig:
-		algorithmMap = rsaPKCS1v15Algorithms
+		switch hash {
+		case crypto.SHA1:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
+		case crypto.SHA224:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
+		case crypto.SHA256:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
+		case crypto.SHA384:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
+		case crypto.SHA512:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
+		case 0:
+			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
+		default:
+			return 0, errors.New("unsupported PKCS1v15 hash: " + hash.String())
+		}
 	case algorithmTypeOAEP:
-		algorithmMap = rsaOAEPAlgorithms
+		switch hash {
+		case crypto.SHA1:
+			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+		case crypto.SHA224:
+			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+		case crypto.SHA256:
+			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+		case crypto.SHA384:
+			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+		case crypto.SHA512:
+			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+		default:
+			return 0, errors.New("unsupported OAEP hash: " + hash.String())
+		}
 	case algorithmTypeECDSA:
 		return C.kSecKeyAlgorithmECDSASignatureDigestX962, nil
 	default:
-		return 0, errors.New("unsupported algorithm type")
+		return 0, errors.New("unsupported algorithm type: " + strconv.Itoa(int(algorithmType)))
 	}
-
-	algorithm, ok := algorithmMap[hash]
-	if !ok {
-		return 0, errors.New("unsupported combination of algorithm type and hash")
-	}
-
-	return algorithm, nil
+	return algo, nil
 }
 
 // bytesToCFData turns a byte slice into a CFDataRef. Caller then "owns" the

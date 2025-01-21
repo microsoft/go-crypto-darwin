@@ -6,6 +6,7 @@
 package xcrypto
 
 // #cgo CFLAGS: -Wno-deprecated-declarations
+// #cgo LDFLAGS: -framework Security -framework CoreFoundation
 import "C"
 import "unsafe"
 

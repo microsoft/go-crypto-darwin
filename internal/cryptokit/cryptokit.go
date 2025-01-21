@@ -6,7 +6,7 @@
 package cryptokit
 
 // #cgo CFLAGS: -Wno-deprecated-declarations
-// #cgo LDFLAGS: -L /Library/Developer/CommandLineTools/usr/lib/swift/macosx ${SRCDIR}/CryptoKit.o
+// #cgo LDFLAGS: -framework Security -framework CoreFoundation -L /Library/Developer/CommandLineTools/usr/lib/swift/macosx ${SRCDIR}/CryptoKit.o
 import "C"
 import "unsafe"
 

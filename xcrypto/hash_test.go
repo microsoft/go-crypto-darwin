@@ -13,7 +13,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
@@ -269,7 +268,7 @@ func TestHash_OneShot(t *testing.T) {
 		oneShot func([]byte) []byte
 	}{
 		{crypto.SHA1, func(p []byte) []byte {
-			b := cryptokit.SHA1(p)
+			b := xcrypto.SHA1(p)
 			return b[:]
 		}},
 		{crypto.SHA224, func(p []byte) []byte {
@@ -277,15 +276,15 @@ func TestHash_OneShot(t *testing.T) {
 			return b[:]
 		}},
 		{crypto.SHA256, func(p []byte) []byte {
-			b := cryptokit.SHA256(p)
+			b := xcrypto.SHA256(p)
 			return b[:]
 		}},
 		{crypto.SHA384, func(p []byte) []byte {
-			b := cryptokit.SHA384(p)
+			b := xcrypto.SHA384(p)
 			return b[:]
 		}},
 		{crypto.SHA512, func(p []byte) []byte {
-			b := cryptokit.SHA512(p)
+			b := xcrypto.SHA512(p)
 			return b[:]
 		}},
 		// {crypto.SHA3_224, func(p []byte) []byte {
@@ -459,7 +458,7 @@ func TestCgo(t *testing.T) {
 	h.Write(d.Data[:])
 	h.Sum(nil)
 
-	cryptokit.SHA256(d.Data[:])
+	xcrypto.SHA256(d.Data[:])
 }
 
 func BenchmarkHash8Bytes(b *testing.B) {

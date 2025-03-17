@@ -47,11 +47,7 @@ func MD4(p []byte) (sum [16]byte) {
 }
 
 func MD5(p []byte) (sum [16]byte) {
-	result := C.CC_MD5(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: MD5 failed")
-	}
-	return
+	return cryptokit.MD5(p)
 }
 
 func SHA1(p []byte) (sum [20]byte) {

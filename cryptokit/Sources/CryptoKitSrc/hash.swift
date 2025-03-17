@@ -4,6 +4,19 @@
 import CryptoKit
 import Foundation
 
+@_cdecl("MD5")
+public func MD5(
+    inputPointer: UnsafePointer<UInt8>,
+    inputLength: Int,
+    outputPointer: UnsafeMutablePointer<UInt8>
+) -> Void {
+    let inputData = Data(bytes: inputPointer, count: inputLength)
+    let hash = Insecure.MD5.hash(data: inputData)
+    
+    let hashData = hash.withUnsafeBytes { Data($0) }
+    hashData.copyBytes(to: outputPointer, count: hashData.count)
+}
+
 @_cdecl("SHA1")
 public func SHA1(
     inputPointer: UnsafePointer<UInt8>,

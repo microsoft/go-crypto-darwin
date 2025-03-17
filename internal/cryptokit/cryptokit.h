@@ -40,6 +40,7 @@ int expandHKDF(int32_t hashFunction,
                const uint8_t *info, size_t infoLength,
                uint8_t *okm, size_t okmLength);
 
+void MD5(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 void SHA1(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 void SHA256(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 void SHA384(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);

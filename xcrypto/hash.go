@@ -13,6 +13,8 @@ import (
 	"hash"
 	"runtime"
 	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 // NOTE: Implementation ported from https://go-review.googlesource.com/c/go/+/404295.
@@ -45,19 +47,11 @@ func MD4(p []byte) (sum [16]byte) {
 }
 
 func MD5(p []byte) (sum [16]byte) {
-	result := C.CC_MD5(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: MD5 failed")
-	}
-	return
+	return cryptokit.MD5(p)
 }
 
 func SHA1(p []byte) (sum [20]byte) {
-	result := C.CC_SHA1(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: SHA1 failed")
-	}
-	return
+	return cryptokit.SHA1(p)
 }
 
 func SHA224(p []byte) (sum [28]byte) {
@@ -69,27 +63,15 @@ func SHA224(p []byte) (sum [28]byte) {
 }
 
 func SHA256(p []byte) (sum [32]byte) {
-	result := C.CC_SHA256(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: SHA256 failed")
-	}
-	return
+	return cryptokit.SHA256(p)
 }
 
 func SHA384(p []byte) (sum [48]byte) {
-	result := C.CC_SHA384(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: SHA384 failed")
-	}
-	return
+	return cryptokit.SHA384(p)
 }
 
 func SHA512(p []byte) (sum [64]byte) {
-	result := C.CC_SHA512(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
-	if result == nil {
-		panic("commoncrypto: SHA512 failed")
-	}
-	return
+	return cryptokit.SHA512(p)
 }
 
 // cloneHash is an interface that defines a Clone method.

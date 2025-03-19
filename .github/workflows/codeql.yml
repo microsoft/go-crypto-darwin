@@ -25,7 +25,7 @@ jobs:
 
     strategy:
       matrix:
-        language: [go, swift]
+        language: [go, swift, cpp]
 
     steps:
       - name: Checkout repository

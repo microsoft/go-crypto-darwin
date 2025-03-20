@@ -17,17 +17,6 @@ import (
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
-// NOTE: Implementation ported from https://go-review.googlesource.com/c/go/+/404295.
-// The cgo calls in this file are arranged to avoid marking the parameters as escaping.
-// To do that, we call noescape (including via addr).
-// We must also make sure that the data pointer arguments have the form unsafe.Pointer(&...)
-// so that cgo does not annotate them with cgoCheckPointer calls. If it did that, it might look
-// beyond the byte slice and find Go pointers in unprocessed parts of a larger allocation.
-// To do both of these simultaneously, the idiom is unsafe.Pointer(&*addr(p)),
-// where addr returns the base pointer of p, substituting a non-nil pointer for nil,
-// and applying a noescape along the way.
-// This is all to preserve compatibility with the allocation behavior of the non-commoncrypto implementations.
-
 // SupportsHash returns true if a hash.Hash implementation is supported for h.
 func SupportsHash(h crypto.Hash) bool {
 	switch h {
@@ -39,7 +28,12 @@ func SupportsHash(h crypto.Hash) bool {
 }
 
 func MD4(p []byte) (sum [16]byte) {
-	result := C.CC_MD4(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
+	if len(p) > 0 {
+		var pinner runtime.Pinner
+		defer pinner.Unpin()
+		pinner.Pin(&p[0])
+	}
+	result := C.CC_MD4(pbase(p), C.CC_LONG(len(p)), base(sum[:]))
 	if result == nil {
 		panic("commoncrypto: MD4 failed")
 	}
@@ -55,7 +49,12 @@ func SHA1(p []byte) (sum [20]byte) {
 }
 
 func SHA224(p []byte) (sum [28]byte) {
-	result := C.CC_SHA224(unsafe.Pointer(&*addr(p)), C.CC_LONG(len(p)), (*C.uchar)(&*addr(sum[:])))
+	if len(p) > 0 {
+		var pinner runtime.Pinner
+		defer pinner.Unpin()
+		pinner.Pin(&p[0])
+	}
+	result := C.CC_SHA224(pbase(p), C.CC_LONG(len(p)), base(sum[:]))
 	if result == nil {
 		panic("commoncrypto: SHA224 failed")
 	}
@@ -94,6 +93,7 @@ type evpHash struct {
 	// the state of ctx. Having it here allows reusing the
 	// same allocated object multiple times.
 	ctx2      unsafe.Pointer
+	pinner    runtime.Pinner
 	init      func(ctx unsafe.Pointer) C.int
 	update    func(ctx unsafe.Pointer, data []byte) C.int
 	final     func(ctx unsafe.Pointer, digest []byte) C.int
@@ -150,6 +150,8 @@ func (h *evpHash) Reset() {
 func (h *evpHash) Write(p []byte) (int, error) {
 	h.initialize()
 	if len(p) > 0 {
+		defer h.pinner.Unpin()
+		h.pinner.Pin(&p[0])
 		// Use a local variable to prevent the compiler from misinterpreting the pointer
 		data := p
 		if h.update(h.ctx, data) != 1 {
@@ -240,7 +242,7 @@ func NewMD4() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_MD4_Init((*C.CC_MD4_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_MD4_Update((*C.CC_MD4_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_MD4_Update((*C.CC_MD4_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_MD4_Final(base(digest), (*C.CC_MD4_CTX)(ctx))
@@ -262,7 +264,7 @@ func NewMD5() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_MD5_Init((*C.CC_MD5_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_MD5_Update((*C.CC_MD5_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_MD5_Update((*C.CC_MD5_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_MD5_Final(base(digest), (*C.CC_MD5_CTX)(ctx))
@@ -284,7 +286,7 @@ func NewSHA1() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_SHA1_Init((*C.CC_SHA1_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA1_Update((*C.CC_SHA1_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_SHA1_Update((*C.CC_SHA1_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_SHA1_Final(base(digest), (*C.CC_SHA1_CTX)(ctx))
@@ -306,7 +308,7 @@ func NewSHA224() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_SHA224_Init((*C.CC_SHA256_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA224_Update((*C.CC_SHA256_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_SHA224_Update((*C.CC_SHA256_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_SHA224_Final(base(digest), (*C.CC_SHA256_CTX)(ctx))
@@ -328,7 +330,7 @@ func NewSHA256() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_SHA256_Init((*C.CC_SHA256_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA256_Update((*C.CC_SHA256_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_SHA256_Update((*C.CC_SHA256_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_SHA256_Final(base(digest), (*C.CC_SHA256_CTX)(ctx))
@@ -350,7 +352,7 @@ func NewSHA384() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_SHA384_Init((*C.CC_SHA512_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA384_Update((*C.CC_SHA512_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_SHA384_Update((*C.CC_SHA512_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_SHA384_Final(base(digest), (*C.CC_SHA512_CTX)(ctx))
@@ -372,7 +374,7 @@ func NewSHA512() hash.Hash {
 		evpHash: newEvpHash(
 			func(ctx unsafe.Pointer) C.int { return C.CC_SHA512_Init((*C.CC_SHA512_CTX)(ctx)) },
 			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA512_Update((*C.CC_SHA512_CTX)(ctx), unsafe.Pointer(&*addr(data)), C.CC_LONG(len(data)))
+				return C.CC_SHA512_Update((*C.CC_SHA512_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
 			},
 			func(ctx unsafe.Pointer, digest []byte) C.int {
 				return C.CC_SHA512_Final(base(digest), (*C.CC_SHA512_CTX)(ctx))

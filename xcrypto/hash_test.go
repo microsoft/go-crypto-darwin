@@ -461,6 +461,30 @@ func TestCgo(t *testing.T) {
 	xcrypto.SHA256(d.Data[:])
 }
 
+func TestHashAllocations(t *testing.T) {
+	if Asan() {
+		t.Skip("skipping allocations test with sanitizers")
+	}
+	msg := []byte("testing")
+	n := int(testing.AllocsPerRun(10, func() {
+		sink ^= xcrypto.MD4(msg)[0]
+		sink ^= xcrypto.MD5(msg)[0]
+		sink ^= xcrypto.SHA1(msg)[0]
+		sink ^= xcrypto.SHA224(msg)[0]
+		sink ^= xcrypto.SHA256(msg)[0]
+		sink ^= xcrypto.SHA512(msg)[0]
+	}))
+	want := 6
+	if compareCurrentVersion("go1.24") >= 0 {
+		// The go1.24 compiler is able to optimize the allocation away.
+		// See cgo_go124.go for more information.
+		want = 0
+	}
+	if n > want {
+		t.Errorf("allocs = %d, want %d", n, want)
+	}
+}
+
 func BenchmarkHash8Bytes(b *testing.B) {
 	b.StopTimer()
 	h := xcrypto.NewSHA256()

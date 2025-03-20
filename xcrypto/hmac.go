@@ -12,7 +12,6 @@ import (
 	"hash"
 	"runtime"
 	"slices"
-	"unsafe"
 )
 
 // commonCryptoHMAC encapsulates an HMAC using xcrypto.
@@ -58,8 +57,11 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 // Write adds more data to the running HMAC hash.
 func (h *commonCryptoHMAC) Write(p []byte) (int, error) {
 	if len(p) > 0 {
-		C.CCHmacUpdate(&h.ctx, unsafe.Pointer(&*addr(p)), C.size_t(len(p)))
+		var pinner runtime.Pinner
+		pinner.Pin(&p[0])
+		defer pinner.Unpin()
 	}
+	C.CCHmacUpdate(&h.ctx, pbase(p), C.size_t(len(p)))
 	runtime.KeepAlive(h)
 	return len(p), nil
 }

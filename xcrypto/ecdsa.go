@@ -52,7 +52,7 @@ func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
 		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
 	}
 
-	pubKeyRef, err := createSecKeyWithData(encodedKey, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(encodedKey, kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func NewPrivateKeyECDSA(curve string, x, y, d BigInt) (*PrivateKeyECDSA, error) 
 		return nil, errors.New("crypto/ecdsa: failed to encode private key: " + err.Error())
 	}
 
-	privKeyRef, err := createSecKeyWithData(encodedKey, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(encodedKey, kSecAttrKeyTypeECSECPrimeRandom, kSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
 	}
 
 	keySizeInBits := curveToKeySizeInBits(curve)
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, nil, err
 	}

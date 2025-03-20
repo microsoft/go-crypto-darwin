@@ -16,6 +16,12 @@ package xcrypto
 // observed to benefit from these directives, not every function that is merely
 // expected to meet the noescape/nocallback criteria.
 
-// #cgo noescape SecRandomCopyBytes
-// #cgo nocallback SecRandomCopyBytes
+/*
+#cgo noescape SecRandomCopyBytes
+#cgo nocallback SecRandomCopyBytes
+#cgo noescape CC_MD4
+#cgo nocallback CC_MD4
+#cgo noescape CC_SHA224
+#cgo nocallback CC_SHA224
+*/
 import "C"

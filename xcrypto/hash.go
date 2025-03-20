@@ -149,9 +149,9 @@ func (h *evpHash) Reset() {
 
 func (h *evpHash) Write(p []byte) (int, error) {
 	h.initialize()
-	defer h.pinner.Unpin()
-	h.pinner.Pin(&p[0])
 	if len(p) > 0 {
+		defer h.pinner.Unpin()
+		h.pinner.Pin(&p[0])
 		// Use a local variable to prevent the compiler from misinterpreting the pointer
 		data := p
 		if h.update(h.ctx, data) != 1 {

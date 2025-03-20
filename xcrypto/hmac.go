@@ -22,6 +22,7 @@ type commonCryptoHMAC struct {
 	output    []byte
 	size      int
 	blockSize int
+	pinner    runtime.Pinner
 }
 
 // NewHMAC returns a new HMAC using xcrypto.
@@ -57,9 +58,8 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 // Write adds more data to the running HMAC hash.
 func (h *commonCryptoHMAC) Write(p []byte) (int, error) {
 	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
+		h.pinner.Pin(&p[0])
+		defer h.pinner.Unpin()
 	}
 	C.CCHmacUpdate(&h.ctx, pbase(p), C.size_t(len(p)))
 	runtime.KeepAlive(h)

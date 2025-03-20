@@ -15,10 +15,7 @@ func MD5(p []byte) (sum [16]byte) {
 		pinner.Pin(&p[0])
 		defer pinner.Unpin()
 	}
-	C.MD5(
-		base(p),
-		C.size_t(len(p)),
-		base(sum[:]))
+	C.MD5(base(p), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -28,10 +25,7 @@ func SHA1(p []byte) (sum [20]byte) {
 		pinner.Pin(&p[0])
 		defer pinner.Unpin()
 	}
-	C.SHA1(
-		base(p),
-		C.size_t(len(p)),
-		base(sum[:]))
+	C.SHA1(base(p), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -41,10 +35,7 @@ func SHA256(p []byte) (sum [32]byte) {
 		pinner.Pin(&p[0])
 		defer pinner.Unpin()
 	}
-	C.SHA256(
-		base(p),
-		C.size_t(len(p)),
-		base(sum[:]))
+	C.SHA256(base(p), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -54,10 +45,7 @@ func SHA384(p []byte) (sum [48]byte) {
 		pinner.Pin(&p[0])
 		defer pinner.Unpin()
 	}
-	C.SHA384(
-		base(p),
-		C.size_t(len(p)),
-		base(sum[:]))
+	C.SHA384(base(p), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -67,9 +55,6 @@ func SHA512(p []byte) (sum [64]byte) {
 		pinner.Pin(&p[0])
 		defer pinner.Unpin()
 	}
-	C.SHA512(
-		base(p),
-		C.size_t(len(p)),
-		base(sum[:]))
+	C.SHA512(base(p), C.size_t(len(p)), base(sum[:]))
 	return
 }

@@ -12,6 +12,8 @@ import (
 	"hash"
 	"runtime"
 	"slices"
+
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 // commonCryptoHMAC encapsulates an HMAC using xcrypto.
@@ -97,17 +99,17 @@ func (h commonCryptoHMAC) BlockSize() int {
 // Mapping Go hash functions to CommonCrypto hash constants
 func hashToCCDigestHMAC(hash hash.Hash) (C.CCAlgorithm, error) {
 	switch hash.(type) {
-	case *md5Hash:
+	case *cryptokit.MD5Hash:
 		return C.kCCHmacAlgMD5, nil
-	case *sha1Hash:
+	case *cryptokit.SHA1Hash:
 		return C.kCCHmacAlgSHA1, nil
 	case *sha224Hash:
 		return C.kCCHmacAlgSHA224, nil
-	case *sha256Hash:
+	case *cryptokit.SHA256Hash:
 		return C.kCCHmacAlgSHA256, nil
-	case *sha384Hash:
+	case *cryptokit.SHA384Hash:
 		return C.kCCHmacAlgSHA384, nil
-	case *sha512Hash:
+	case *cryptokit.SHA512Hash:
 		return C.kCCHmacAlgSHA512, nil
 	default:
 		return 0, errors.New("unsupported hash function")

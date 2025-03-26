@@ -11,6 +11,8 @@ import (
 	"errors"
 	"hash"
 	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
@@ -49,15 +51,15 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 // Mapping Go hash functions to CommonCrypto hash constants
 func hashToCCDigestPBKDF2(hash hash.Hash) (C.CCAlgorithm, error) {
 	switch hash.(type) {
-	case *sha1Hash:
+	case *cryptokit.SHA1Hash:
 		return C.kCCPRFHmacAlgSHA1, nil
 	case *sha224Hash:
 		return C.kCCPRFHmacAlgSHA224, nil
-	case *sha256Hash:
+	case *cryptokit.SHA256Hash:
 		return C.kCCPRFHmacAlgSHA256, nil
-	case *sha384Hash:
+	case *cryptokit.SHA384Hash:
 		return C.kCCPRFHmacAlgSHA384, nil
-	case *sha512Hash:
+	case *cryptokit.SHA512Hash:
 		return C.kCCPRFHmacAlgSHA512, nil
 	default:
 		return 0, errors.New("unsupported hash function")

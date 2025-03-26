@@ -215,12 +215,12 @@ func (h *evpHash) Size() int {
 	return h.size
 }
 
-type md5Hash struct {
+type MD5Hash struct {
 	*evpHash
 }
 
 func NewMD5() hash.Hash {
-	return &md5Hash{
+	return &MD5Hash{
 		evpHash: newEVPHash(
 			C.NewMD5(),
 			MD5BlockSize,
@@ -238,13 +238,13 @@ func NewMD5() hash.Hash {
 	}
 }
 
-type sha1Hash struct {
+type SHA1Hash struct {
 	*evpHash
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
-	return &sha1Hash{
+	return &SHA1Hash{
 		evpHash: newEVPHash(
 			C.NewSHA1(),
 			SHA1BlockSize,
@@ -262,13 +262,13 @@ func NewSHA1() hash.Hash {
 	}
 }
 
-type sha256Hash struct {
+type SHA256Hash struct {
 	*evpHash
 }
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
-	return &sha256Hash{
+	return &SHA256Hash{
 		evpHash: newEVPHash(
 			C.NewSHA256(),
 			SHA256BlockSize,
@@ -286,13 +286,13 @@ func NewSHA256() hash.Hash {
 	}
 }
 
-type sha384Hash struct {
+type SHA384Hash struct {
 	*evpHash
 }
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
-	return &sha384Hash{
+	return &SHA384Hash{
 		evpHash: newEVPHash(
 			C.NewSHA384(),
 			SHA384BlockSize,
@@ -310,13 +310,13 @@ func NewSHA384() hash.Hash {
 	}
 }
 
-type sha512Hash struct {
+type SHA512Hash struct {
 	*evpHash
 }
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
-	return &sha512Hash{
+	return &SHA512Hash{
 		evpHash: &evpHash{
 			ptr: C.NewSHA512(),
 			writeFunc: func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) C.int {

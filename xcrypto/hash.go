@@ -254,17 +254,9 @@ func NewMD4() hash.Hash {
 	}
 }
 
-type md5Hash struct {
-	*evpHash
-}
-
 // NewMD5 initializes a new MD5 hasher.
 func NewMD5() hash.Hash {
 	return cryptokit.NewMD5()
-}
-
-type sha1Hash struct {
-	*evpHash
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
@@ -294,26 +286,14 @@ func NewSHA224() hash.Hash {
 	}
 }
 
-type sha256Hash struct {
-	*evpHash
-}
-
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
 	return cryptokit.NewSHA256()
 }
 
-type sha384Hash struct {
-	*evpHash
-}
-
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
 	return cryptokit.NewSHA384()
-}
-
-type sha512Hash struct {
-	*evpHash
 }
 
 // NewSHA512 initializes a new SHA512 hasher.

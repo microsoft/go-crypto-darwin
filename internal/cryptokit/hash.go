@@ -140,7 +140,6 @@ func (h *evpHash) Clone() hash.Hash {
 	defer h.pinner.Unpin()
 
 	newHash := newEVPHash(h.cloneFunc(h.ptr), h.blockSize, h.size, h.writeFunc, h.sumFunc, h.resetFunc, h.cloneFunc, h.freeFunc)
-	runtime.SetFinalizer(newHash, (*evpHash).finalize)
 
 	return newHash
 }

@@ -88,7 +88,8 @@ public func MD5Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8
 @_cdecl("MD5Sum")
 public func MD5Sum(_ ptr: UnsafeMutableRawPointer, _ outputPointer: UnsafeMutablePointer<UInt8>) {
     let hasher = ptr.assumingMemoryBound(to: Insecure.MD5.self)
-    let hash = hasher.pointee.finalize();
+    let copiedHasher = hasher.pointee
+    let hash = copiedHasher.finalize();
 
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)
@@ -146,7 +147,8 @@ public func SHA1Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt
 @_cdecl("SHA1Sum")
 public func SHA1Sum(_ ptr: UnsafeMutableRawPointer, _ outputPointer: UnsafeMutablePointer<UInt8>) {
     let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
-    let hash = hasher.pointee.finalize();
+    let copiedHasher = hasher.pointee
+    let hash = copiedHasher.finalize();
 
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)
@@ -204,7 +206,8 @@ public func SHA256Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UI
 @_cdecl("SHA256Sum")
 public func SHA256Sum(_ ptr: UnsafeMutableRawPointer, _ outputPointer: UnsafeMutablePointer<UInt8>) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)
-    let hash = hasher.pointee.finalize();
+    let copiedHasher = hasher.pointee
+    let hash = copiedHasher.finalize();
 
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)
@@ -263,7 +266,8 @@ public func SHA384Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UI
 @_cdecl("SHA384Sum")
 public func SHA384Sum(_ ptr: UnsafeMutableRawPointer, _ outputPointer: UnsafeMutablePointer<UInt8>) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA384.self)
-    let hash = hasher.pointee.finalize();
+    let copiedHasher = hasher.pointee
+    let hash = copiedHasher.finalize();
 
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)
@@ -321,7 +325,8 @@ public func SHA512Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UI
 @_cdecl("SHA512Sum")
 public func SHA512Sum(_ ptr: UnsafeMutableRawPointer, _ outputPointer: UnsafeMutablePointer<UInt8>) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA512.self)
-    let hash = hasher.pointee.finalize();
+    let copiedHasher = hasher.pointee
+    let hash = copiedHasher.finalize();
 
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)

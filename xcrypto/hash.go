@@ -260,20 +260,7 @@ type md5Hash struct {
 
 // NewMD5 initializes a new MD5 hasher.
 func NewMD5() hash.Hash {
-	return &md5Hash{
-		evpHash: newEvpHash(
-			func(ctx unsafe.Pointer) C.int { return C.CC_MD5_Init((*C.CC_MD5_CTX)(ctx)) },
-			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_MD5_Update((*C.CC_MD5_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
-			},
-			func(ctx unsafe.Pointer, digest []byte) C.int {
-				return C.CC_MD5_Final(base(digest), (*C.CC_MD5_CTX)(ctx))
-			},
-			C.sizeof_CC_MD5_CTX,
-			C.CC_MD5_BLOCK_BYTES,
-			C.CC_MD5_DIGEST_LENGTH,
-		),
-	}
+	return cryptokit.NewMD5()
 }
 
 type sha1Hash struct {
@@ -282,20 +269,7 @@ type sha1Hash struct {
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
-	return &sha1Hash{
-		evpHash: newEvpHash(
-			func(ctx unsafe.Pointer) C.int { return C.CC_SHA1_Init((*C.CC_SHA1_CTX)(ctx)) },
-			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA1_Update((*C.CC_SHA1_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
-			},
-			func(ctx unsafe.Pointer, digest []byte) C.int {
-				return C.CC_SHA1_Final(base(digest), (*C.CC_SHA1_CTX)(ctx))
-			},
-			C.sizeof_CC_SHA1_CTX,
-			C.CC_SHA1_BLOCK_BYTES,
-			C.CC_SHA1_DIGEST_LENGTH,
-		),
-	}
+	return cryptokit.NewSHA1()
 }
 
 type sha224Hash struct {
@@ -326,20 +300,7 @@ type sha256Hash struct {
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
-	return &sha256Hash{
-		evpHash: newEvpHash(
-			func(ctx unsafe.Pointer) C.int { return C.CC_SHA256_Init((*C.CC_SHA256_CTX)(ctx)) },
-			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA256_Update((*C.CC_SHA256_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
-			},
-			func(ctx unsafe.Pointer, digest []byte) C.int {
-				return C.CC_SHA256_Final(base(digest), (*C.CC_SHA256_CTX)(ctx))
-			},
-			C.sizeof_CC_SHA256_CTX,
-			C.CC_SHA256_BLOCK_BYTES,
-			C.CC_SHA256_DIGEST_LENGTH,
-		),
-	}
+	return cryptokit.NewSHA256()
 }
 
 type sha384Hash struct {
@@ -348,20 +309,7 @@ type sha384Hash struct {
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
-	return &sha384Hash{
-		evpHash: newEvpHash(
-			func(ctx unsafe.Pointer) C.int { return C.CC_SHA384_Init((*C.CC_SHA512_CTX)(ctx)) },
-			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA384_Update((*C.CC_SHA512_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
-			},
-			func(ctx unsafe.Pointer, digest []byte) C.int {
-				return C.CC_SHA384_Final(base(digest), (*C.CC_SHA512_CTX)(ctx))
-			},
-			C.sizeof_CC_SHA512_CTX,
-			C.CC_SHA384_BLOCK_BYTES,
-			C.CC_SHA384_DIGEST_LENGTH,
-		),
-	}
+	return cryptokit.NewSHA384()
 }
 
 type sha512Hash struct {
@@ -370,18 +318,5 @@ type sha512Hash struct {
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
-	return &sha512Hash{
-		evpHash: newEvpHash(
-			func(ctx unsafe.Pointer) C.int { return C.CC_SHA512_Init((*C.CC_SHA512_CTX)(ctx)) },
-			func(ctx unsafe.Pointer, data []byte) C.int {
-				return C.CC_SHA512_Update((*C.CC_SHA512_CTX)(ctx), pbase(data), C.CC_LONG(len(data)))
-			},
-			func(ctx unsafe.Pointer, digest []byte) C.int {
-				return C.CC_SHA512_Final(base(digest), (*C.CC_SHA512_CTX)(ctx))
-			},
-			C.sizeof_CC_SHA512_CTX,
-			C.CC_SHA512_BLOCK_BYTES,
-			C.CC_SHA512_DIGEST_LENGTH,
-		),
-	}
+	return cryptokit.NewSHA512()
 }

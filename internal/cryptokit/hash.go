@@ -312,19 +312,19 @@ type SHA512Hash struct {
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
 	return &SHA512Hash{
-		evpHash: &evpHash{
-			ptr: C.NewSHA512(),
-			writeFunc: func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
+		evpHash: newEVPHash(
+			C.NewSHA512(),
+			SHA512BlockSize,
+			SHA512Size,
+			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
 				C.SHA512Write(p0, p1, p2)
 			},
-			sumFunc:   func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA512Sum(p0, p1) },
-			resetFunc: func(p0 unsafe.Pointer) { C.SHA512Reset(p0) },
-			cloneFunc: func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
+			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA512Sum(p0, p1) },
+			func(p0 unsafe.Pointer) { C.SHA512Reset(p0) },
+			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
 				return C.SHA512Copy(p0)
 			},
-			freeFunc:  func(p0 unsafe.Pointer) { C.SHA512Free(p0) },
-			blockSize: SHA512BlockSize,
-			size:      SHA512Size,
-		},
+			func(p0 unsafe.Pointer) { C.SHA512Free(p0) },
+		),
 	}
 }

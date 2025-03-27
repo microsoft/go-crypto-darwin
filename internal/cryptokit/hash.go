@@ -139,7 +139,7 @@ func (h *evpHash) Clone() hash.Hash {
 
 	newHash := newEVPHash(h.cloneFunc(h.ptr), h.blockSize, h.size, h.writeFunc, h.sumFunc, h.resetFunc, h.cloneFunc, h.freeFunc)
 
-	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
+	runtime.KeepAlive(h)
 
 	return newHash
 }
@@ -151,7 +151,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 	}
 	h.writeFunc(h.ptr, base(p), C.int(len(p)))
 
-	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
+	runtime.KeepAlive(h)
 
 	return len(p), nil
 }
@@ -164,7 +164,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 	}
 	h.writeFunc(h.ptr, base(p), C.int(len(p)))
 
-	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
+	runtime.KeepAlive(h)
 
 	return len(s), nil
 }
@@ -172,7 +172,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 func (h *evpHash) WriteByte(c byte) error {
 	h.writeFunc(h.ptr, base([]byte{c}), C.int(1))
 
-	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
+	runtime.KeepAlive(h)
 
 	return nil
 }
@@ -180,7 +180,7 @@ func (h *evpHash) WriteByte(c byte) error {
 func (h *evpHash) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.size, 64) // explicit cap to allow stack allocation
 	h.sumFunc(h.ptr, base(hashSlice))
-	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
+	runtime.KeepAlive(h)
 
 	b = append(b, hashSlice...)
 	return b

@@ -144,7 +144,7 @@ func (h *evpHash) Clone() hash.Hash {
 	return newHash
 }
 
-func (h *evpHash) Write(p []byte) (n int, err error) {
+func (h *evpHash) Write(p []byte) (int, error) {
 	if len(p) > 0 {
 		h.pinner.Pin(&p[0])
 		defer h.pinner.Unpin()
@@ -153,10 +153,10 @@ func (h *evpHash) Write(p []byte) (n int, err error) {
 
 	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
 
-	return len(p), err
+	return len(p), nil
 }
 
-func (h *evpHash) WriteString(s string) (n int, err error) {
+func (h *evpHash) WriteString(s string) (int, error) {
 	p := []byte(s)
 	if len(p) > 0 {
 		h.pinner.Pin(&p[0])
@@ -166,15 +166,15 @@ func (h *evpHash) WriteString(s string) (n int, err error) {
 
 	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
 
-	return len(s), err
+	return len(s), nil
 }
 
-func (h *evpHash) WriteByte(c byte) (err error) {
+func (h *evpHash) WriteByte(c byte) error {
 	h.writeFunc(h.ptr, base([]byte{c}), C.int(1))
 
 	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
 
-	return err
+	return nil
 }
 
 func (h *evpHash) Sum(b []byte) []byte {

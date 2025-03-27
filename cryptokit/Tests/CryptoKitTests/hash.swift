@@ -11,8 +11,8 @@ final class CryptoKitTests: XCTestCase {
     let testString = "The quick brown fox jumps over the lazy dog"
     let emptyString = ""
     
-    // Test MD5 hash function
-    func testMD5() {
+    // Test one shot MD5 hash function
+    func testOneShotMD5() {
         let input = Array(testString.utf8)
         var output = [UInt8](repeating: 0, count: 16) // MD5 is 16 bytes
         
@@ -39,8 +39,8 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(output).hexString, emptyExpectedHex)
     }
     
-    // Test SHA1 hash function
-    func testSHA1() {
+    // Test one shot SHA1 hash function
+    func testOneShotSHA1() {
         let input = Array(testString.utf8)
         var output = [UInt8](repeating: 0, count: 20) // SHA1 is 20 bytes
         
@@ -67,8 +67,8 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(output).hexString, emptyExpectedHex)
     }
     
-    // Test SHA256 hash function
-    func testSHA256() {
+    // Test one shot SHA256 hash function
+    func testOneShotSHA256() {
         let input = Array(testString.utf8)
         var output = [UInt8](repeating: 0, count: 32) // SHA256 is 32 bytes
         
@@ -95,8 +95,8 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(output).hexString, emptyExpectedHex)
     }
     
-    // Test SHA384 hash function
-    func testSHA384() {
+    // Test one shot SHA384 hash function
+    func testOneShotSHA384() {
         let input = Array(testString.utf8)
         var output = [UInt8](repeating: 0, count: 48) // SHA384 is 48 bytes
         
@@ -123,8 +123,8 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(output).hexString, emptyExpectedHex)
     }
     
-    // Test SHA512 hash function
-    func testSHA512() {
+    // Test one shot SHA512 hash function
+    func testOneShotSHA512() {
         let input = Array(testString.utf8)
         var output = [UInt8](repeating: 0, count: 64) // SHA512 is 64 bytes
         
@@ -172,7 +172,6 @@ final class CryptoKitTests: XCTestCase {
     }
     
     // Test data
-    private let emptyString = ""
     private let testString1 = "hello world"
     private let testString2 = "The quick brown fox jumps over the lazy dog"
     

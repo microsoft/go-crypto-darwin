@@ -13,6 +13,8 @@ import (
 	"hash"
 	"strconv"
 	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 type algorithmType int
@@ -168,15 +170,15 @@ func evpVerify(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Has
 // hashToCryptoHash converts a hash.Hash to a crypto.Hash.
 func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
 	switch hash.(type) {
-	case *sha1Hash:
+	case *cryptokit.SHA1Hash:
 		return crypto.SHA1, nil
 	case *sha224Hash:
 		return crypto.SHA224, nil
-	case *sha256Hash:
+	case *cryptokit.SHA256Hash:
 		return crypto.SHA256, nil
-	case *sha384Hash:
+	case *cryptokit.SHA384Hash:
 		return crypto.SHA384, nil
-	case *sha512Hash:
+	case *cryptokit.SHA512Hash:
 		return crypto.SHA512, nil
 	default:
 		return 0, errors.New("unsupported hash function")

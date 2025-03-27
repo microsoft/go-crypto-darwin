@@ -46,4 +46,54 @@ void SHA256(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outp
 void SHA384(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 void SHA512(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 
+// MD5
+void *NewMD5(void);
+int MD5Write(void *ptr, const uint8_t *data, int length);
+void MD5Sum(void *ptr, uint8_t *outputPointer);
+void MD5Reset(void *ptr);
+int MD5Size(void);
+int MD5BlockSize(void);
+void *MD5Copy(void *ptr);
+void MD5Free(void *ptr);
+
+// SHA1
+void *NewSHA1(void);
+void SHA1Write(void *ptr, const uint8_t *data, int length);
+void SHA1Sum(void *ptr, uint8_t *outputPointer);
+void SHA1Reset(void *ptr);
+int SHA1Size(void);
+int SHA1BlockSize(void);
+void *SHA1Copy(void *ptr);
+void SHA1Free(void *ptr);
+
+// SHA256
+void *NewSHA256(void);
+void SHA256Write(void *ptr, const uint8_t *data, int length);
+void SHA256Sum(void *ptr, uint8_t *outputPointer);
+void SHA256Reset(void *ptr);
+int SHA256Size(void);
+int SHA256BlockSize(void);
+void *SHA256Copy(void *ptr);
+void SHA256Free(void *ptr);
+
+// SHA384
+void *NewSHA384(void);
+void SHA384Write(void *ptr, const uint8_t *data, int length);
+void SHA384Sum(void *ptr, uint8_t *outputPointer);
+void SHA384Reset(void *ptr);
+int SHA384Size(void);
+int SHA384BlockSize(void);
+void *SHA384Copy(void *ptr);
+void SHA384Free(void *ptr);
+
+// SHA512
+void *NewSHA512(void);
+void SHA512Write(void *ptr, const uint8_t *data, int length);
+void SHA512Sum(void *ptr, uint8_t *outputPointer);
+void SHA512Reset(void *ptr);
+int SHA512Size(void);
+int SHA512BlockSize(void);
+void *SHA512Copy(void *ptr);
+void SHA512Free(void *ptr);
+
 #endif /* CRYPTOKIT_H */

@@ -3,8 +3,7 @@
 
 import XCTest
 import Foundation
-import CryptoKit // Required for SHA types used in HashingFunctions/configs
-import Insecure // Required for MD5/SHA1 types used in HashingFunctions/configs (Ensure this module exists if needed)
+import CryptoKit
 @testable import CryptoKitSrc // Make internal/public functions from CryptoKitSrc available
 
 // MARK: - Data <-> Hex String Helpers (Combined & Enhanced)

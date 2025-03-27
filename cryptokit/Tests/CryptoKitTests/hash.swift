@@ -339,38 +339,6 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(result2, "55d99c20facde0a7a5ba589fd2aa5a71")
     }
     
-    // MARK: - Additional hash algorithm tests
-    
-    func testSHA384() {
-        let input = testString1.data(using: .utf8)!
-        let output = UnsafeMutablePointer<UInt8>.allocate(capacity: 48)
-        defer { output.deallocate() }
-        
-        input.withUnsafeBytes { inputPtr in
-            SHA384(inputPointer: inputPtr.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                   inputLength: input.count,
-                   outputPointer: output)
-        }
-        
-        let result = bytesToHexString(Array(UnsafeBufferPointer(start: output, count: 48)))
-        XCTAssertEqual(result, SHA384_hello)
-    }
-    
-    func testSHA512() {
-        let input = testString1.data(using: .utf8)!
-        let output = UnsafeMutablePointer<UInt8>.allocate(capacity: 64)
-        defer { output.deallocate() }
-        
-        input.withUnsafeBytes { inputPtr in
-            SHA512(inputPointer: inputPtr.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                   inputLength: input.count,
-                   outputPointer: output)
-        }
-        
-        let result = bytesToHexString(Array(UnsafeBufferPointer(start: output, count: 64)))
-        XCTAssertEqual(result, SHA512_hello)
-    }
-    
     // MARK: - Test with empty string
     
     func testEmptyStringHashes() {

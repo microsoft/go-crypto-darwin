@@ -58,7 +58,7 @@ void MD5Free(void *ptr);
 
 // SHA1
 void *NewSHA1(void);
-int SHA1Write(void *ptr, const uint8_t *data, int length);
+void SHA1Write(void *ptr, const uint8_t *data, int length);
 void SHA1Sum(void *ptr, uint8_t *outputPointer);
 void SHA1Reset(void *ptr);
 int SHA1Size(void);
@@ -68,7 +68,7 @@ void SHA1Free(void *ptr);
 
 // SHA256
 void *NewSHA256(void);
-int SHA256Write(void *ptr, const uint8_t *data, int length);
+void SHA256Write(void *ptr, const uint8_t *data, int length);
 void SHA256Sum(void *ptr, uint8_t *outputPointer);
 void SHA256Reset(void *ptr);
 int SHA256Size(void);
@@ -78,7 +78,7 @@ void SHA256Free(void *ptr);
 
 // SHA384
 void *NewSHA384(void);
-int SHA384Write(void *ptr, const uint8_t *data, int length);
+void SHA384Write(void *ptr, const uint8_t *data, int length);
 void SHA384Sum(void *ptr, uint8_t *outputPointer);
 void SHA384Reset(void *ptr);
 int SHA384Size(void);
@@ -88,7 +88,7 @@ void SHA384Free(void *ptr);
 
 // SHA512
 void *NewSHA512(void);
-int SHA512Write(void *ptr, const uint8_t *data, int length);
+void SHA512Write(void *ptr, const uint8_t *data, int length);
 void SHA512Sum(void *ptr, uint8_t *outputPointer);
 void SHA512Reset(void *ptr);
 int SHA512Size(void);

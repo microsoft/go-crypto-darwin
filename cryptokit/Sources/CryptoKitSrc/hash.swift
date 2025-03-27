@@ -38,6 +38,7 @@ public func SHA256(
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA256.hash(data: inputData)
+
     let hashData = hash.withUnsafeBytes { Data($0) }
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
@@ -76,13 +77,13 @@ public func NewMD5() -> UnsafeMutableRawPointer {
 }
 
 @_cdecl("MD5Write")
-public func MD5Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) -> Int {
+public func MD5Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int)  {
     let hasher = ptr.assumingMemoryBound(to: Insecure.MD5.self)
     let buffer = UnsafeRawBufferPointer(start: data, count: length)
 
     hasher.pointee.update(data: buffer)
-    
-    return length // Always return full length as Swift doesn't have partial writes
+
+    // No need to return length as Swift doesn't have partial writes
 }
 
 @_cdecl("MD5Sum")
@@ -135,13 +136,13 @@ public func NewSHA1() -> UnsafeMutableRawPointer {
 }
 
 @_cdecl("SHA1Write")
-public func SHA1Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) -> Int {
+public func SHA1Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) {
     let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
     let buffer = UnsafeRawBufferPointer(start: data, count: length)
 
     hasher.pointee.update(data: buffer)
     
-    return length // Always return full length as Swift doesn't have partial writes
+    // No need to return length as Swift doesn't have partial writes
 }
 
 @_cdecl("SHA1Sum")
@@ -195,12 +196,13 @@ public func NewSHA256() -> UnsafeMutableRawPointer {
 }
 
 @_cdecl("SHA256Write")
-public func SHA256Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) -> Int {
+public func SHA256Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)
     let buffer = UnsafeRawBufferPointer(start: data, count: length)
 
     hasher.pointee.update(data: buffer)
-    return length // Always return full length as Swift doesn't have partial writes
+    
+    // No need to return length as Swift doesn't have partial writes
 }
 
 @_cdecl("SHA256Sum")
@@ -254,13 +256,13 @@ public func NewSHA384() -> UnsafeMutableRawPointer {
 }
 
 @_cdecl("SHA384Write")
-public func SHA384Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) -> Int {
+public func SHA384Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA384.self)
     let buffer = UnsafeRawBufferPointer(start: data, count: length)
 
     hasher.pointee.update(data: buffer)
     
-    return length // Always return full length as Swift doesn't have partial writes
+    // No need to return length as Swift doesn't have partial writes
 }
 
 @_cdecl("SHA384Sum")
@@ -313,13 +315,13 @@ public func NewSHA512() -> UnsafeMutableRawPointer {
 }
 
 @_cdecl("SHA512Write")
-public func SHA512Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) -> Int {
+public func SHA512Write(_ ptr: UnsafeMutableRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int) {
     let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA512.self)
     let buffer = UnsafeRawBufferPointer(start: data, count: length)
 
     hasher.pointee.update(data: buffer)
     
-    return length // Always return full length as Swift doesn't have partial writes
+    // No need to return length as Swift doesn't have partial writes
 }
 
 @_cdecl("SHA512Sum")

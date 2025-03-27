@@ -153,7 +153,7 @@ func (h *evpHash) Write(p []byte) (n int, err error) {
 
 	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
 
-	return 0, err
+	return len(p), err
 }
 
 func (h *evpHash) WriteString(s string) (n int, err error) {
@@ -166,7 +166,7 @@ func (h *evpHash) WriteString(s string) (n int, err error) {
 
 	runtime.KeepAlive(h) // Ensure the hash object is not garbage-collected
 
-	return 0, err
+	return len(s), err
 }
 
 func (h *evpHash) WriteByte(c byte) (err error) {

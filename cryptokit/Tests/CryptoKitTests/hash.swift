@@ -183,7 +183,7 @@ final class CryptoKitTests: XCTestCase {
         
         // Known SHA384 hash for empty string
         // Correction: Original code had a typo in the empty hash for SHA384 (last digit was b instead of 4)
-        let emptyExpectedHex = "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b954"
+        let emptyExpectedHex = "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b"
         XCTAssertEqual(Data(emptyOutput).hexString, emptyExpectedHex)
     }
     
@@ -252,7 +252,7 @@ final class CryptoKitTests: XCTestCase {
     static let sha384Config = HashingFunctions(
         name: "SHA384_Wrapper", new: NewSHA384, write: SHA384Write, sum: SHA384Sum, reset: SHA384Reset, copy: SHA384Copy, free: SHA384Free, size: SHA384Size, blockSize: SHA384BlockSize,
         expectedSize: 48, expectedBlockSize: 128,
-        knownEmptyHashHex: "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b954",
+        knownEmptyHashHex: "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
         knownTestStringHashHex: "fdbd8e75a67f29f701a4e040385e2e23986303ea10239211af907fcbb83578b3e417cb71ce646efd0819dd8c088de1bd" // "hello world"
     )
 

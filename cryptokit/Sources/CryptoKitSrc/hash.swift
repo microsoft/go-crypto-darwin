@@ -103,7 +103,7 @@ public func MD5Reset(_ ptr: UnsafeMutableRawPointer) {
 }
 
 @_cdecl("MD5Size")
-public func MD5BSize() -> Int {
+public func MD5Size() -> Int {
     return Insecure.MD5.byteCount
 }
 

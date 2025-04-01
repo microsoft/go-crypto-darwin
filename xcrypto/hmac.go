@@ -32,6 +32,13 @@ type commonCryptoHMAC struct {
 // CommonCrypto (for example, h could be xcrypto.NewSHA256).
 // If h is not recognized, NewHMAC returns nil.
 func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
+	if _, ok := fh().(*sha224Hash); ok {
+		return newCommonCryptoHMAC(fh, key)
+	}
+	return cryptokit.NewHMAC(fh, key)
+}
+
+func newCommonCryptoHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	h := fh()
 	ccDigest, err := hashToCCDigestHMAC(h)
 	if err != nil {

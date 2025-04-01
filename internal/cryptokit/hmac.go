@@ -35,6 +35,11 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	hashEnum := hashToHMACEnum(h)
+	if hashEnum == 0 {
+		// The hash function is not supported by the HMAC implementation.
+		return nil
+	}
+
 	pinner := runtime.Pinner{}
 
 	if len(key) > 0 {
@@ -153,6 +158,6 @@ func hashToHMACEnum(h hash.Hash) int {
 	case *SHA512Hash:
 		return 5
 	default:
-		panic("unsupported hash function")
+		return 0
 	}
 }

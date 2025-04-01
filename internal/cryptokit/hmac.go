@@ -11,6 +11,7 @@ import (
 	"errors"
 	"hash"
 	"runtime"
+	"slices"
 	"unsafe"
 )
 
@@ -36,7 +37,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 
 	// copying the key here to ensure that it is not modified
 	// while this algorithm is using it.
-	key = append(make([]byte, 0, len(key)), key...)
+	key = slices.Clone(key)
 	kind := hashToHMACEnum(h)
 	if kind == 0 {
 		// The hash function is not supported by the HMAC implementation.

@@ -86,7 +86,7 @@ func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	C.finalizeHMAC(
 		C.int(h.hashEnum),
 		h.ptr,
-		base(b),
+		base(hashSlice),
 	)
 	runtime.KeepAlive(h)
 

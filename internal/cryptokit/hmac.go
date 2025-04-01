@@ -54,7 +54,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 		size:      h.Size(),
 	}
 
-	runtime.SetFinalizer(h, func(h *cryptoKitHMAC) {
+	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
 		if h.ptr != nil {
 			C.freeHMAC(
 				C.int(h.hashEnum),

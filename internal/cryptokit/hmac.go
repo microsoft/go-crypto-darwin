@@ -21,8 +21,8 @@ type cryptoKitHMAC struct {
 	pinner runtime.Pinner
 	ptr    unsafe.Pointer
 
-	hashEnum int
-	key      []byte
+	kind int
+	key  []byte
 
 	blockSize int
 	size      int
@@ -34,8 +34,11 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 		return nil
 	}
 
-	hashEnum := hashToHMACEnum(h)
-	if hashEnum == 0 {
+	// copying the key here to ensure that it is not modified
+	// while this algorithm is using it.
+	key = append(make([]byte, 0, len(key)), key...)
+	kind := hashToHMACEnum(h)
+	if kind == 0 {
 		// The hash function is not supported by the HMAC implementation.
 		return nil
 	}
@@ -50,10 +53,10 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	hmac := &cryptoKitHMAC{
 		pinner: pinner,
 		ptr: C.initMAC(
-			C.int(hashEnum),
+			C.int(kind),
 			base(key), C.int(len(key)),
 		),
-		hashEnum:  hashEnum,
+		kind:      kind,
 		key:       key,
 		blockSize: h.BlockSize(),
 		size:      h.Size(),
@@ -62,7 +65,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
 		if h.ptr != nil {
 			C.freeHMAC(
-				C.int(h.hashEnum),
+				C.int(h.kind),
 				h.ptr,
 			)
 		}
@@ -77,7 +80,7 @@ func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
 		defer h.pinner.Unpin()
 	}
 
-	C.updateHMAC(C.int(h.hashEnum),
+	C.updateHMAC(C.int(h.kind),
 		h.ptr,
 		base(p), C.int(len(p)))
 
@@ -89,7 +92,7 @@ func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
 func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.size, 64) // explicit cap to allow stack allocation
 	C.finalizeHMAC(
-		C.int(h.hashEnum),
+		C.int(h.kind),
 		h.ptr,
 		base(hashSlice),
 	)
@@ -117,12 +120,10 @@ func (h *cryptoKitHMAC) Clone() hash.Hash {
 }
 
 func (h *cryptoKitHMAC) Reset() {
-	if h.ptr != nil {
-		C.freeHMAC(
-			C.int(h.hashEnum),
-			h.ptr,
-		)
-	}
+	C.freeHMAC(
+		C.int(h.kind),
+		h.ptr,
+	)
 
 	if len(h.key) > 0 {
 		h.pinner.Pin(&h.key[0])
@@ -130,7 +131,7 @@ func (h *cryptoKitHMAC) Reset() {
 	}
 
 	h.ptr = C.initMAC(
-		C.int(h.hashEnum),
+		C.int(h.kind),
 		base(h.key), C.int(len(h.key)),
 	)
 

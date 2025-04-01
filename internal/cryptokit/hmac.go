@@ -63,12 +63,10 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		if h.ptr != nil {
-			C.freeHMAC(
-				C.int(h.kind),
-				h.ptr,
-			)
-		}
+		C.freeHMAC(
+			C.int(h.kind),
+			h.ptr,
+		)
 	})
 
 	return hmac

@@ -6,9 +6,9 @@ import Foundation
 
 @_cdecl("initMAC")
 public func initHMAC(
-    hashFunction: Int32,
-    keyPointer: UnsafePointer<UInt8>,
-    keyLength: Int
+    _ hashFunction: Int32,
+    _ keyPointer: UnsafePointer<UInt8>,
+    _ keyLength: Int
 ) -> UnsafeMutableRawPointer {
     let key: SymmetricKey = SymmetricKey(data: Data(bytes: keyPointer, count: keyLength))
     switch hashFunction {
@@ -43,7 +43,7 @@ public func initHMAC(
 }
 
 @_cdecl("freeHMAC")
-public func freeHMAC(hashFunction: Int32, ptr: UnsafeMutableRawPointer) {
+public func freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     switch hashFunction {
     case 1:
         let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.MD5>.self)
@@ -67,8 +67,8 @@ public func freeHMAC(hashFunction: Int32, ptr: UnsafeMutableRawPointer) {
 
 @_cdecl("updateHMAC")
 public func updateHMAC(
-    hashFunction: Int32,
-    ptr: UnsafeMutableRawPointer,
+    _ hashFunction: Int32,
+    _ ptr: UnsafeMutableRawPointer,
     _ data: UnsafePointer<UInt8>,
     _ length: Int
 ) -> Void {
@@ -97,7 +97,7 @@ public func updateHMAC(
 
 @_cdecl("finalizeHMAC")
 public func finalizeHMAC(
-    hashFunction: Int32,
+    _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {

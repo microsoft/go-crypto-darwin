@@ -53,8 +53,6 @@ func hashToCCDigestPBKDF2(hash hash.Hash) (C.CCAlgorithm, error) {
 	switch hash.(type) {
 	case *cryptokit.SHA1Hash:
 		return C.kCCPRFHmacAlgSHA1, nil
-	case *sha224Hash:
-		return C.kCCPRFHmacAlgSHA224, nil
 	case *cryptokit.SHA256Hash:
 		return C.kCCPRFHmacAlgSHA256, nil
 	case *cryptokit.SHA384Hash:

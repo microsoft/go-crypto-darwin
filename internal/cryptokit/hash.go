@@ -170,7 +170,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 }
 
 func (h *evpHash) WriteByte(c byte) error {
-	h.writeFunc(h.ptr, base([]byte{c}), C.int(1))
+	h.writeFunc(h.ptr, (*C.uchar)(unsafe.Pointer(&c)), C.int(1))
 
 	runtime.KeepAlive(h)
 

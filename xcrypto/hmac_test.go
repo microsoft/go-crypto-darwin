@@ -18,7 +18,6 @@ func TestHMAC(t *testing.T) {
 	}{
 		{"md5", xcrypto.NewMD5},
 		{"sha1", xcrypto.NewSHA1},
-		{"sha224", xcrypto.NewSHA224},
 		{"sha256", xcrypto.NewSHA256},
 		{"sha384", xcrypto.NewSHA384},
 		{"sha512", xcrypto.NewSHA512},

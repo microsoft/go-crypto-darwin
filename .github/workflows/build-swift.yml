@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+name: Build Swift
+
 on:
   workflow_dispatch:
   push:
@@ -11,42 +13,45 @@ on:
       - ".github/workflows/build-swift.yml"
       - "gen-swift-bindings.sh"
 
-name: Build Swift
 jobs:
-create-pr:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+  create-pr:
+    runs-on: ubuntu-latest
+    # Prevent workflow from triggering on its own automated commits
+    if: ${{ !contains(github.event.head_commit.message, 'Automated PR') }}
 
-    - name: Create a new branch and commit changes
-      run: |
-        # Configure git for the action
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+    permissions:
+      contents: write
+      pull-requests: write
 
-        # Create a new branch
-        git checkout -b update-readme
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-        # Example change: Append a line to README.md (adjust as needed)
-        echo "Update made by GitHub Actions" >> README.md
+      - name: Create a new branch and commit changes
+        run: |
+          # Configure git for the action
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        # Stage and commit changes
-        git add README.md
-        git commit -m "Update README via GitHub Actions"
+          # Create a new branch
+          git checkout -b update-readme
 
-        # Push the new branch to the repository
-        git push origin update-readme
+          # Example change: Append a line to README.md (adjust as needed)
+          echo "Update made by GitHub Actions" >> README.md
 
-    - name: Create Pull Request via GitHub API
-      run: |
-        curl -X POST \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/pulls \
-          -d '{
-                "title": "Automated PR: Update README",
-                "body": "This pull request was automatically created by GitHub Actions.",
-                "head": "update-readme",
-                "base": "main"
-              }'
+          # Stage and commit changes
+          git add README.md
+          git commit -m "Update README via GitHub Actions"
+
+          # Push the new branch to the repository
+          git push origin update-readme
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Automated PR - Update README"
+          title: "Automated PR - Update README"
+          body: "This pull request was automatically created by GitHub Actions."
+          branch: update-readme
+          base: main

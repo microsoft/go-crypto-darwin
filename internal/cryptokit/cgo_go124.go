@@ -73,5 +73,13 @@ package cryptokit
 #cgo nocallback SHA512BlockSize
 #cgo nocallback SHA512Copy
 #cgo nocallback SHA512Free
+
+#cgo noescape initMAC
+#cgo noescape updateHMAC
+#cgo noescape finalizeHMAC
+#cgo nocallback initMAC
+#cgo nocallback freeHMAC
+#cgo nocallback updateHMAC
+#cgo nocallback finalizeHMAC
 */
 import "C"

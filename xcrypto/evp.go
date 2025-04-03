@@ -172,8 +172,6 @@ func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
 	switch hash.(type) {
 	case *cryptokit.SHA1Hash:
 		return crypto.SHA1, nil
-	case *sha224Hash:
-		return crypto.SHA224, nil
 	case *cryptokit.SHA256Hash:
 		return crypto.SHA256, nil
 	case *cryptokit.SHA384Hash:

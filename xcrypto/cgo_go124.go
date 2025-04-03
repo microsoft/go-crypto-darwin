@@ -19,9 +19,5 @@ package xcrypto
 /*
 #cgo noescape SecRandomCopyBytes
 #cgo nocallback SecRandomCopyBytes
-#cgo noescape CC_MD4
-#cgo nocallback CC_MD4
-#cgo noescape CC_SHA224
-#cgo nocallback CC_SHA224
 */
 import "C"

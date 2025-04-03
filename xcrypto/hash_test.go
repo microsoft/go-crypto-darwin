@@ -18,14 +18,10 @@ import (
 
 func cryptoToHash(h crypto.Hash) func() hash.Hash {
 	switch h {
-	case crypto.MD4:
-		return xcrypto.NewMD4
 	case crypto.MD5:
 		return xcrypto.NewMD5
 	case crypto.SHA1:
 		return xcrypto.NewSHA1
-	case crypto.SHA224:
-		return xcrypto.NewSHA224
 	case crypto.SHA256:
 		return xcrypto.NewSHA256
 	case crypto.SHA384:
@@ -271,10 +267,6 @@ func TestHash_OneShot(t *testing.T) {
 			b := xcrypto.SHA1(p)
 			return b[:]
 		}},
-		{crypto.SHA224, func(p []byte) []byte {
-			b := xcrypto.SHA224(p)
-			return b[:]
-		}},
 		{crypto.SHA256, func(p []byte) []byte {
 			b := xcrypto.SHA256(p)
 			return b[:]
@@ -416,27 +408,6 @@ func TestGolden(t *testing.T) {
 			c.Reset()
 		}
 	}
-	for _, g := range golden224 {
-		s := fmt.Sprintf("%x", xcrypto.SHA224([]byte(g.in)))
-		if s != g.out {
-			t.Fatalf("Sum224 function: sha224(%s) = %s want %s", g.in, s, g.out)
-		}
-		c := xcrypto.NewSHA224()
-		for j := 0; j < 3; j++ {
-			if j < 2 {
-				io.WriteString(c, g.in)
-			} else {
-				io.WriteString(c, g.in[:len(g.in)/2])
-				c.Sum(nil)
-				io.WriteString(c, g.in[len(g.in)/2:])
-			}
-			s := fmt.Sprintf("%x", c.Sum(nil))
-			if s != g.out {
-				t.Fatalf("sha224[%d](%s) = %s want %s", j, g.in, s, g.out)
-			}
-			c.Reset()
-		}
-	}
 }
 
 type cgoData struct {
@@ -467,10 +438,8 @@ func TestHashAllocations(t *testing.T) {
 	}
 	msg := []byte("testing")
 	n := int(testing.AllocsPerRun(10, func() {
-		sink ^= xcrypto.MD4(msg)[0]
 		sink ^= xcrypto.MD5(msg)[0]
 		sink ^= xcrypto.SHA1(msg)[0]
-		sink ^= xcrypto.SHA224(msg)[0]
 		sink ^= xcrypto.SHA256(msg)[0]
 		sink ^= xcrypto.SHA512(msg)[0]
 	}))

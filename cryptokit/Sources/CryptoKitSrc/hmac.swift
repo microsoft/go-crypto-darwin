@@ -105,23 +105,23 @@ public func finalizeHMAC(
     case 1:
         let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.MD5>.self)
         let authenticationCode = hmac.pointee.finalize()
-        Data(authenticationCode).copyBytes(to: outputPointer, count: MD5Size())
+        Data(authenticationCode).copyBytes(to: outputPointer, count: Insecure.MD5.byteCount)
     case 2:
         let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.SHA1>.self)
         let authenticationCode = hmac.pointee.finalize()
-        Data(authenticationCode).copyBytes(to: outputPointer, count: SHA1Size())
+        Data(authenticationCode).copyBytes(to: outputPointer, count: Insecure.SHA1.byteCount)
     case 3:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA256>.self)
         let authenticationCode = hmac.pointee.finalize()
-        Data(authenticationCode).copyBytes(to: outputPointer, count: SHA256Size())
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA256.byteCount)
     case 4:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA384>.self)
         let authenticationCode = hmac.pointee.finalize()
-        Data(authenticationCode).copyBytes(to: outputPointer, count: SHA384Size())
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA384.byteCount)
     case 5:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
         let authenticationCode = hmac.pointee.finalize()
-        Data(authenticationCode).copyBytes(to: outputPointer, count: SHA512Size())
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA512.byteCount)
     default:
         fatalError("Unsupported hash function")
     }

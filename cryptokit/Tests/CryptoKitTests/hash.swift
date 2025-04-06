@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import CryptoKit
+import Foundation
 import XCTest
 
 @testable import CryptoKitSrc
@@ -218,268 +220,155 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(emptyOutput).hexString, emptyExpectedHex)
     }
 
-    // MARK: - === C-Style Wrapper Function Tests ===
+    // MARK: - C-Style Function Tests (Advanced API)
 
-    // MARK: - Properties & Configurations for Wrapper Tests
+    func testHashFunctions() {
+        let testString = "hello world"
+        let testData = Data(testString.utf8)
 
-    // Test string used for C-Style wrapper tests
-    static let wrapperTestString = "hello world"
-    static let wrapperTestStringData = wrapperTestString.data(using: .utf8)!
-    static let emptyData = Data()  // Used by both sets
+        let functionsList: [HashingFunctions] = [
+            HashingFunctions(
+                name: "MD5",
+                new: { hashNew(1) },
+                write: { ptr, data, length in hashWrite(1, ptr, data, length) },
+                sum: { ptr, out in hashSum(1, ptr, out) },
+                reset: { ptr in hashReset(1, ptr) },
+                copy: { ptr in hashCopy(1, ptr) },
+                free: { ptr in hashFree(1, ptr) },
+                size: { hashSize(1) },
+                blockSize: { hashBlockSize(1) },
+                expectedSize: Insecure.MD5.byteCount,
+                expectedBlockSize: Insecure.MD5.blockByteCount,
+                knownEmptyHashHex: "d41d8cd98f00b204e9800998ecf8427e",
+                knownTestStringHashHex: "5eb63bbbe01eeed093cb22bb8f5acdc3"
+            ),
+            HashingFunctions(
+                name: "SHA1",
+                new: { hashNew(2) },
+                write: { ptr, data, length in hashWrite(2, ptr, data, length) },
+                sum: { ptr, out in hashSum(2, ptr, out) },
+                reset: { ptr in hashReset(2, ptr) },
+                copy: { ptr in hashCopy(2, ptr) },
+                free: { ptr in hashFree(2, ptr) },
+                size: { hashSize(2) },
+                blockSize: { hashBlockSize(2) },
+                expectedSize: Insecure.SHA1.byteCount,
+                expectedBlockSize: Insecure.SHA1.blockByteCount,
+                knownEmptyHashHex: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                knownTestStringHashHex: "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
+            ),
+            HashingFunctions(
+                name: "SHA256",
+                new: { hashNew(3) },
+                write: { ptr, data, length in hashWrite(3, ptr, data, length) },
+                sum: { ptr, out in hashSum(3, ptr, out) },
+                reset: { ptr in hashReset(3, ptr) },
+                copy: { ptr in hashCopy(3, ptr) },
+                free: { ptr in hashFree(3, ptr) },
+                size: { hashSize(3) },
+                blockSize: { hashBlockSize(3) },
+                expectedSize: CryptoKit.SHA256.byteCount,
+                expectedBlockSize: CryptoKit.SHA256.blockByteCount,
+                knownEmptyHashHex: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                knownTestStringHashHex: "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+            ),
+            HashingFunctions(
+                name: "SHA384",
+                new: { hashNew(4) },
+                write: { ptr, data, length in hashWrite(4, ptr, data, length) },
+                sum: { ptr, out in hashSum(4, ptr, out) },
+                reset: { ptr in hashReset(4, ptr) },
+                copy: { ptr in hashCopy(4, ptr) },
+                free: { ptr in hashFree(4, ptr) },
+                size: { hashSize(4) },
+                blockSize: { hashBlockSize(4) },
+                expectedSize: CryptoKit.SHA384.byteCount,
+                expectedBlockSize: CryptoKit.SHA384.blockByteCount,
+                knownEmptyHashHex:
+                    "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+                knownTestStringHashHex:
+                    "fdbd8e75a67f29f701a4e040385e2e23986303ea10239211af907fcbb83578b3e417cb71ce646efd0819dd8c088de1bd"
+            ),
+            HashingFunctions(
+                name: "SHA512",
+                new: { hashNew(5) },
+                write: { ptr, data, length in hashWrite(5, ptr, data, length) },
+                sum: { ptr, out in hashSum(5, ptr, out) },
+                reset: { ptr in hashReset(5, ptr) },
+                copy: { ptr in hashCopy(5, ptr) },
+                free: { ptr in hashFree(5, ptr) },
+                size: { hashSize(5) },
+                blockSize: { hashBlockSize(5) },
+                expectedSize: CryptoKit.SHA512.byteCount,
+                expectedBlockSize: CryptoKit.SHA512.blockByteCount,
+                knownEmptyHashHex:
+                    "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+                knownTestStringHashHex:
+                    "309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f"
+            ),
+        ]
 
-    // Algorithm Configurations for C-Style Wrappers
-    // (Assumes the @_cdecl functions NewMD5, MD5Write etc. are defined and accessible)
-    static let md5Config = HashingFunctions(
-        name: "MD5_Wrapper",
-        new: NewMD5,
-        write: MD5Write,
-        sum: MD5Sum,
-        reset: MD5Reset,
-        copy: MD5Copy,
-        free: MD5Free,
-        size: MD5Size,
-        blockSize: MD5BlockSize,
-        expectedSize: 16,
-        expectedBlockSize: 64,
-        knownEmptyHashHex: "d41d8cd98f00b204e9800998ecf8427e",
-        knownTestStringHashHex: "5eb63bbbe01eeed093cb22bb8f5acdc3"  // "hello world"
-    )
+        for functions in functionsList {
+            let ptr = functions.new()
+            defer { functions.free(ptr) }
 
-    static let sha1Config = HashingFunctions(
-        name: "SHA1_Wrapper",
-        new: NewSHA1,
-        write: SHA1Write,
-        sum: SHA1Sum,
-        reset: SHA1Reset,
-        copy: SHA1Copy,
-        free: SHA1Free,
-        size: SHA1Size,
-        blockSize: SHA1BlockSize,
-        expectedSize: 20,
-        expectedBlockSize: 64,
-        knownEmptyHashHex: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-        knownTestStringHashHex: "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"  // "hello world"
-    )
-
-    static let sha256Config = HashingFunctions(
-        name: "SHA256_Wrapper",
-        new: NewSHA256,
-        write: SHA256Write,
-        sum: SHA256Sum,
-        reset: SHA256Reset,
-        copy: SHA256Copy,
-        free: SHA256Free,
-        size: SHA256Size,
-        blockSize: SHA256BlockSize,
-        expectedSize: 32,
-        expectedBlockSize: 64,
-        knownEmptyHashHex: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        knownTestStringHashHex: "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"  // "hello world"
-    )
-
-    static let sha384Config = HashingFunctions(
-        name: "SHA384_Wrapper",
-        new: NewSHA384,
-        write: SHA384Write,
-        sum: SHA384Sum,
-        reset: SHA384Reset,
-        copy: SHA384Copy,
-        free: SHA384Free,
-        size: SHA384Size,
-        blockSize: SHA384BlockSize,
-        expectedSize: 48,
-        expectedBlockSize: 128,
-        knownEmptyHashHex:
-            "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
-        knownTestStringHashHex:
-            "fdbd8e75a67f29f701a4e040385e2e23986303ea10239211af907fcbb83578b3e417cb71ce646efd0819dd8c088de1bd"  // "hello world"
-    )
-
-    static let sha512Config = HashingFunctions(
-        name: "SHA512_Wrapper",
-        new: NewSHA512,
-        write: SHA512Write,
-        sum: SHA512Sum,
-        reset: SHA512Reset,
-        copy: SHA512Copy,
-        free: SHA512Free,
-        size: SHA512Size,
-        blockSize: SHA512BlockSize,
-        expectedSize: 64,
-        expectedBlockSize: 128,
-        knownEmptyHashHex:
-            "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
-        knownTestStringHashHex:
-            "309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f"  // "hello world"
-    )
-
-    static let allWrapperConfigs = [md5Config, sha1Config, sha256Config, sha384Config, sha512Config]
-
-    // MARK: - Generic Helper Methods for Wrapper Tests
-
-    func calculateHash(for data: Data, using functions: HashingFunctions) -> Data {
-        let ptr = functions.new()
-        defer { functions.free(ptr) }
-        writeData(data, to: ptr, using: functions)
-        return getSum(from: ptr, using: functions)
-    }
-
-    func getSum(from ptr: UnsafeMutableRawPointer, using functions: HashingFunctions) -> Data {
-        let outputSize = functions.size()
-        // Check size consistency within the helper for robustness
-        XCTAssertEqual(
-            outputSize,
-            functions.expectedSize,
-            "\(functions.name): size() returned unexpected value (\(outputSize) vs expected \(functions.expectedSize))."
-        )
-        guard outputSize == functions.expectedSize else {
-            // Avoid buffer overflow if size is wrong
-            XCTFail("\(functions.name): Aborting sum calculation due to size mismatch.")
-            return Data()  // Return empty data on critical failure
-        }
-        var outputBuffer = [UInt8](repeating: 0, count: outputSize)
-        outputBuffer.withUnsafeMutableBytes { rawMutableBufferPointer in
-            let outputPtr = rawMutableBufferPointer.baseAddress!.assumingMemoryBound(to: UInt8.self)
-            functions.sum(ptr, outputPtr)
-        }
-        return Data(outputBuffer)
-    }
-
-    func writeData(_ data: Data, to ptr: UnsafeMutableRawPointer, using functions: HashingFunctions) {
-        data.withUnsafeBytes { rawBufferPointer in
-            let count = rawBufferPointer.count
-            let baseAddress = rawBufferPointer.baseAddress
-            // Handle empty data case explicitly by passing a potentially null pointer but with count 0
-            let unsafePointer = baseAddress?.assumingMemoryBound(to: UInt8.self) ?? UnsafePointer<UInt8>(bitPattern: 0)!
-            functions.write(ptr, unsafePointer, count)
-        }
-    }
-
-    // MARK: - Wrapper Tests Grouped by Functionality
-
-    func testWrapper_BasicHashing() {
-        for config in Self.allWrapperConfigs {
-            // Test empty string
-            let emptyResult = calculateHash(for: Self.emptyData, using: config)
+            XCTAssertEqual(functions.size(), functions.expectedSize, "\(functions.name) size mismatch")
             XCTAssertEqual(
-                emptyResult.hexEncodedString(),
-                config.knownEmptyHashHex,
-                "\(config.name): Empty string hash mismatch"
+                functions.blockSize(),
+                functions.expectedBlockSize,
+                "\(functions.name) block size mismatch"
             )
 
-            // Test known string ("hello world")
-            let testStringResult = calculateHash(for: Self.wrapperTestStringData, using: config)
+            // Test empty hash
+            let emptyOutput = UnsafeMutablePointer<UInt8>.allocate(capacity: functions.size())
+            defer { emptyOutput.deallocate() }
+
+            functions.sum(ptr, emptyOutput)
             XCTAssertEqual(
-                testStringResult.hexEncodedString(),
-                config.knownTestStringHashHex,
-                "\(config.name): '\(Self.wrapperTestString)' hash mismatch"
+                Data(buffer: UnsafeBufferPointer(start: emptyOutput, count: functions.size())).hexEncodedString(),
+                functions.knownEmptyHashHex,
+                "\(functions.name) empty hash mismatch"
+            )
+
+            // Test hash with data
+            functions.reset(ptr)
+            testData.withUnsafeBytes { buffer in
+                functions.write(ptr, buffer.baseAddress!.assumingMemoryBound(to: UInt8.self), buffer.count)
+            }
+
+            let output = UnsafeMutablePointer<UInt8>.allocate(capacity: functions.size())
+            defer { output.deallocate() }
+
+            functions.sum(ptr, output)
+            XCTAssertEqual(
+                Data(buffer: UnsafeBufferPointer(start: output, count: functions.size())).hexEncodedString(),
+                functions.knownTestStringHashHex,
+                "\(functions.name) hash mismatch"
+            )
+
+            // Test copy
+            let copiedPtr = functions.copy(ptr)
+            defer { functions.free(copiedPtr) }
+
+            let copiedOutput = UnsafeMutablePointer<UInt8>.allocate(capacity: functions.size())
+            defer { copiedOutput.deallocate() }
+
+            functions.sum(copiedPtr, copiedOutput)
+            XCTAssertEqual(
+                Data(buffer: UnsafeBufferPointer(start: copiedOutput, count: functions.size())).hexEncodedString(),
+                functions.knownTestStringHashHex,
+                "\(functions.name) copied hash mismatch"
+            )
+
+            // Test reset and re-sum
+            functions.reset(ptr)
+            functions.sum(ptr, output)
+            XCTAssertEqual(
+                Data(buffer: UnsafeBufferPointer(start: output, count: functions.size())).hexEncodedString(),
+                functions.knownEmptyHashHex,
+                "\(functions.name) reset hash mismatch"
             )
         }
     }
 
-    func testWrapper_MultipleWrites() {
-        let part1 = "hello "
-        let part2 = "world"
-        let data1 = part1.data(using: .utf8)!
-        let data2 = part2.data(using: .utf8)!
-
-        for config in Self.allWrapperConfigs {
-            let ptr = config.new()
-            defer { config.free(ptr) }
-
-            writeData(data1, to: ptr, using: config)
-            writeData(data2, to: ptr, using: config)
-
-            let resultData = getSum(from: ptr, using: config)
-            XCTAssertEqual(
-                resultData.hexEncodedString(),
-                config.knownTestStringHashHex,
-                "\(config.name): Multiple writes hash mismatch"
-            )
-        }
-    }
-
-    func testWrapper_Reset() {
-        for config in Self.allWrapperConfigs {
-            let ptr = config.new()
-            defer { config.free(ptr) }
-
-            writeData("initial data".data(using: .utf8)!, to: ptr, using: config)  // Write something
-            config.reset(ptr)  // Reset
-            // After reset, it should behave as if new, so hashing empty data should yield empty hash
-            writeData(Self.emptyData, to: ptr, using: config)
-
-            let resultData = getSum(from: ptr, using: config)
-            XCTAssertEqual(
-                resultData.hexEncodedString(),
-                config.knownEmptyHashHex,
-                "\(config.name): Hash after reset + empty write mismatch"
-            )
-
-            // Optional: Write test string after reset to double check
-            config.reset(ptr)
-            writeData(Self.wrapperTestStringData, to: ptr, using: config)
-            let resultData2 = getSum(from: ptr, using: config)
-            XCTAssertEqual(
-                resultData2.hexEncodedString(),
-                config.knownTestStringHashHex,
-                "\(config.name): Hash after reset + '\(Self.wrapperTestString)' write mismatch"
-            )
-        }
-    }
-
-    func testWrapper_Copy() {
-        let initialData = "Initial ".data(using: .utf8)!
-        let originalExtraData = "Original Extra".data(using: .utf8)!
-        let copiedExtraData = "Copied Extra".data(using: .utf8)!
-
-        let fullOriginalData = initialData + originalExtraData  // "Initial Original Extra"
-        let fullCopiedData = initialData + copiedExtraData  // "Initial Copied Extra"
-
-        for config in Self.allWrapperConfigs {
-            let originalPtr = config.new()
-            defer { config.free(originalPtr) }
-
-            writeData(initialData, to: originalPtr, using: config)
-
-            let copiedPtr = config.copy(originalPtr)  // Create copy *after* initial write
-            defer { config.free(copiedPtr) }
-
-            // Write different data to original and copy *after* copying
-            writeData(originalExtraData, to: originalPtr, using: config)
-            writeData(copiedExtraData, to: copiedPtr, using: config)
-
-            // Get final sums
-            let originalResult = getSum(from: originalPtr, using: config)
-            let copiedResult = getSum(from: copiedPtr, using: config)
-
-            // Calculate expected results directly for comparison
-            let expectedOriginal = calculateHash(for: fullOriginalData, using: config)
-            let expectedCopied = calculateHash(for: fullCopiedData, using: config)
-
-            XCTAssertEqual(originalResult, expectedOriginal, "\(config.name): Original hash after copy is incorrect.")
-            XCTAssertEqual(copiedResult, expectedCopied, "\(config.name): Copied hash is incorrect.")
-            XCTAssertNotEqual(originalResult, copiedResult, "\(config.name): Original and Copied hashes should differ.")
-        }
-    }
-
-    func testWrapper_Constants() {
-        for config in Self.allWrapperConfigs {
-            XCTAssertEqual(config.size(), config.expectedSize, "\(config.name): size() constant mismatch.")
-            XCTAssertEqual(
-                config.blockSize(),
-                config.expectedBlockSize,
-                "\(config.name): blockSize() constant mismatch."
-            )
-        }
-    }
-
-    func testWrapper_Lifecycle() {
-        for config in Self.allWrapperConfigs {
-            let ptr = config.new()
-            XCTAssertNotNil(ptr, "\(config.name): new() returned nil")
-            // Simple check to ensure free doesn't crash (passes if no crash)
-            config.free(ptr)
-        }
-    }
 }

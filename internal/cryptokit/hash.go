@@ -64,17 +64,25 @@ func SHA512(p []byte) (sum [64]byte) {
 	return
 }
 
+const (
+	md5    = 1
+	sha1   = 2
+	sha256 = 3
+	sha384 = 4
+	sha512 = 5
+)
+
 var (
-	MD5BlockSize    = int(C.MD5BlockSize())
-	MD5Size         = int(C.MD5Size())
-	SHA1BlockSize   = int(C.SHA1BlockSize())
-	SHA1Size        = int(C.SHA1Size())
-	SHA256BlockSize = int(C.SHA256BlockSize())
-	SHA256Size      = int(C.SHA256Size())
-	SHA384BlockSize = int(C.SHA384BlockSize())
-	SHA384Size      = int(C.SHA384Size())
-	SHA512BlockSize = int(C.SHA512BlockSize())
-	SHA512Size      = int(C.SHA512Size())
+	MD5BlockSize    = int(C.hashBlockSize(md5))
+	MD5Size         = int(C.hashSize(md5))
+	SHA1BlockSize   = int(C.hashBlockSize(sha1))
+	SHA1Size        = int(C.hashSize(sha1))
+	SHA256BlockSize = int(C.hashBlockSize(sha256))
+	SHA256Size      = int(C.hashSize(sha256))
+	SHA384BlockSize = int(C.hashBlockSize(sha384))
+	SHA384Size      = int(C.hashSize(sha384))
+	SHA512BlockSize = int(C.hashBlockSize(sha512))
+	SHA512Size      = int(C.hashSize(sha512))
 )
 
 // cloneHash is an interface that defines a Clone method.
@@ -91,33 +99,19 @@ var _ hash.Hash = (*evpHash)(nil)
 var _ cloneHash = (*evpHash)(nil)
 
 type evpHash struct {
-	pinner    runtime.Pinner
-	ptr       unsafe.Pointer
-	blockSize int
-	size      int
-
-	writeFunc func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int)
-	sumFunc   func(p0 unsafe.Pointer, p1 *C.uint8_t)
-	resetFunc func(p0 unsafe.Pointer)
-	cloneFunc func(p0 unsafe.Pointer) (r1 unsafe.Pointer)
-	freeFunc  func(p0 unsafe.Pointer)
+	pinner        runtime.Pinner
+	ptr           unsafe.Pointer
+	hashAlgorithm int32
+	blockSize     int
+	size          int
 }
 
-func newEVPHash(ptr unsafe.Pointer, blockSize, size int,
-	writeFunc func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int),
-	sumFunc func(p0 unsafe.Pointer, p1 *C.uint8_t),
-	resetFunc func(p0 unsafe.Pointer),
-	cloneFunc func(p0 unsafe.Pointer) (r1 unsafe.Pointer),
-	freeFunc func(p0 unsafe.Pointer)) *evpHash {
+func newEVPHash(ptr unsafe.Pointer, hashAlgorithm int32, blockSize, size int) *evpHash {
 	h := &evpHash{
-		ptr:       ptr,
-		blockSize: blockSize,
-		size:      size,
-		writeFunc: writeFunc,
-		sumFunc:   sumFunc,
-		resetFunc: resetFunc,
-		cloneFunc: cloneFunc,
-		freeFunc:  freeFunc,
+		ptr:           ptr,
+		hashAlgorithm: hashAlgorithm,
+		blockSize:     blockSize,
+		size:          size,
 	}
 
 	runtime.SetFinalizer(h, (*evpHash).finalize)
@@ -127,7 +121,7 @@ func newEVPHash(ptr unsafe.Pointer, blockSize, size int,
 
 func (h *evpHash) finalize() {
 	if h.ptr != nil {
-		h.freeFunc(h.ptr)
+		C.hashFree(C.int(h.hashAlgorithm), h.ptr)
 		h.ptr = nil
 	}
 }
@@ -137,7 +131,7 @@ func (h *evpHash) Clone() hash.Hash {
 		return nil
 	}
 
-	newHash := newEVPHash(h.cloneFunc(h.ptr), h.blockSize, h.size, h.writeFunc, h.sumFunc, h.resetFunc, h.cloneFunc, h.freeFunc)
+	newHash := newEVPHash(C.hashCopy(C.int(h.hashAlgorithm), h.ptr), h.hashAlgorithm, h.blockSize, h.size)
 
 	runtime.KeepAlive(h)
 
@@ -149,7 +143,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 		h.pinner.Pin(&p[0])
 		defer h.pinner.Unpin()
 	}
-	h.writeFunc(h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base(p), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -162,7 +156,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 		h.pinner.Pin(&p[0])
 		defer h.pinner.Unpin()
 	}
-	h.writeFunc(h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base(p), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -170,7 +164,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 }
 
 func (h *evpHash) WriteByte(c byte) error {
-	h.writeFunc(h.ptr, base([]byte{c}), 1)
+	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base([]byte{c}), 1)
 
 	runtime.KeepAlive(h)
 
@@ -179,7 +173,7 @@ func (h *evpHash) WriteByte(c byte) error {
 
 func (h *evpHash) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.size, 64) // explicit cap to allow stack allocation
-	h.sumFunc(h.ptr, base(hashSlice))
+	C.hashSum(C.int(h.hashAlgorithm), h.ptr, base(hashSlice))
 	runtime.KeepAlive(h)
 
 	b = append(b, hashSlice...)
@@ -199,7 +193,7 @@ func (h *evpHash) UnmarshalBinary(data []byte) error {
 }
 
 func (h *evpHash) Reset() {
-	h.resetFunc(h.ptr)
+	C.hashReset(C.int(h.hashAlgorithm), h.ptr)
 }
 
 func (h *evpHash) BlockSize() int {
@@ -217,18 +211,10 @@ type MD5Hash struct {
 func NewMD5() hash.Hash {
 	return &MD5Hash{
 		evpHash: newEVPHash(
-			C.NewMD5(),
+			C.hashNew(md5),
+			md5,
 			MD5BlockSize,
 			MD5Size,
-			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
-				C.MD5Write(p0, p1, p2)
-			},
-			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.MD5Sum(p0, p1) },
-			func(p0 unsafe.Pointer) { C.MD5Reset(p0) },
-			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
-				return C.MD5Copy(p0)
-			},
-			func(p0 unsafe.Pointer) { C.MD5Free(p0) },
 		),
 	}
 }
@@ -241,18 +227,10 @@ type SHA1Hash struct {
 func NewSHA1() hash.Hash {
 	return &SHA1Hash{
 		evpHash: newEVPHash(
-			C.NewSHA1(),
+			C.hashNew(sha1),
+			sha1,
 			SHA1BlockSize,
 			SHA1Size,
-			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
-				C.SHA1Write(p0, p1, p2)
-			},
-			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA1Sum(p0, p1) },
-			func(p0 unsafe.Pointer) { C.SHA1Reset(p0) },
-			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
-				return C.SHA1Copy(p0)
-			},
-			func(p0 unsafe.Pointer) { C.SHA1Free(p0) },
 		),
 	}
 }
@@ -265,18 +243,10 @@ type SHA256Hash struct {
 func NewSHA256() hash.Hash {
 	return &SHA256Hash{
 		evpHash: newEVPHash(
-			C.NewSHA256(),
+			C.hashNew(sha256),
+			sha256,
 			SHA256BlockSize,
 			SHA256Size,
-			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
-				C.SHA256Write(p0, p1, p2)
-			},
-			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA256Sum(p0, p1) },
-			func(p0 unsafe.Pointer) { C.SHA256Reset(p0) },
-			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
-				return C.SHA256Copy(p0)
-			},
-			func(p0 unsafe.Pointer) { C.SHA256Free(p0) },
 		),
 	}
 }
@@ -289,18 +259,10 @@ type SHA384Hash struct {
 func NewSHA384() hash.Hash {
 	return &SHA384Hash{
 		evpHash: newEVPHash(
-			C.NewSHA384(),
+			C.hashNew(sha384),
+			sha384,
 			SHA384BlockSize,
 			SHA384Size,
-			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
-				C.SHA384Write(p0, p1, p2)
-			},
-			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA384Sum(p0, p1) },
-			func(p0 unsafe.Pointer) { C.SHA384Reset(p0) },
-			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
-				return C.SHA384Copy(p0)
-			},
-			func(p0 unsafe.Pointer) { C.SHA384Free(p0) },
 		),
 	}
 }
@@ -313,18 +275,10 @@ type SHA512Hash struct {
 func NewSHA512() hash.Hash {
 	return &SHA512Hash{
 		evpHash: newEVPHash(
-			C.NewSHA512(),
+			C.hashNew(sha512),
+			sha512,
 			SHA512BlockSize,
 			SHA512Size,
-			func(p0 unsafe.Pointer, p1 *C.uint8_t, p2 C.int) {
-				C.SHA512Write(p0, p1, p2)
-			},
-			func(p0 unsafe.Pointer, p1 *C.uint8_t) { C.SHA512Sum(p0, p1) },
-			func(p0 unsafe.Pointer) { C.SHA512Reset(p0) },
-			func(p0 unsafe.Pointer) (r1 unsafe.Pointer) {
-				return C.SHA512Copy(p0)
-			},
-			func(p0 unsafe.Pointer) { C.SHA512Free(p0) },
 		),
 	}
 }

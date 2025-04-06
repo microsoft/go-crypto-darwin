@@ -18,5 +18,23 @@ package cryptokit
 #cgo nocallback SHA384
 #cgo noescape SHA512
 #cgo nocallback SHA512
+
+#cgo noescape hashWrite
+#cgo noescape hashSum
+#cgo nocallback hashNew
+#cgo nocallback hashWrite
+#cgo nocallback hashSum
+#cgo nocallback hashReset
+#cgo nocallback hashSize
+#cgo nocallback hashBlockSize
+#cgo nocallback hashCopy
+#cgo nocallback hashFree
+
+#cgo noescape updateHMAC
+#cgo noescape finalizeHMAC
+#cgo nocallback initMAC
+#cgo nocallback freeHMAC
+#cgo nocallback updateHMAC
+#cgo nocallback finalizeHMAC
 */
 import "C"

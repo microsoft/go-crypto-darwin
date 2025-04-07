@@ -443,7 +443,46 @@ func TestHashAllocations(t *testing.T) {
 		sink ^= xcrypto.SHA256(msg)[0]
 		sink ^= xcrypto.SHA512(msg)[0]
 	}))
-	want := 6
+	want := 4
+	if compareCurrentVersion("go1.24") >= 0 {
+		// The go1.24 compiler is able to optimize the allocation away.
+		// See cgo_go124.go for more information.
+		want = 0
+	}
+	if n > want {
+		t.Errorf("allocs = %d, want %d", n, want)
+	}
+}
+
+func TestHashStructAllocations(t *testing.T) {
+	if Asan() {
+		t.Skip("skipping allocations test with sanitizers")
+	}
+	msg := []byte("testing")
+
+	md5Hash := xcrypto.NewMD5()
+	sha1Hash := xcrypto.NewSHA1()
+	sha256Hash := xcrypto.NewSHA256()
+	sha512Hash := xcrypto.NewSHA512()
+
+	sum := make([]byte, sha512Hash.Size())
+	n := int(testing.AllocsPerRun(10, func() {
+		md5Hash.Write(msg)
+		sha1Hash.Write(msg)
+		sha256Hash.Write(msg)
+		sha512Hash.Write(msg)
+
+		md5Hash.Sum(sum[:0])
+		sha1Hash.Sum(sum[:0])
+		sha256Hash.Sum(sum[:0])
+		sha512Hash.Sum(sum[:0])
+
+		md5Hash.Reset()
+		sha1Hash.Reset()
+		sha256Hash.Reset()
+		sha512Hash.Reset()
+	}))
+	want := 8
 	if compareCurrentVersion("go1.24") >= 0 {
 		// The go1.24 compiler is able to optimize the allocation away.
 		// See cgo_go124.go for more information.

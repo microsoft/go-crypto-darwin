@@ -101,12 +101,12 @@ var _ cloneHash = (*evpHash)(nil)
 type evpHash struct {
 	pinner        runtime.Pinner
 	ptr           unsafe.Pointer
-	hashAlgorithm int32
+	hashAlgorithm C.int
 	blockSize     int
 	size          int
 }
 
-func newEVPHash(ptr unsafe.Pointer, hashAlgorithm int32, blockSize, size int) *evpHash {
+func newEVPHash(ptr unsafe.Pointer, hashAlgorithm C.int, blockSize, size int) *evpHash {
 	h := &evpHash{
 		ptr:           ptr,
 		hashAlgorithm: hashAlgorithm,
@@ -121,7 +121,7 @@ func newEVPHash(ptr unsafe.Pointer, hashAlgorithm int32, blockSize, size int) *e
 
 func (h *evpHash) finalize() {
 	if h.ptr != nil {
-		C.hashFree(C.int(h.hashAlgorithm), h.ptr)
+		C.hashFree(h.hashAlgorithm, h.ptr)
 		h.ptr = nil
 	}
 }
@@ -131,7 +131,7 @@ func (h *evpHash) Clone() hash.Hash {
 		return nil
 	}
 
-	newHash := newEVPHash(C.hashCopy(C.int(h.hashAlgorithm), h.ptr), h.hashAlgorithm, h.blockSize, h.size)
+	newHash := newEVPHash(C.hashCopy(h.hashAlgorithm, h.ptr), h.hashAlgorithm, h.blockSize, h.size)
 
 	runtime.KeepAlive(h)
 
@@ -143,7 +143,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 		h.pinner.Pin(&p[0])
 		defer h.pinner.Unpin()
 	}
-	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, base(p), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -156,7 +156,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 		h.pinner.Pin(&p[0])
 		defer h.pinner.Unpin()
 	}
-	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, base(p), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -164,7 +164,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 }
 
 func (h *evpHash) WriteByte(c byte) error {
-	C.hashWrite(C.int(h.hashAlgorithm), h.ptr, base([]byte{c}), 1)
+	C.hashWrite(h.hashAlgorithm, h.ptr, base([]byte{c}), 1)
 
 	runtime.KeepAlive(h)
 
@@ -173,7 +173,7 @@ func (h *evpHash) WriteByte(c byte) error {
 
 func (h *evpHash) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.size, 64) // explicit cap to allow stack allocation
-	C.hashSum(C.int(h.hashAlgorithm), h.ptr, base(hashSlice))
+	C.hashSum(h.hashAlgorithm, h.ptr, base(hashSlice))
 	runtime.KeepAlive(h)
 
 	b = append(b, hashSlice...)
@@ -193,7 +193,7 @@ func (h *evpHash) UnmarshalBinary(data []byte) error {
 }
 
 func (h *evpHash) Reset() {
-	C.hashReset(C.int(h.hashAlgorithm), h.ptr)
+	C.hashReset(h.hashAlgorithm, h.ptr)
 }
 
 func (h *evpHash) BlockSize() int {
@@ -212,7 +212,7 @@ func NewMD5() hash.Hash {
 	return &MD5Hash{
 		evpHash: newEVPHash(
 			C.hashNew(md5),
-			md5,
+			C.int(md5),
 			MD5BlockSize,
 			MD5Size,
 		),

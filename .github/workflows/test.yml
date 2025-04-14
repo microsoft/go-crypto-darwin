@@ -26,6 +26,10 @@ jobs:
       - name: Build CryptoKit.o
         run: bash gen-swift-bindings.sh
 
+      # Test the code can be built with CGO disabled.
+      - name: Run Build
+        run: CGO_ENABLED=0 go build ./...
+
       - name: Run Go Tests
         run: go test -gcflags=all=-d=checkptr -count 10 -v ./...
 

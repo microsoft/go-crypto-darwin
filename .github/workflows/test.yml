@@ -26,6 +26,10 @@ jobs:
       - name: Build CryptoKit.o
         run: bash gen-swift-bindings.sh
 
+      # Test the code can be built with CGO disabled.
+      - name: Run Build
+        run: CGO_ENABLED=0 go build ./...
+
       - name: Run Go Tests
         run: go test -gcflags=all=-d=checkptr -count 10 -v ./...
 
@@ -45,10 +49,3 @@ jobs:
             echo "CryptoKit.o has been checked in. Please remove this from your PR."
             exit 1
           fi
-  cgolessbuild:
-    runs-on: macos-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Run Build
-      run: CGO_ENABLED=0 go build ./...

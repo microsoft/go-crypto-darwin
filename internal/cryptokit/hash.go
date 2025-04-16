@@ -116,7 +116,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
-	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*addr(p)), C.int(len(p)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*addrNeverEmpty(p)), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 

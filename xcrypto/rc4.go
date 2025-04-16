@@ -69,8 +69,8 @@ func (c *RC4Cipher) XORKeyStream(dst, src []byte) {
 	var outLen C.size_t
 	status := C.CCCryptorUpdate(
 		c.ctx,
-		unsafe.Pointer(&*addr(src)), C.size_t(len(src)), // Input
-		unsafe.Pointer(&*addr(dst)), C.size_t(len(dst)), // Output
+		unsafe.Pointer(&*addrNeverEmpty(src)), C.size_t(len(src)), // Input
+		unsafe.Pointer(&*addrNeverEmpty(dst)), C.size_t(len(dst)), // Output
 		&outLen,
 	)
 	if status != C.kCCSuccess {

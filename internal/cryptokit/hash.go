@@ -15,52 +15,27 @@ import (
 )
 
 func MD5(p []byte) (sum [16]byte) {
-	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
-	}
-	C.MD5(base(p), C.size_t(len(p)), base(sum[:]))
+	C.MD5((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA1(p []byte) (sum [20]byte) {
-	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
-	}
-	C.SHA1(base(p), C.size_t(len(p)), base(sum[:]))
+	C.SHA1((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA256(p []byte) (sum [32]byte) {
-	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
-	}
-	C.SHA256(base(p), C.size_t(len(p)), base(sum[:]))
+	C.SHA256((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA384(p []byte) (sum [48]byte) {
-	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
-	}
-	C.SHA384(base(p), C.size_t(len(p)), base(sum[:]))
+	C.SHA384((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA512(p []byte) (sum [64]byte) {
-	if len(p) > 0 {
-		var pinner runtime.Pinner
-		pinner.Pin(&p[0])
-		defer pinner.Unpin()
-	}
-	C.SHA512(base(p), C.size_t(len(p)), base(sum[:]))
+	C.SHA512((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -99,7 +74,6 @@ var _ hash.Hash = (*evpHash)(nil)
 var _ cloneHash = (*evpHash)(nil)
 
 type evpHash struct {
-	pinner        runtime.Pinner
 	ptr           unsafe.Pointer
 	hashAlgorithm C.int
 	blockSize     int
@@ -139,11 +113,7 @@ func (h *evpHash) Clone() hash.Hash {
 }
 
 func (h *evpHash) Write(p []byte) (int, error) {
-	if len(p) > 0 {
-		h.pinner.Pin(&p[0])
-		defer h.pinner.Unpin()
-	}
-	C.hashWrite(h.hashAlgorithm, h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*addr(p)), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -151,12 +121,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 }
 
 func (h *evpHash) WriteString(s string) (int, error) {
-	p := []byte(s)
-	if len(p) > 0 {
-		h.pinner.Pin(&p[0])
-		defer h.pinner.Unpin()
-	}
-	C.hashWrite(h.hashAlgorithm, h.ptr, base(p), C.int(len(p)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*unsafe.StringData(s)), C.int(len(s)))
 
 	runtime.KeepAlive(h)
 

@@ -15,22 +15,17 @@ var zero byte
 // base returns the address of the underlying array in b,
 // being careful not to panic when b has zero length.
 func base(b []byte) *C.uchar {
-	if len(b) == 0 {
-		return nil
-	}
-	return (*C.uchar)(unsafe.Pointer(&b[0]))
+	return (*C.uchar)(unsafe.Pointer(addr(b)))
 }
 
 func sbase(b []byte) *C.char {
-	if len(b) == 0 {
-		return nil
-	}
-	return (*C.char)(unsafe.Pointer(&b[0]))
+	return (*C.char)(unsafe.Pointer(addr(b)))
 }
 
 func pbase(b []byte) unsafe.Pointer {
-	if len(b) == 0 {
-		return nil
-	}
-	return unsafe.Pointer(&b[0])
+	return unsafe.Pointer(addr(b))
+}
+
+func addr(b []byte) *byte {
+	return unsafe.SliceData(b)
 }

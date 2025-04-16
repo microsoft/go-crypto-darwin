@@ -19,8 +19,7 @@ var _ hash.Hash = (*cryptoKitHMAC)(nil)
 var _ cloneHash = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
-	pinner runtime.Pinner
-	ptr    unsafe.Pointer
+	ptr unsafe.Pointer
 
 	kind int
 	key  []byte
@@ -44,15 +43,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 		return nil
 	}
 
-	pinner := runtime.Pinner{}
-
-	if len(key) > 0 {
-		pinner.Pin(&key[0])
-		defer pinner.Unpin()
-	}
-
 	hmac := &cryptoKitHMAC{
-		pinner: pinner,
 		ptr: C.initMAC(
 			C.int(kind),
 			base(key), C.int(len(key)),
@@ -74,14 +65,9 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 }
 
 func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
-	if len(p) > 0 {
-		h.pinner.Pin(&p[0])
-		defer h.pinner.Unpin()
-	}
-
 	C.updateHMAC(C.int(h.kind),
 		h.ptr,
-		base(p), C.int(len(p)))
+		(*C.uint8_t)(&*addr(h.key)), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 
@@ -124,14 +110,9 @@ func (h *cryptoKitHMAC) Reset() {
 		h.ptr,
 	)
 
-	if len(h.key) > 0 {
-		h.pinner.Pin(&h.key[0])
-		defer h.pinner.Unpin()
-	}
-
 	h.ptr = C.initMAC(
 		C.int(h.kind),
-		base(h.key), C.int(len(h.key)),
+		(*C.uint8_t)(&*addr(h.key)), C.int(len(h.key)),
 	)
 
 	runtime.KeepAlive(h)

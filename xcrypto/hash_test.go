@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -487,6 +488,29 @@ func TestHashStructAllocations(t *testing.T) {
 		// The go1.24 compiler is able to optimize the allocation away.
 		// See cgo_go124.go for more information.
 		want = 0
+	}
+	if n > want {
+		t.Errorf("allocs = %d, want %d", n, want)
+	}
+}
+
+func verifySHA256(token, salt string) [32]byte {
+	return xcrypto.SHA256([]byte(token + salt))
+}
+
+func TestIssue71943(t *testing.T) {
+	// https://github.com/golang/go/issues/71943
+	if Asan() {
+		t.Skip("skipping allocations test with sanitizers")
+	}
+	n := int(testing.AllocsPerRun(10, func() {
+		runtime.KeepAlive(verifySHA256("teststring", "test"))
+	}))
+	want := 2
+	if compareCurrentVersion("go1.25") >= 0 {
+		want = 0
+	} else if compareCurrentVersion("go1.24") >= 0 {
+		want = 1
 	}
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)

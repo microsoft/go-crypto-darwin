@@ -112,7 +112,7 @@ func (h *cryptoKitHMAC) Reset() {
 
 	h.ptr = C.initMAC(
 		C.int(h.kind),
-		(*C.uint8_t)(&*addr(h.key)), C.int(len(h.key)),
+		(*C.uint8_t)(&*addrNeverEmpty(h.key)), C.int(len(h.key)),
 	)
 
 	runtime.KeepAlive(h)

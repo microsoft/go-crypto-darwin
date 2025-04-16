@@ -15,27 +15,27 @@ import (
 )
 
 func MD5(p []byte) (sum [16]byte) {
-	C.MD5((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
+	C.MD5((*C.uint8_t)(&*addrNeverEmpty(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA1(p []byte) (sum [20]byte) {
-	C.SHA1((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
+	C.SHA1((*C.uint8_t)(&*addrNeverEmpty(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA256(p []byte) (sum [32]byte) {
-	C.SHA256((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
+	C.SHA256((*C.uint8_t)(&*addrNeverEmpty(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA384(p []byte) (sum [48]byte) {
-	C.SHA384((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
+	C.SHA384((*C.uint8_t)(&*addrNeverEmpty(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
 func SHA512(p []byte) (sum [64]byte) {
-	C.SHA512((*C.uint8_t)(&*addr(p)), C.size_t(len(p)), base(sum[:]))
+	C.SHA512((*C.uint8_t)(&*addrNeverEmpty(p)), C.size_t(len(p)), base(sum[:]))
 	return
 }
 
@@ -113,6 +113,9 @@ func (h *evpHash) Clone() hash.Hash {
 }
 
 func (h *evpHash) Write(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
 	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*addr(p)), C.int(len(p)))
 
 	runtime.KeepAlive(h)
@@ -121,7 +124,10 @@ func (h *evpHash) Write(p []byte) (int, error) {
 }
 
 func (h *evpHash) WriteString(s string) (int, error) {
-	C.hashWrite(h.hashAlgorithm, h.ptr, base([]byte(s)), C.int(len(s)))
+	if len(s) == 0 {
+		return 0, nil
+	}
+	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uchar)(unsafe.Pointer(unsafe.StringData(s))), C.int(len(s)))
 
 	runtime.KeepAlive(h)
 

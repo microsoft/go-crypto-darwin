@@ -67,7 +67,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
 	C.updateHMAC(C.int(h.kind),
 		h.ptr,
-		(*C.uint8_t)(&*addr(h.key)), C.int(len(p)))
+		(*C.uint8_t)(&*addr(p)), C.int(len(p)))
 
 	runtime.KeepAlive(h)
 

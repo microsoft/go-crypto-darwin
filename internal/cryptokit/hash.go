@@ -121,7 +121,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 }
 
 func (h *evpHash) WriteString(s string) (int, error) {
-	C.hashWrite(h.hashAlgorithm, h.ptr, (*C.uint8_t)(&*unsafe.StringData(s)), C.int(len(s)))
+	C.hashWrite(h.hashAlgorithm, h.ptr, base([]byte(s)), C.int(len(s)))
 
 	runtime.KeepAlive(h)
 

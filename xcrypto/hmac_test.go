@@ -24,7 +24,7 @@ func TestHMAC(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
 			h := xcrypto.NewHMAC(tt.fn, nil)
 			if h == nil {
 				t.Skip("digest not supported")

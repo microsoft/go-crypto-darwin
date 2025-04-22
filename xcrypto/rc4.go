@@ -11,12 +11,12 @@ import (
 	"errors"
 	"runtime"
 	"slices"
+	"unsafe"
 )
 
 // RC4Cipher is an instance of RC4 using a particular key.
 type RC4Cipher struct {
-	ctx    C.CCCryptorRef
-	pinner runtime.Pinner
+	ctx C.CCCryptorRef
 }
 
 // NewRC4Cipher creates and returns a new RC4 cipher with the given key.
@@ -67,20 +67,10 @@ func (c *RC4Cipher) XORKeyStream(dst, src []byte) {
 	// Ensures `dst` has sufficient space.
 	_ = dst[len(src)-1]
 	var outLen C.size_t
-	// Pin both src and dst to prevent GC from relocating their memory.
-	if len(dst) > 0 || len(src) > 0 {
-		if len(src) > 0 {
-			c.pinner.Pin(&src[0])
-		}
-		if len(dst) > 0 {
-			c.pinner.Pin(&dst[0])
-		}
-		defer c.pinner.Unpin()
-	}
 	status := C.CCCryptorUpdate(
 		c.ctx,
-		pbase(src), C.size_t(len(src)), // Input
-		pbase(dst), C.size_t(len(dst)), // Output
+		unsafe.Pointer(&*addrNeverEmpty(src)), C.size_t(len(src)), // Input
+		unsafe.Pointer(&*addrNeverEmpty(dst)), C.size_t(len(dst)), // Output
 		&outLen,
 	)
 	if status != C.kCCSuccess {

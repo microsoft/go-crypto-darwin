@@ -34,6 +34,9 @@ func TestHMAC(t *testing.T) {
 
 			h = xcrypto.NewHMAC(tt.fn, nil)
 			h.Write([]byte("hello world"))
+			// Test that passing and empty slice don't panic.
+			h.Write(nil)
+			h.Write([]byte{})
 
 			sumHelloWorld := h.Sum(nil)
 

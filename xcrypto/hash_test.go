@@ -72,6 +72,9 @@ func TestHash(t *testing.T) {
 			if n != len(msg) {
 				t.Errorf("got: %d, want: %d", n, len(msg))
 			}
+			// Test that passing and empty slice don't panic.
+			h.Write(nil)
+			h.Write([]byte{})
 			sum := h.Sum(nil)
 			if size := h.Size(); len(sum) != size {
 				t.Errorf("got: %d, want: %d", len(sum), size)

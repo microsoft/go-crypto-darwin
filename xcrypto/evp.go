@@ -190,56 +190,56 @@ func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringR
 	case algorithmTypePSS:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1
+			algo = kSecKeyAlgorithmRSASignatureDigestPSSSHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA224
+			algo = kSecKeyAlgorithmRSASignatureDigestPSSSHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA256
+			algo = kSecKeyAlgorithmRSASignatureDigestPSSSHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA384
+			algo = kSecKeyAlgorithmRSASignatureDigestPSSSHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA512
+			algo = kSecKeyAlgorithmRSASignatureDigestPSSSHA512
 		default:
 			return 0, errors.New("unsupported PSS hash: " + hash.String())
 		}
 	case algorithmTypeRAW:
-		algo = C.kSecKeyAlgorithmRSAEncryptionRaw
+		algo = kSecKeyAlgorithmRSAEncryptionRaw
 	case algorithmTypePKCS1v15Enc:
-		return C.kSecKeyAlgorithmRSAEncryptionPKCS1, nil
+		return kSecKeyAlgorithmRSAEncryptionPKCS1, nil
 	case algorithmTypePKCS1v15Sig:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
 		case 0:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
+			algo = kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
 		default:
 			return 0, errors.New("unsupported PKCS1v15 hash: " + hash.String())
 		}
 	case algorithmTypeOAEP:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+			algo = kSecKeyAlgorithmRSAEncryptionOAEPSHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+			algo = kSecKeyAlgorithmRSAEncryptionOAEPSHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+			algo = kSecKeyAlgorithmRSAEncryptionOAEPSHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+			algo = kSecKeyAlgorithmRSAEncryptionOAEPSHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+			algo = kSecKeyAlgorithmRSAEncryptionOAEPSHA512
 		default:
 			return 0, errors.New("unsupported OAEP hash: " + hash.String())
 		}
 	case algorithmTypeECDSA:
-		return C.kSecKeyAlgorithmECDSASignatureDigestX962, nil
+		return kSecKeyAlgorithmECDSASignatureDigestX962, nil
 	default:
 		return 0, errors.New("unsupported algorithm type: " + strconv.Itoa(int(algorithmType)))
 	}
@@ -249,7 +249,7 @@ func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringR
 // bytesToCFData turns a byte slice into a CFDataRef. Caller then "owns" the
 // CFDataRef and must CFRelease the CFDataRef when done.
 func bytesToCFData(buf []byte) C.CFDataRef {
-	return C.CFDataCreate(C.kCFAllocatorDefault, base(buf), C.CFIndex(len(buf)))
+	return C.CFDataCreate(kCFAllocatorDefault, base(buf), C.CFIndex(len(buf)))
 }
 
 // cfDataToBytes turns a CFDataRef into a byte slice.
@@ -264,15 +264,15 @@ func cfRelease(ref unsafe.Pointer) {
 
 // createSecKeyWithData creates a SecKey from the provided encoded key and attributes dictionary.
 func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (C.SecKeyRef, error) {
-	encodedKeyCF := C.CFDataCreate(C.kCFAllocatorDefault, base(encodedKey), C.CFIndex(len(encodedKey)))
+	encodedKeyCF := C.CFDataCreate(kCFAllocatorDefault, base(encodedKey), C.CFIndex(len(encodedKey)))
 	if encodedKeyCF == 0 {
 		return 0, errors.New("xcrypto: failed to create CFData for private key")
 	}
 	defer C.CFRelease(C.CFTypeRef(encodedKeyCF))
 
 	attrKeys := []C.CFTypeRef{
-		C.CFTypeRef(C.kSecAttrKeyType),
-		C.CFTypeRef(C.kSecAttrKeyClass),
+		C.CFTypeRef(kSecAttrKeyType),
+		C.CFTypeRef(kSecAttrKeyClass),
 	}
 
 	attrValues := []C.CFTypeRef{
@@ -282,7 +282,7 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (C
 
 	// Create attributes dictionary for the key
 	attrDict := C.CFDictionaryCreate(
-		C.kCFAllocatorDefault,
+		kCFAllocatorDefault,
 		(*unsafe.Pointer)(unsafe.Pointer(&attrKeys[0])),
 		(*unsafe.Pointer)(unsafe.Pointer(&attrValues[0])),
 		C.CFIndex(len(attrKeys)),
@@ -305,7 +305,7 @@ func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (C
 
 // createSecKeyRandom creates a new SecKey with the provided attributes dictionary.
 func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, C.SecKeyRef, error) {
-	keyAttrs := C.CFDictionaryCreateMutable(C.kCFAllocatorDefault, 0, nil, nil)
+	keyAttrs := C.CFDictionaryCreateMutable(kCFAllocatorDefault, 0, nil, nil)
 	if keyAttrs == 0 {
 		return nil, 0, errors.New("failed to create key attributes dictionary")
 	}
@@ -313,14 +313,14 @@ func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, C.SecKeyRef
 
 	C.CFDictionarySetValue(
 		keyAttrs,
-		unsafe.Pointer(C.kSecAttrKeyType),
+		unsafe.Pointer(kSecAttrKeyType),
 		unsafe.Pointer(keyType),
 	)
 
 	C.CFDictionarySetValue(
 		keyAttrs,
-		unsafe.Pointer(C.kSecAttrKeySizeInBits),
-		unsafe.Pointer(C.CFNumberCreate(C.kCFAllocatorDefault, C.kCFNumberIntType, unsafe.Pointer(&keySize))),
+		unsafe.Pointer(kSecAttrKeySizeInBits),
+		unsafe.Pointer(C.CFNumberCreate(kCFAllocatorDefault, C.kCFNumberIntType, unsafe.Pointer(&keySize))),
 	)
 
 	// Generate the private key

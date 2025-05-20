@@ -218,6 +218,38 @@ func (g *aesGCM) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
 	return ret
 }
 
+func (g *aesGCM) SealWithRandomNonce(dst, nonce, plaintext, additionalData []byte) {
+	if len(nonce) != gcmStandardNonceSize {
+		panic("cipher: incorrect nonce length given to GCM")
+	}
+	if uint64(len(plaintext)) > ((1<<32)-2)*aesBlockSize || len(plaintext)+gcmTagSize < len(plaintext) {
+		panic("cipher: message too large for GCM")
+	}
+	if len(dst)+len(plaintext)+gcmTagSize < len(dst) {
+		panic("cipher: message too large for buffer")
+	}
+
+	if g.tls != cipherGCMTLSNone {
+		panic("cipher: TLS 1.2 and 1.3 modes do not support random nonce")
+	}
+
+	// Check delayed until now to make sure len(dst) is accurate.
+	if inexactOverlap(dst, plaintext) {
+		panic("cipher: invalid buffer overlap")
+	}
+	if anyOverlap(dst, additionalData) {
+		panic("crypto/cipher: invalid buffer overlap of output and additional data")
+	}
+
+	tag := dst[len(dst)-gcmTagSize:]
+	// Generate a random nonce
+	RandReader.Read(nonce)
+	err := cryptokit.EncryptAESGCM(g.key, plaintext, nonce, additionalData, dst[:len(dst)-gcmTagSize], tag)
+	if err != 0 {
+		panic("cipher: encryption failed")
+	}
+}
+
 var errOpen = errors.New("cipher: message authentication failed")
 
 func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, error) {

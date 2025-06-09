@@ -44,7 +44,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	hmac := &cryptoKitHMAC{
-		ptr: C.initMAC(
+		ptr: C.initHMAC(
 			C.int(kind),
 			base(key), C.int(len(key)),
 		),
@@ -125,7 +125,7 @@ func (h *cryptoKitHMAC) Reset() {
 		h.ptr,
 	)
 
-	h.ptr = C.initMAC(
+	h.ptr = C.initHMAC(
 		C.int(h.kind),
 		(*C.uint8_t)(&*addrNeverEmpty(h.key)), C.int(len(h.key)),
 	)

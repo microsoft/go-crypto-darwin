@@ -32,7 +32,7 @@ package cryptokit
 
 #cgo noescape updateHMAC
 #cgo noescape finalizeHMAC
-#cgo nocallback initMAC
+#cgo nocallback initHMAC
 #cgo nocallback freeHMAC
 #cgo nocallback updateHMAC
 #cgo nocallback finalizeHMAC

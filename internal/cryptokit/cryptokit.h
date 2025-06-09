@@ -44,6 +44,7 @@ void *initMAC(int32_t hashFunction, const uint8_t *key, int keyLength);
 void freeHMAC(int32_t hashFunction, void *ptr);
 void updateHMAC(int32_t hashFunction, void *ptr, const uint8_t *data, int length);
 void finalizeHMAC(int32_t hashFunction, void *ptr, uint8_t *outputPointer);
+void *copyHMAC(int32_t hashAlgorithm, void *ptr);
 
 void MD5(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);
 void SHA1(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer);

@@ -95,6 +95,49 @@ public func updateHMAC(
     }
 }
 
+@_cdecl("copyHMAC")
+public func copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    switch hashAlgorithm {
+    case 1:
+        let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.MD5>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<Insecure.MD5>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    case 2:
+        let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.SHA1>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<Insecure.SHA1>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    case 3:
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA256>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA256>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    case 4:
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA384>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA384>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    case 5:
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA512>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    default:
+        fatalError("Unsupported hash function")
+    }
+}
+
 @_cdecl("finalizeHMAC")
 public func finalizeHMAC(
     _ hashFunction: Int32,

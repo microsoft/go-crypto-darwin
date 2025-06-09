@@ -101,7 +101,22 @@ func (h *cryptoKitHMAC) UnmarshalBinary(data []byte) error {
 }
 
 func (h *cryptoKitHMAC) Clone() (hash.Hash, error) {
-	panic("cryptokit: hash state is not cloneable")
+	if h.ptr == nil {
+		panic("cryptokit: hash already finalized")
+	}
+
+	hmac := &cryptoKitHMAC{ptr: C.copyHMAC(C.int(h.kind), h.ptr), kind: h.kind, key: slices.Clone(h.key), blockSize: h.blockSize, size: h.size}
+
+	runtime.KeepAlive(h)
+
+	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
+		C.freeHMAC(
+			C.int(h.kind),
+			h.ptr,
+		)
+	})
+
+	return hmac, nil
 }
 
 func (h *cryptoKitHMAC) Reset() {

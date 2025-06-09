@@ -100,7 +100,7 @@ func (h *cryptoKitHMAC) UnmarshalBinary(data []byte) error {
 	return errors.New("cryptokit: hash state is not marshallable")
 }
 
-func (h *cryptoKitHMAC) Clone() hash.Hash {
+func (h *cryptoKitHMAC) Clone() (hash.Hash, error) {
 	panic("cryptokit: hash state is not cloneable")
 }
 

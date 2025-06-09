@@ -67,7 +67,7 @@ var (
 type cloneHash interface {
 	hash.Hash
 	// Clone returns a separate Hash instance with the same state as h.
-	Clone() hash.Hash
+	Clone() (hash.Hash, error)
 }
 
 var _ hash.Hash = (*evpHash)(nil)
@@ -100,16 +100,16 @@ func (h *evpHash) finalize() {
 	}
 }
 
-func (h *evpHash) Clone() hash.Hash {
+func (h *evpHash) Clone() (hash.Hash, error) {
 	if h.ptr == nil {
-		return nil
+		panic("cryptokit: hash already finalized")
 	}
 
 	newHash := newEVPHash(C.hashCopy(h.hashAlgorithm, h.ptr), h.hashAlgorithm, h.blockSize, h.size)
 
 	runtime.KeepAlive(h)
 
-	return newHash
+	return newHash, nil
 }
 
 func (h *evpHash) Write(p []byte) (int, error) {

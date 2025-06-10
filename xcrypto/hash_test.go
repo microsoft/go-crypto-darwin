@@ -14,6 +14,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
@@ -206,7 +207,7 @@ func TestHash_Clone(t *testing.T) {
 			}
 			// We don't define an interface for the Clone method to avoid other
 			// packages from depending on it. Use type assertion to call it.
-			h2, _ := h.(interface{ Clone() (hash.Hash, error) }).Clone()
+			h2, _ := h.(cryptokit.HashCloner).Clone()
 			h.Write(msg)
 			h2.Write(msg)
 			if actual, actual2 := h.Sum(nil), h2.Sum(nil); !bytes.Equal(actual, actual2) {

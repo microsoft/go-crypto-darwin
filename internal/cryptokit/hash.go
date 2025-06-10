@@ -60,16 +60,6 @@ var (
 	SHA512Size      = int(C.hashSize(sha512))
 )
 
-// cloneHash is an interface that defines a Clone method.
-//
-// hash.CloneHash will probably be added in Go 1.25, see https://golang.org/issue/69521,
-// but we need it now.
-type HashCloner interface {
-	hash.Hash
-	// Clone returns a separate Hash instance with the same state as h.
-	Clone() (HashCloner, error)
-}
-
 var _ hash.Hash = (*evpHash)(nil)
 var _ HashCloner = (*evpHash)(nil)
 

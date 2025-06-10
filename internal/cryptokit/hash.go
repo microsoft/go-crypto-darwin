@@ -64,14 +64,14 @@ var (
 //
 // hash.CloneHash will probably be added in Go 1.25, see https://golang.org/issue/69521,
 // but we need it now.
-type cloneHash interface {
+type HashCloner interface {
 	hash.Hash
 	// Clone returns a separate Hash instance with the same state as h.
-	Clone() (hash.Hash, error)
+	Clone() (HashCloner, error)
 }
 
 var _ hash.Hash = (*evpHash)(nil)
-var _ cloneHash = (*evpHash)(nil)
+var _ HashCloner = (*evpHash)(nil)
 
 type evpHash struct {
 	ptr           unsafe.Pointer
@@ -100,7 +100,7 @@ func (h *evpHash) finalize() {
 	}
 }
 
-func (h *evpHash) Clone() (hash.Hash, error) {
+func (h *evpHash) Clone() (HashCloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}

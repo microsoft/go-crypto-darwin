@@ -16,7 +16,7 @@ import (
 )
 
 var _ hash.Hash = (*cryptoKitHMAC)(nil)
-var _ cloneHash = (*cryptoKitHMAC)(nil)
+var _ HashCloner = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
 	ptr unsafe.Pointer
@@ -100,7 +100,7 @@ func (h *cryptoKitHMAC) UnmarshalBinary(data []byte) error {
 	return errors.New("cryptokit: hash state is not marshallable")
 }
 
-func (h *cryptoKitHMAC) Clone() (hash.Hash, error) {
+func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}

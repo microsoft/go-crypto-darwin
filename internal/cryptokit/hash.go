@@ -60,18 +60,8 @@ var (
 	SHA512Size      = int(C.hashSize(sha512))
 )
 
-// cloneHash is an interface that defines a Clone method.
-//
-// hash.CloneHash will probably be added in Go 1.25, see https://golang.org/issue/69521,
-// but we need it now.
-type cloneHash interface {
-	hash.Hash
-	// Clone returns a separate Hash instance with the same state as h.
-	Clone() hash.Hash
-}
-
 var _ hash.Hash = (*evpHash)(nil)
-var _ cloneHash = (*evpHash)(nil)
+var _ HashCloner = (*evpHash)(nil)
 
 type evpHash struct {
 	ptr           unsafe.Pointer
@@ -100,16 +90,16 @@ func (h *evpHash) finalize() {
 	}
 }
 
-func (h *evpHash) Clone() hash.Hash {
+func (h *evpHash) Clone() (HashCloner, error) {
 	if h.ptr == nil {
-		return nil
+		panic("cryptokit: hash already finalized")
 	}
 
 	newHash := newEVPHash(C.hashCopy(h.hashAlgorithm, h.ptr), h.hashAlgorithm, h.blockSize, h.size)
 
 	runtime.KeepAlive(h)
 
-	return newHash
+	return newHash, nil
 }
 
 func (h *evpHash) Write(p []byte) (int, error) {

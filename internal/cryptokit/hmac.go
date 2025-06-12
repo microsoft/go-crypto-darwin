@@ -16,7 +16,7 @@ import (
 )
 
 var _ hash.Hash = (*cryptoKitHMAC)(nil)
-var _ cloneHash = (*cryptoKitHMAC)(nil)
+var _ HashCloner = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
 	ptr unsafe.Pointer
@@ -44,7 +44,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	hmac := &cryptoKitHMAC{
-		ptr: C.initMAC(
+		ptr: C.initHMAC(
 			C.int(kind),
 			base(key), C.int(len(key)),
 		),
@@ -100,8 +100,23 @@ func (h *cryptoKitHMAC) UnmarshalBinary(data []byte) error {
 	return errors.New("cryptokit: hash state is not marshallable")
 }
 
-func (h *cryptoKitHMAC) Clone() hash.Hash {
-	panic("cryptokit: hash state is not cloneable")
+func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
+	if h.ptr == nil {
+		panic("cryptokit: hash already finalized")
+	}
+
+	hmac := &cryptoKitHMAC{ptr: C.copyHMAC(C.int(h.kind), h.ptr), kind: h.kind, key: slices.Clone(h.key), blockSize: h.blockSize, size: h.size}
+
+	runtime.KeepAlive(h)
+
+	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
+		C.freeHMAC(
+			C.int(h.kind),
+			h.ptr,
+		)
+	})
+
+	return hmac, nil
 }
 
 func (h *cryptoKitHMAC) Reset() {
@@ -110,7 +125,7 @@ func (h *cryptoKitHMAC) Reset() {
 		h.ptr,
 	)
 
-	h.ptr = C.initMAC(
+	h.ptr = C.initHMAC(
 		C.int(h.kind),
 		(*C.uint8_t)(&*addrNeverEmpty(h.key)), C.int(len(h.key)),
 	)

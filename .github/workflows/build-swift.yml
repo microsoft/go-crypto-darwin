@@ -16,6 +16,7 @@ jobs:
   build:
     permissions:
       contents: write
+      pull-requests: write
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4

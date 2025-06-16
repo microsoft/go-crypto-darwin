@@ -1,0 +1,4 @@
+path_classifiers:
+  tests:
+    - "internal/cryptotest/*.go"
+    - "cmd/gentestvectors/main.go"

@@ -49,7 +49,7 @@ jobs:
 
       - name: Build dummy C file for CodeQL
         if: matrix.language == 'cpp'
-        run: clang -c internal/cryptokit/cryptokit_codeql.c -o internal/cryptokit/cryptokit_codeql.o
+        run: clang -c internal/cryptokit/cryptokit.h -o /dev/null
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

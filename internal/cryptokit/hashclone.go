@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build !go1.25 && darwin
 
 package cryptokit
 

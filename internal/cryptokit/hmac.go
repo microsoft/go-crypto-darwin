@@ -8,7 +8,6 @@ package cryptokit
 // #include "cryptokit.h"
 import "C"
 import (
-	"errors"
 	"hash"
 	"runtime"
 	"slices"
@@ -86,18 +85,6 @@ func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	b = append(b, hashSlice...)
 
 	return b
-}
-
-func (h *cryptoKitHMAC) MarshalBinary() ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
-}
-
-func (h *cryptoKitHMAC) AppendBinary(b []byte) ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
-}
-
-func (h *cryptoKitHMAC) UnmarshalBinary(data []byte) error {
-	return errors.New("cryptokit: hash state is not marshallable")
 }
 
 func (h *cryptoKitHMAC) Clone() (HashCloner, error) {

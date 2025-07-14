@@ -79,20 +79,20 @@ func TestHMACUnsupportedHash(t *testing.T) {
 }
 
 func TestHMACAllocations(t *testing.T) {
-	h := xcrypto.NewHMAC(xcrypto.NewSHA256, nil)
 	msg := []byte("hello world")
 	sum := make([]byte, xcrypto.NewSHA256().Size())
 	n := int(testing.AllocsPerRun(10, func() {
+		h := xcrypto.NewHMAC(xcrypto.NewSHA256, nil)
 		h.Write(msg)
 		h.Sum(sum[:0])
 		h.Reset()
 	}))
 
-	want := 2
+	want := 4
 	if compareCurrentVersion("go1.24") >= 0 {
 		// The go1.24 compiler is able to optimize the allocation away.
 		// See cgo_go124.go for more information.
-		want = 0
+		want = 2
 	}
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)

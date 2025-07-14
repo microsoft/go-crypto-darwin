@@ -130,15 +130,15 @@ func (h *cryptoKitHMAC) BlockSize() int {
 
 func hashToHMACEnum(h hash.Hash) int {
 	switch h.(type) {
-	case *MD5Hash:
+	case MD5Hash:
 		return 1
-	case *SHA1Hash:
+	case SHA1Hash:
 		return 2
-	case *SHA256Hash:
+	case SHA256Hash:
 		return 3
-	case *SHA384Hash:
+	case SHA384Hash:
 		return 4
-	case *SHA512Hash:
+	case SHA512Hash:
 		return 5
 	default:
 		return 0

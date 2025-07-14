@@ -489,13 +489,13 @@ func TestHashStructAllocations(t *testing.T) {
 	}
 	msg := []byte("testing")
 
-	md5Hash := xcrypto.NewMD5()
-	sha1Hash := xcrypto.NewSHA1()
-	sha256Hash := xcrypto.NewSHA256()
-	sha512Hash := xcrypto.NewSHA512()
-
-	sum := make([]byte, sha512Hash.Size())
+	sum := make([]byte, xcrypto.NewSHA512().Size())
 	n := int(testing.AllocsPerRun(10, func() {
+		md5Hash := xcrypto.NewMD5()
+		sha1Hash := xcrypto.NewSHA1()
+		sha256Hash := xcrypto.NewSHA256()
+		sha512Hash := xcrypto.NewSHA512()
+
 		md5Hash.Write(msg)
 		sha1Hash.Write(msg)
 		sha256Hash.Write(msg)
@@ -515,7 +515,7 @@ func TestHashStructAllocations(t *testing.T) {
 	if compareCurrentVersion("go1.24") >= 0 {
 		// The go1.24 compiler is able to optimize the allocation away.
 		// See cgo_go124.go for more information.
-		want = 0
+		want = 4
 	}
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)

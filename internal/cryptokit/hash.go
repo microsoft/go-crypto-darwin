@@ -70,9 +70,9 @@ type evpHash struct {
 	size          int
 }
 
-func newEVPHash(ptr unsafe.Pointer, hashAlgorithm C.int, blockSize, size int) *evpHash {
+func newEVPHash(hashAlgorithm C.int, blockSize, size int) *evpHash {
 	h := &evpHash{
-		ptr:           ptr,
+		ptr:           C.hashNew(hashAlgorithm),
 		hashAlgorithm: hashAlgorithm,
 		blockSize:     blockSize,
 		size:          size,
@@ -95,7 +95,14 @@ func (h *evpHash) Clone() (HashCloner, error) {
 		panic("cryptokit: hash already finalized")
 	}
 
-	newHash := newEVPHash(C.hashCopy(h.hashAlgorithm, h.ptr), h.hashAlgorithm, h.blockSize, h.size)
+	newHash := &evpHash{
+		ptr:           C.hashCopy(h.hashAlgorithm, h.ptr),
+		hashAlgorithm: h.hashAlgorithm,
+		blockSize:     h.blockSize,
+		size:          h.size,
+	}
+
+	runtime.SetFinalizer(newHash, (*evpHash).finalize)
 
 	runtime.KeepAlive(h)
 
@@ -170,9 +177,8 @@ type MD5Hash struct {
 }
 
 func NewMD5() hash.Hash {
-	return &MD5Hash{
+	return MD5Hash{
 		evpHash: newEVPHash(
-			C.hashNew(md5),
 			C.int(md5),
 			MD5BlockSize,
 			MD5Size,
@@ -186,9 +192,8 @@ type SHA1Hash struct {
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
-	return &SHA1Hash{
+	return SHA1Hash{
 		evpHash: newEVPHash(
-			C.hashNew(sha1),
 			sha1,
 			SHA1BlockSize,
 			SHA1Size,
@@ -202,9 +207,8 @@ type SHA256Hash struct {
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
-	return &SHA256Hash{
+	return SHA256Hash{
 		evpHash: newEVPHash(
-			C.hashNew(sha256),
 			sha256,
 			SHA256BlockSize,
 			SHA256Size,
@@ -218,9 +222,8 @@ type SHA384Hash struct {
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
-	return &SHA384Hash{
+	return SHA384Hash{
 		evpHash: newEVPHash(
-			C.hashNew(sha384),
 			sha384,
 			SHA384BlockSize,
 			SHA384Size,
@@ -234,9 +237,8 @@ type SHA512Hash struct {
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
-	return &SHA512Hash{
+	return SHA512Hash{
 		evpHash: newEVPHash(
-			C.hashNew(sha512),
 			sha512,
 			SHA512BlockSize,
 			SHA512Size,

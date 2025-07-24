@@ -9,6 +9,7 @@ package cryptokit
 import "C"
 import (
 	"errors"
+	"fmt"
 	"hash"
 	"runtime"
 	"unsafe"
@@ -149,15 +150,15 @@ func (h *evpHash) Sum(b []byte) []byte {
 }
 
 func (h *evpHash) MarshalBinary() ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
+	return nil, fmt.Errorf("cryptokit: hash state is not marshallable: %w", errors.ErrUnsupported)
 }
 
 func (h *evpHash) AppendBinary(b []byte) ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
+	return nil, fmt.Errorf("cryptokit: hash state is not marshallable: %w", errors.ErrUnsupported)
 }
 
 func (h *evpHash) UnmarshalBinary(data []byte) error {
-	return errors.New("cryptokit: hash state is not marshallable")
+	return fmt.Errorf("cryptokit: hash state is not marshallable: %w", errors.ErrUnsupported)
 }
 
 func (h *evpHash) Reset() {

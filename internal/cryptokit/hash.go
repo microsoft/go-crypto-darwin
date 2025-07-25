@@ -148,16 +148,26 @@ func (h *evpHash) Sum(b []byte) []byte {
 	return b
 }
 
+type errMarshallUnsupported struct{}
+
+func (e errMarshallUnsupported) Error() string {
+	return "cryptokit: hash state is not marshallable"
+}
+
+func (e errMarshallUnsupported) Unwrap() error {
+	return errors.ErrUnsupported
+}
+
 func (h *evpHash) MarshalBinary() ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
+	return nil, errMarshallUnsupported{}
 }
 
 func (h *evpHash) AppendBinary(b []byte) ([]byte, error) {
-	return nil, errors.New("cryptokit: hash state is not marshallable")
+	return nil, errMarshallUnsupported{}
 }
 
 func (h *evpHash) UnmarshalBinary(data []byte) error {
-	return errors.New("cryptokit: hash state is not marshallable")
+	return errMarshallUnsupported{}
 }
 
 func (h *evpHash) Reset() {

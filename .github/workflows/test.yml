@@ -21,7 +21,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build CryptoKit.o
         run: bash gen-swift-bindings.sh
@@ -39,7 +39,7 @@ jobs:
   santise:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

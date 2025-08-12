@@ -19,7 +19,7 @@ jobs:
       pull-requests: write
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Xcode
         run: sudo xcode-select --switch /Applications/Xcode_14.1.app
       - name: Build Swift

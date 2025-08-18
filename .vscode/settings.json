@@ -9,7 +9,16 @@
     }
   },
   "editor.formatOnSave": true,
+  "[c]": {
+    "editor.formatOnSave": false,
+  },
   "[swift]": {
     "editor.defaultFormatter": "vknabel.vscode-apple-swift-format",
+  },
+  "files.associations": {
+    "*.ejs": "ejs",
+    "*.gmk": "makefile",
+    "*.hcl": "terraform",
+    "stdbool.h": "c"
   },
 }

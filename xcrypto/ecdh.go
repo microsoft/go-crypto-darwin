@@ -5,33 +5,34 @@
 
 package xcrypto
 
-// #include <Security/Security.h>
-import "C"
 import (
 	"errors"
 	"runtime"
 	"slices"
+	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/security"
 )
 
 type PublicKeyECDH struct {
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 	bytes []byte
 }
 
 func (k *PublicKeyECDH) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
 type PrivateKeyECDH struct {
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 	pub   []byte
 }
 
 func (k *PrivateKeyECDH) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
@@ -39,7 +40,7 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 	if len(bytes) < 1 {
 		return nil, errors.New("NewPublicKeyECDH: missing key")
 	}
-	pubKeyRef, err := createSecKeyWithData(bytes, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(bytes, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
 // bytes expects the public key to be in uncompressed ANSI X9.63 format
 func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) {
 	key := append(slices.Clone(pub), priv...)
-	privKeyRef, err := createSecKeyWithData(key, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(key, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +65,8 @@ func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) 
 
 func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
 	defer runtime.KeepAlive(k)
-	pubKeyRef := C.SecKeyCopyPublicKey(k._pkey)
-	if pubKeyRef == 0 {
+	pubKeyRef := security.SecKeyCopyPublicKey(k._pkey)
+	if pubKeyRef == nil {
 		return nil, errors.New("failed to extract public key")
 	}
 	pubKey := &PublicKeyECDH{pubKeyRef, k.pub}
@@ -77,26 +78,25 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	defer runtime.KeepAlive(priv)
 	defer runtime.KeepAlive(pub)
 
-	var algorithm C.CFStringRef = C.kSecKeyAlgorithmECDHKeyExchangeStandard
-
-	supported := C.SecKeyIsAlgorithmSupported(priv._pkey, C.kSecKeyOperationTypeKeyExchange, algorithm)
+	var algorithm = security.KSecKeyAlgorithmECDHKeyExchangeStandard
+	supported := security.SecKeyIsAlgorithmSupported(priv._pkey, security.KSecKeyOperationTypeKeyExchange, algorithm)
 	if supported == 0 {
 		return nil, errors.New("ECDH algorithm not supported for the given private key")
 	}
 
-	var cfErr C.CFErrorRef
+	var cfErr security.CFErrorRef
 	// Perform the key exchange
-	sharedSecretRef := C.SecKeyCopyKeyExchangeResult(
+	sharedSecretRef := security.SecKeyCopyKeyExchangeResult(
 		priv._pkey,
 		algorithm,
 		pub._pkey,
-		C.CFDictionaryRef(0),
+		security.CFDictionaryRef(unsafe.Pointer(uintptr(0))),
 		&cfErr,
 	)
 	if err := goCFErrorRef(cfErr); err != nil {
 		return nil, err
 	}
-	defer C.CFRelease(C.CFTypeRef(sharedSecretRef))
+	defer security.CFRelease(security.CFTypeRef(sharedSecretRef))
 
 	sharedSecret := cfDataToBytes(sharedSecretRef)
 	return sharedSecret, nil
@@ -109,13 +109,13 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	}
 	keySizeInBits := curveToKeySizeInBits(curve)
 	// Generate the private key and get its DER representation
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(security.KSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, err
 	}
 	pub, priv, err := extractECDHComponents(privKeyDER, keySize)
 	if err != nil {
-		C.CFRelease(C.CFTypeRef(privKeyRef))
+		security.CFRelease(security.CFTypeRef(privKeyRef))
 		return nil, nil, err
 	}
 	k := &PrivateKeyECDH{privKeyRef, pub}

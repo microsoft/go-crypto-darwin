@@ -1,39 +1,39 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 import (
 	"errors"
 	"runtime"
 	"slices"
 	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
 // RC4Cipher is an instance of RC4 using a particular key.
 type RC4Cipher struct {
-	ctx C.CCCryptorRef
+	ctx commoncrypto.CCCryptorRef
 }
 
 // NewRC4Cipher creates and returns a new RC4 cipher with the given key.
 func NewRC4Cipher(key []byte) (*RC4Cipher, error) {
 	// Clone the key to prevent modification.
 	key = slices.Clone(key)
-	var ctx C.CCCryptorRef
-	status := C.CCCryptorCreate(
-		C.kCCEncrypt,       // Operation (RC4 stream)
-		C.kCCAlgorithmRC4,  // Algorithm
-		0,                  // No padding or other options
-		pbase(key),         // Key
-		C.size_t(len(key)), // Key length
-		nil,                // No IV needed for RC4
-		&ctx,               // Output: CCCryptorRef
+	var ctx commoncrypto.CCCryptorRef
+	status := commoncrypto.CCCryptorCreate(
+		commoncrypto.KCCEncrypt,      // Operation (RC4 stream)
+		commoncrypto.KCCAlgorithmRC4, // Algorithm
+		0,                            // No padding or other options
+		pbase(key),                   // Key
+		int(len(key)),                // Key length
+		nil,                          // No IV needed for RC4
+		&ctx,                         // Output: CCCryptorRef
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		return nil, errors.New("failed to create RC4 cipher")
 	}
 	c := &RC4Cipher{ctx: ctx}
@@ -44,14 +44,14 @@ func NewRC4Cipher(key []byte) (*RC4Cipher, error) {
 // finalize releases the RC4 cipher context when no longer needed.
 func (c *RC4Cipher) finalize() {
 	if c.ctx != nil {
-		C.CCCryptorRelease(c.ctx)
+		commoncrypto.CCCryptorRelease(c.ctx)
 	}
 }
 
 // Reset zeros the key data and makes the cipher unusable.
 func (c *RC4Cipher) Reset() {
 	if c.ctx != nil {
-		C.CCCryptorRelease(c.ctx)
+		commoncrypto.CCCryptorRelease(c.ctx)
 		c.ctx = nil
 	}
 }
@@ -66,14 +66,14 @@ func (c *RC4Cipher) XORKeyStream(dst, src []byte) {
 	}
 	// Ensures `dst` has sufficient space.
 	_ = dst[len(src)-1]
-	var outLen C.size_t
-	status := C.CCCryptorUpdate(
+	var outLen int
+	status := commoncrypto.CCCryptorUpdate(
 		c.ctx,
-		unsafe.Pointer(&*addrNeverEmpty(src)), C.size_t(len(src)), // Input
-		unsafe.Pointer(&*addrNeverEmpty(dst)), C.size_t(len(dst)), // Output
+		unsafe.Pointer(&*addrNeverEmpty(src)), int(len(src)), // Input
+		unsafe.Pointer(&*addrNeverEmpty(dst)), int(len(dst)), // Output
 		&outLen,
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorUpdate failed")
 	}
 	if int(outLen) != len(src) {

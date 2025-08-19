@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+AllowShortEnumsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+BinPackParameters: true
+ColumnLimit: 0
+BraceWrapping:
+  AfterEnum: false
+  SplitEmptyRecord: false

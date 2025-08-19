@@ -1,17 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 import (
 	"crypto/cipher"
 	"errors"
 	"slices"
 
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
@@ -27,7 +26,7 @@ const (
 
 const (
 	// AES block size is the same for all key sizes
-	aesBlockSize         = C.kCCBlockSizeAES128
+	aesBlockSize         = commoncrypto.KCCBlockSizeAES128
 	gcmTagSize           = 16
 	gcmStandardNonceSize = 12
 	// TLS 1.2 additional data is constructed as:
@@ -43,14 +42,14 @@ const (
 
 type aesCipher struct {
 	key  []byte
-	kind C.CCAlgorithm
+	kind commoncrypto.CCAlgorithm
 }
 
 func NewAESCipher(key []byte) (cipher.Block, error) {
-	var alg C.CCAlgorithm
+	var alg commoncrypto.CCAlgorithm
 	switch len(key) {
 	case 16, 24, 32:
-		alg = C.kCCAlgorithmAES
+		alg = commoncrypto.KCCAlgorithmAES
 	default:
 		return nil, errors.New("crypto/aes: invalid key size")
 	}
@@ -75,20 +74,20 @@ func (c *aesCipher) Encrypt(dst, src []byte) {
 		panic("crypto/aes: invalid buffer overlap")
 	}
 
-	status := C.CCCrypt(
-		C.kCCEncrypt,          // Operation
-		C.CCAlgorithm(c.kind), // Algorithm
-		0,                     // Options
-		pbase(c.key),          // Key
-		C.size_t(len(c.key)),  // Key length
-		nil,                   // IV
-		pbase(src),            // Input
-		C.size_t(blockSize),   // Input length
-		pbase(dst),            // Output
-		C.size_t(blockSize),   // Output length
-		nil,                   // Output length
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCEncrypt,          // Operation
+		commoncrypto.CCAlgorithm(c.kind), // Algorithm
+		0,                                // Options
+		pbase(c.key),                     // Key
+		int(len(c.key)),                  // Key length
+		nil,                              // IV
+		pbase(src),                       // Input
+		int(blockSize),                   // Input length
+		pbase(dst),                       // Output
+		int(blockSize),                   // Output length
+		nil,                              // Output length
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/aes: encryption failed")
 	}
 }
@@ -105,20 +104,20 @@ func (c *aesCipher) Decrypt(dst, src []byte) {
 		panic("crypto/aes: invalid buffer overlap")
 	}
 
-	status := C.CCCrypt(
-		C.kCCDecrypt,          // Operation
-		C.CCAlgorithm(c.kind), // Algorithm
-		0,                     // Options
-		pbase(c.key),          // Key
-		C.size_t(len(c.key)),  // Key length
-		nil,                   // IV
-		pbase(src),            // Input
-		C.size_t(blockSize),   // Input length
-		pbase(dst),            // Output
-		C.size_t(blockSize),   // Output length
-		nil,                   // Output length
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCDecrypt,          // Operation
+		commoncrypto.CCAlgorithm(c.kind), // Algorithm
+		0,                                // Options
+		pbase(c.key),                     // Key
+		int(len(c.key)),                  // Key length
+		nil,                              // IV
+		pbase(src),                       // Input
+		int(blockSize),                   // Input length
+		pbase(dst),                       // Output
+		int(blockSize),                   // Output length
+		nil,                              // Output length
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/aes: decryption failed")
 	}
 }
@@ -310,11 +309,11 @@ func NewGCMTLS13(block cipher.Block) (cipher.AEAD, error) {
 }
 
 func (c *aesCipher) NewCBCEncrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCEncrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCEncrypt, c.kind, c.key, iv)
 }
 
 func (c *aesCipher) NewCBCDecrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCDecrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCDecrypt, c.kind, c.key, iv)
 }
 
 // sliceForAppend is a mirror of crypto/cipher.sliceForAppend.

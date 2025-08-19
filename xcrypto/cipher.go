@@ -1,29 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
-
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 
 import (
 	"runtime"
 	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
 type cbcCipher struct {
 	blockSize int
-	cryptor   C.CCCryptorRef
+	cryptor   commoncrypto.CCCryptorRef
 }
 
-func newCBC(operation C.CCOperation, kind C.CCAlgorithm, key, iv []byte) *cbcCipher {
+func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, key, iv []byte) *cbcCipher {
 	var blockSize int
 	switch kind {
-	case C.kCCAlgorithmAES:
+	case commoncrypto.KCCAlgorithmAES:
 		blockSize = aesBlockSize
-	case C.kCCAlgorithmDES, C.kCCAlgorithm3DES:
+	case commoncrypto.KCCAlgorithmDES, commoncrypto.KCCAlgorithm3DES:
 		blockSize = desBlockSize
 	default:
 		panic("invalid algorithm")
@@ -31,22 +30,22 @@ func newCBC(operation C.CCOperation, kind C.CCAlgorithm, key, iv []byte) *cbcCip
 
 	// Create and initialize the cbcMode struct with CCCryptorCreate here
 	x := &cbcCipher{blockSize: blockSize}
-	status := C.CCCryptorCreateWithMode(
-		operation,           // Specifies whether encryption or decryption is performed (kCCEncrypt or kCCDecrypt).
-		C.kCCModeCBC,        // Mode of operation, here explicitly set to CBC (Cipher Block Chaining).
-		C.CCAlgorithm(kind), // The encryption algorithm (e.g., kCCAlgorithmAES128, kCCAlgorithmDES).
-		C.ccNoPadding,       // Padding option, set to no padding; padding can be handled at a higher level if necessary.
-		pbase(iv),           // Initialization Vector (IV) for the cipher, required for CBC mode. Should be nil for ECB mode.
-		pbase(key),          // Pointer to the encryption key.
-		C.size_t(len(key)),  // Length of the encryption key in bytes.
-		nil,                 // Tweak key, used only for XTS mode; here set to nil as it’s not required for CBC.
-		0,                   // Length of the tweak key, set to 0 as tweak is nil.
-		0,                   // Number of rounds, mainly for RC2 and Blowfish; not used here, so set to 0.
-		0,                   // Mode options for CTR and F8 modes; not used for CBC, so set to 0.
-		&x.cryptor,          // Pointer to the CCCryptorRef output, which will hold the state for encryption or decryption.
+	status := commoncrypto.CCCryptorCreateWithMode(
+		operation,                      // Specifies whether encryption or decryption is performed (kCCEncrypt or kCCDecrypt).
+		commoncrypto.KCCModeCBC,        // Mode of operation, here explicitly set to CBC (Cipher Block Chaining).
+		commoncrypto.CCAlgorithm(kind), // The encryption algorithm (e.g., kCCAlgorithmAES128, kCCAlgorithmDES).
+		commoncrypto.CcNoPadding,       // Padding option, set to no padding; padding can be handled at a higher level if necessary.
+		pbase(iv),                      // Initialization Vector (IV) for the cipher, required for CBC mode. Should be nil for ECB mode.
+		pbase(key),                     // Pointer to the encryption key.
+		int(len(key)),                  // Length of the encryption key in bytes.
+		nil,                            // Tweak key, used only for XTS mode; here set to nil as it’s not required for CBC.
+		0,                              // Length of the tweak key, set to 0 as tweak is nil.
+		0,                              // Number of rounds, mainly for RC2 and Blowfish; not used here, so set to 0.
+		0,                              // Mode options for CTR and F8 modes; not used for CBC, so set to 0.
+		&x.cryptor,                     // Pointer to the CCCryptorRef output, which will hold the state for encryption or decryption.
 	)
 
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/des: CCCryptorCreate failed")
 	}
 
@@ -57,7 +56,7 @@ func newCBC(operation C.CCOperation, kind C.CCAlgorithm, key, iv []byte) *cbcCip
 
 func (x *cbcCipher) finalize() {
 	if x.cryptor != nil {
-		C.CCCryptorRelease(x.cryptor)
+		commoncrypto.CCCryptorRelease(x.cryptor)
 		x.cryptor = nil
 	}
 }
@@ -77,16 +76,16 @@ func (x *cbcCipher) CryptBlocks(dst, src []byte) {
 	if len(src) == 0 {
 		return
 	}
-	var outLength C.size_t
-	status := C.CCCryptorUpdate(
-		x.cryptor,          // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
-		pbase(src),         // Pointer to the input data (source buffer) to be encrypted or decrypted.
-		C.size_t(len(src)), // Length of the input data in bytes.
-		pbase(dst),         // Pointer to the output buffer (destination buffer) where the result will be stored.
-		C.size_t(len(dst)), // Size of the output buffer in bytes; must be large enough to hold the processed data.
-		&outLength,         // Pointer to a variable that will contain the number of bytes written to the output buffer.
+	var outLength int
+	status := commoncrypto.CCCryptorUpdate(
+		x.cryptor,     // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
+		pbase(src),    // Pointer to the input data (source buffer) to be encrypted or decrypted.
+		int(len(src)), // Length of the input data in bytes.
+		pbase(dst),    // Pointer to the output buffer (destination buffer) where the result will be stored.
+		int(len(dst)), // Size of the output buffer in bytes; must be large enough to hold the processed data.
+		&outLength,    // Pointer to a variable that will contain the number of bytes written to the output buffer.
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorUpdate failed")
 	}
 	runtime.KeepAlive(x)
@@ -96,11 +95,11 @@ func (x *cbcCipher) SetIV(iv []byte) {
 	if len(iv) != x.blockSize {
 		panic("crypto/cipher: incorrect IV length")
 	}
-	status := C.CCCryptorReset(
+	status := commoncrypto.CCCryptorReset(
 		x.cryptor, // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
 		pbase(iv), // Pointer to the new IV to be set.
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorReset failed")
 	}
 	runtime.KeepAlive(x)

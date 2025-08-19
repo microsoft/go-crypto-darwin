@@ -4,8 +4,6 @@ package security
 
 /*
 #cgo CFLAGS: -Wno-attributes
-#cgo unix LDFLAGS: -ldl
-
 #include "zsecurity.h"
 */
 import "C"

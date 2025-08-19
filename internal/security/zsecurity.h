@@ -3,9 +3,9 @@
 #ifndef MKCGO_H // only include this header once
 #define MKCGO_H
 
-#include <stdlib.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 typedef unsigned char Boolean;
 typedef void* SecRandomRef;

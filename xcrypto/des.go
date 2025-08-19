@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 import (
 	"crypto/cipher"
 	"errors"
 	"slices"
+
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
-const desBlockSize = C.kCCBlockSizeDES
+const desBlockSize = commoncrypto.KCCBlockSizeDES
 
 type desCipher struct {
 	key  []byte
-	kind C.CCAlgorithm
+	kind commoncrypto.CCAlgorithm
 }
 
 // NewDESCipher creates a new DES cipher block using the specified key (8 bytes).
@@ -28,7 +28,7 @@ func NewDESCipher(key []byte) (cipher.Block, error) {
 
 	c := &desCipher{
 		key:  slices.Clone(key),
-		kind: C.kCCAlgorithmDES,
+		kind: commoncrypto.KCCAlgorithmDES,
 	}
 	return c, nil
 }
@@ -41,7 +41,7 @@ func NewTripleDESCipher(key []byte) (cipher.Block, error) {
 
 	c := &desCipher{
 		key:  slices.Clone(key),
-		kind: C.kCCAlgorithm3DES,
+		kind: commoncrypto.KCCAlgorithm3DES,
 	}
 	return c, nil
 }
@@ -58,21 +58,21 @@ func (c *desCipher) Encrypt(dst, src []byte) {
 		panic("crypto/des: invalid buffer overlap")
 	}
 
-	var outLength C.size_t
-	status := C.CCCrypt(
-		C.kCCEncrypt,
-		C.CCAlgorithm(c.kind),
-		C.kCCOptionECBMode,
+	var outLength int
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCEncrypt,
+		commoncrypto.CCAlgorithm(c.kind),
+		commoncrypto.KCCOptionECBMode,
 		pbase(c.key),
-		C.size_t(len(c.key)),
+		int(len(c.key)),
 		nil,
 		pbase(src[:blockSize]),
-		C.size_t(blockSize),
+		int(blockSize),
 		pbase(dst[:blockSize]),
-		C.size_t(blockSize),
+		int(blockSize),
 		&outLength,
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/des: encryption failed")
 	}
 }
@@ -87,31 +87,31 @@ func (c *desCipher) Decrypt(dst, src []byte) {
 		panic("crypto/des: invalid buffer overlap")
 	}
 
-	var outLength C.size_t
-	status := C.CCCrypt(
-		C.kCCDecrypt,
-		C.CCAlgorithm(c.kind),
-		C.kCCOptionECBMode,
+	var outLength int
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCDecrypt,
+		commoncrypto.CCAlgorithm(c.kind),
+		commoncrypto.KCCOptionECBMode,
 		pbase(c.key),
-		C.size_t(len(c.key)),
+		int(len(c.key)),
 		nil,
 		pbase(src[:blockSize]),
-		C.size_t(blockSize),
+		int(blockSize),
 		pbase(dst[:blockSize]),
-		C.size_t(blockSize),
+		int(blockSize),
 		&outLength,
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/des: decryption failed")
 	}
 }
 
 // CBC mode encrypter
 func (c *desCipher) NewCBCEncrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCEncrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCEncrypt, c.kind, c.key, iv)
 }
 
 // CBC mode decrypter
 func (c *desCipher) NewCBCDecrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCDecrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCDecrypt, c.kind, c.key, iv)
 }

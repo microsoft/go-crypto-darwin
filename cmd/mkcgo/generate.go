@@ -24,7 +24,9 @@ func generateGo(src *mkcgo.Source, w io.Writer) {
 	// This block outputs C header includes and forward declarations for loader functions.
 	fmt.Fprintf(w, "/*\n")
 	fmt.Fprintf(w, "#cgo CFLAGS: -Wno-attributes\n")
-	fmt.Fprintf(w, "#cgo unix LDFLAGS: -ldl\n\n")
+	if !*useDynamicLoading {
+		fmt.Fprintf(w, "#cgo unix LDFLAGS: -ldl\n\n")
+	}
 	if *includeHeader != "" {
 		fmt.Fprintf(w, "#include \"%s\"\n", *includeHeader)
 	}

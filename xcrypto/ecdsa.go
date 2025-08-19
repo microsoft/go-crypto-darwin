@@ -1,43 +1,43 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <Security/Security.h>
-import "C"
 import (
 	"errors"
 	"runtime"
+
+	"github.com/microsoft/go-crypto-darwin/internal/security"
 )
 
 type PrivateKeyECDSA struct {
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 }
 
 func (k *PrivateKeyECDSA) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
-func (k *PrivateKeyECDSA) withKey(f func(C.SecKeyRef) C.int) C.int {
+func (k *PrivateKeyECDSA) withKey(f func(security.SecKeyRef) error) error {
 	defer runtime.KeepAlive(k)
 	return f(k._pkey)
 }
 
 type PublicKeyECDSA struct {
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 }
 
 func (k *PublicKeyECDSA) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
-func (k *PublicKeyECDSA) withKey(f func(C.SecKeyRef) C.int) C.int {
+func (k *PublicKeyECDSA) withKey(f func(security.SecKeyRef) error) error {
 	defer runtime.KeepAlive(k)
 	return f(k._pkey)
 }
@@ -52,7 +52,7 @@ func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
 		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
 	}
 
-	pubKeyRef, err := createSecKeyWithData(encodedKey, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(encodedKey, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func NewPrivateKeyECDSA(curve string, x, y, d BigInt) (*PrivateKeyECDSA, error) 
 		return nil, errors.New("crypto/ecdsa: failed to encode private key: " + err.Error())
 	}
 
-	privKeyRef, err := createSecKeyWithData(encodedKey, C.kSecAttrKeyTypeECSECPrimeRandom, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(encodedKey, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -91,11 +91,11 @@ func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
 	}
 
 	keySizeInBits := curveToKeySizeInBits(curve)
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(security.KSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	defer C.CFRelease(C.CFTypeRef(privKeyRef))
+	defer security.CFRelease(security.CFTypeRef(privKeyRef))
 	return decodeFromUncompressedAnsiX963Key(privKeyDER, keySize)
 }
 

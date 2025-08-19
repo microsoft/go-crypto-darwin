@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <Security/Security.h>
-import "C"
 import (
 	"crypto"
 	"errors"
 	"hash"
+	"slices"
 	"strconv"
 	"unsafe"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
+	"github.com/microsoft/go-crypto-darwin/internal/security"
 )
 
 type algorithmType int
@@ -28,7 +28,7 @@ const (
 	algorithmTypeECDSA
 )
 
-type withKeyFunc func(func(C.SecKeyRef) C.int) C.int
+type withKeyFunc func(func(security.SecKeyRef) error) error
 
 // Encrypt encrypts a plaintext message using a given key and algorithm.
 func evpEncrypt(withKey withKeyFunc, algorithmType algorithmType, plaintext []byte, hash hash.Hash) ([]byte, error) {
@@ -48,19 +48,19 @@ func evpEncrypt(withKey withKeyFunc, algorithmType algorithmType, plaintext []by
 	dataRef := bytesToCFData(plaintext)
 	defer cfRelease(unsafe.Pointer(dataRef))
 
-	var encryptedDataRef C.CFDataRef
-	result := withKey(func(key C.SecKeyRef) C.int {
-		if C.SecKeyIsAlgorithmSupported(key, C.kSecKeyOperationTypeEncrypt, algorithm) != 1 {
-			return -1 // Algorithm not supported by the key
+	var encryptedDataRef security.CFDataRef
+	err = withKey(func(key security.SecKeyRef) error {
+		if security.SecKeyIsAlgorithmSupported(key, security.KSecKeyOperationTypeEncrypt, algorithm) != 1 {
+			return errors.New("algorithm not supported by the key")
 		}
-		encryptedDataRef = C.SecKeyCreateEncryptedData(key, algorithm, dataRef, nil)
-		if encryptedDataRef == 0 {
-			return -1 // Encryption failed
+		encryptedDataRef = security.SecKeyCreateEncryptedData(key, algorithm, dataRef, nil)
+		if encryptedDataRef == nil {
+			return errors.New("encryption failed")
 		}
-		return 0
+		return nil
 	})
-	if result != 0 {
-		return nil, errors.New("encryption failed")
+	if err != nil {
+		return nil, err
 	}
 	defer cfRelease(unsafe.Pointer(encryptedDataRef))
 
@@ -84,25 +84,25 @@ func evpDecrypt(withKey withKeyFunc, algorithmType algorithmType, ciphertext []b
 
 	msg := bytesToCFData(ciphertext)
 
-	var decryptedDataRef C.CFDataRef
-	var cfErr C.CFErrorRef
-	result := withKey(func(key C.SecKeyRef) C.int {
-		if C.SecKeyIsAlgorithmSupported(key, C.kSecKeyOperationTypeDecrypt, algorithm) != 1 {
-			return -1 // Algorithm not supported by the key
+	var decryptedDataRef security.CFDataRef
+	var cfErr security.CFErrorRef
+	err = withKey(func(key security.SecKeyRef) error {
+		if security.SecKeyIsAlgorithmSupported(key, security.KSecKeyOperationTypeDecrypt, algorithm) != 1 {
+			return errors.New("algorithm not supported by the key")
 		}
-		decryptedDataRef = C.SecKeyCreateDecryptedData(key, algorithm, msg, &cfErr)
-		if decryptedDataRef == 0 {
-			return -1 // Decryption failed
+		decryptedDataRef = security.SecKeyCreateDecryptedData(key, algorithm, msg, &cfErr)
+		if decryptedDataRef == nil {
+			return errors.New("decryption failed")
 		}
-		return 0 // Success
+		return nil
 	})
 
 	if err := goCFErrorRef(cfErr); err != nil {
 		return nil, err
 	}
 
-	if result != 0 || decryptedDataRef == 0 {
-		return nil, errors.New("decryption failed")
+	if err != nil {
+		return nil, err
 	}
 	defer cfRelease(unsafe.Pointer(decryptedDataRef))
 
@@ -115,25 +115,25 @@ func evpSign(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Hash,
 		return nil, err
 	}
 
-	var signedDataRef C.CFDataRef
-	var cfErr C.CFErrorRef
-	result := withKey(func(key C.SecKeyRef) C.int {
-		if C.SecKeyIsAlgorithmSupported(key, C.kSecKeyOperationTypeSign, algorithm) != 1 {
-			return -1 // Algorithm not supported by the key
+	var signedDataRef security.CFDataRef
+	var cfErr security.CFErrorRef
+	err = withKey(func(key security.SecKeyRef) error {
+		if security.SecKeyIsAlgorithmSupported(key, security.KSecKeyOperationTypeSign, algorithm) != 1 {
+			return errors.New("algorithm not supported by the key")
 		}
-		signedDataRef = C.SecKeyCreateSignature(key, algorithm, bytesToCFData(hashed), &cfErr)
-		if signedDataRef == 0 {
-			return -1 // Signing failed
+		signedDataRef = security.SecKeyCreateSignature(key, algorithm, bytesToCFData(hashed), &cfErr)
+		if signedDataRef == nil {
+			return errors.New("signing failed")
 		}
-		return 0 // Success
+		return nil
 	})
 
 	if err := goCFErrorRef(cfErr); err != nil {
 		return nil, err
 	}
 
-	if result != 0 || signedDataRef == 0 {
-		return nil, errors.New("signing failed")
+	if err != nil {
+		return nil, err
 	}
 	defer cfRelease(unsafe.Pointer(signedDataRef))
 
@@ -146,25 +146,22 @@ func evpVerify(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Has
 		return err
 	}
 
-	var cfErr C.CFErrorRef
-	result := withKey(func(key C.SecKeyRef) C.int {
-		if C.SecKeyIsAlgorithmSupported(key, C.kSecKeyOperationTypeVerify, algorithm) != 1 {
-			return -1 // Algorithm not supported by the key
+	var cfErr security.CFErrorRef
+	err = withKey(func(key security.SecKeyRef) error {
+		if security.SecKeyIsAlgorithmSupported(key, security.KSecKeyOperationTypeVerify, algorithm) != 1 {
+			return errors.New("algorithm not supported by the key")
 		}
-		if C.SecKeyVerifySignature(key, algorithm, bytesToCFData(hashed), bytesToCFData(signature), &cfErr) != 1 {
-			return -1 // Verification failed
+		if security.SecKeyVerifySignature(key, algorithm, bytesToCFData(hashed), bytesToCFData(signature), &cfErr) != 1 {
+			return errors.New("verification failed")
 		}
-		return 0 // Success
+		return nil
 	})
 
 	if err := goCFErrorRef(cfErr); err != nil {
 		return err
 	}
 
-	if result != 0 {
-		return errors.New("verification failed")
-	}
-	return nil
+	return err
 }
 
 // hashToCryptoHash converts a hash.Hash to a crypto.Hash.
@@ -184,162 +181,166 @@ func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
 }
 
 // selectAlgorithm selects the appropriate SecKeyAlgorithm based on hash and algorithm type.
-func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (C.CFStringRef, error) {
-	var algo C.CFStringRef
+func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (security.CFStringRef, error) {
+	var algo security.CFStringRef
 	switch algorithmType {
 	case algorithmTypePSS:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA1
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPSSSHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA224
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPSSSHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA256
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPSSSHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA384
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPSSSHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPSSSHA512
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPSSSHA512
 		default:
-			return 0, errors.New("unsupported PSS hash: " + hash.String())
+			return nil, errors.New("unsupported PSS hash: " + hash.String())
 		}
 	case algorithmTypeRAW:
-		algo = C.kSecKeyAlgorithmRSAEncryptionRaw
+		algo = security.KSecKeyAlgorithmRSAEncryptionRaw
 	case algorithmTypePKCS1v15Enc:
-		return C.kSecKeyAlgorithmRSAEncryptionPKCS1, nil
+		return security.KSecKeyAlgorithmRSAEncryptionPKCS1, nil
 	case algorithmTypePKCS1v15Sig:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
 		case 0:
-			algo = C.kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
+			algo = security.KSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
 		default:
-			return 0, errors.New("unsupported PKCS1v15 hash: " + hash.String())
+			return nil, errors.New("unsupported PKCS1v15 hash: " + hash.String())
 		}
 	case algorithmTypeOAEP:
 		switch hash {
 		case crypto.SHA1:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+			algo = security.KSecKeyAlgorithmRSAEncryptionOAEPSHA1
 		case crypto.SHA224:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+			algo = security.KSecKeyAlgorithmRSAEncryptionOAEPSHA224
 		case crypto.SHA256:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+			algo = security.KSecKeyAlgorithmRSAEncryptionOAEPSHA256
 		case crypto.SHA384:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+			algo = security.KSecKeyAlgorithmRSAEncryptionOAEPSHA384
 		case crypto.SHA512:
-			algo = C.kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+			algo = security.KSecKeyAlgorithmRSAEncryptionOAEPSHA512
 		default:
-			return 0, errors.New("unsupported OAEP hash: " + hash.String())
+			return nil, errors.New("unsupported OAEP hash: " + hash.String())
 		}
 	case algorithmTypeECDSA:
-		return C.kSecKeyAlgorithmECDSASignatureDigestX962, nil
+		return security.KSecKeyAlgorithmECDSASignatureDigestX962, nil
 	default:
-		return 0, errors.New("unsupported algorithm type: " + strconv.Itoa(int(algorithmType)))
+		return nil, errors.New("unsupported algorithm type: " + strconv.Itoa(int(algorithmType)))
 	}
 	return algo, nil
 }
 
 // bytesToCFData turns a byte slice into a CFDataRef. Caller then "owns" the
 // CFDataRef and must CFRelease the CFDataRef when done.
-func bytesToCFData(buf []byte) C.CFDataRef {
-	return C.CFDataCreate(C.kCFAllocatorDefault, base(buf), C.CFIndex(len(buf)))
+func bytesToCFData(buf []byte) security.CFDataRef {
+	return security.CFDataCreate(security.KCFAllocatorDefault, addr(buf), security.CFIndex(len(buf)))
 }
 
 // cfDataToBytes turns a CFDataRef into a byte slice.
-func cfDataToBytes(cfData C.CFDataRef) []byte {
-	return C.GoBytes(unsafe.Pointer(C.CFDataGetBytePtr(cfData)), C.int(C.CFDataGetLength(cfData)))
+func cfDataToBytes(cfData security.CFDataRef) []byte {
+	// TODO: remove this allocation
+	return slices.Clone(unsafe.Slice(security.CFDataGetBytePtr(cfData), security.CFDataGetLength(cfData)))
 }
 
 // cfRelease releases a CoreFoundation object.
 func cfRelease(ref unsafe.Pointer) {
-	C.CFRelease(C.CFTypeRef(ref))
+	security.CFRelease(security.CFTypeRef(ref))
 }
 
 // createSecKeyWithData creates a SecKey from the provided encoded key and attributes dictionary.
-func createSecKeyWithData(encodedKey []byte, keyType, keyClass C.CFStringRef) (C.SecKeyRef, error) {
-	encodedKeyCF := C.CFDataCreate(C.kCFAllocatorDefault, base(encodedKey), C.CFIndex(len(encodedKey)))
-	if encodedKeyCF == 0 {
-		return 0, errors.New("xcrypto: failed to create CFData for private key")
+func createSecKeyWithData(encodedKey []byte, keyType, keyClass security.CFStringRef) (security.SecKeyRef, error) {
+	encodedKeyCF := security.CFDataCreate(security.KCFAllocatorDefault, addr(encodedKey), security.CFIndex(len(encodedKey)))
+	if encodedKeyCF == nil {
+		return nil, errors.New("xcrypto: failed to create CFData for private key")
 	}
-	defer C.CFRelease(C.CFTypeRef(encodedKeyCF))
+	defer security.CFRelease(security.CFTypeRef(encodedKeyCF))
 
-	attrKeys := []C.CFTypeRef{
-		C.CFTypeRef(C.kSecAttrKeyType),
-		C.CFTypeRef(C.kSecAttrKeyClass),
+	attrKeys := []security.CFTypeRef{
+		security.CFTypeRef(security.KSecAttrKeyType),
+		security.CFTypeRef(security.KSecAttrKeyClass),
 	}
 
-	attrValues := []C.CFTypeRef{
-		C.CFTypeRef(keyType),
-		C.CFTypeRef(keyClass),
+	attrValues := []security.CFTypeRef{
+		security.CFTypeRef(keyType),
+		security.CFTypeRef(keyClass),
 	}
 
 	// Create attributes dictionary for the key
-	attrDict := C.CFDictionaryCreate(
-		C.kCFAllocatorDefault,
+	attrDict := security.CFDictionaryCreate(
+		security.KCFAllocatorDefault,
 		(*unsafe.Pointer)(unsafe.Pointer(&attrKeys[0])),
 		(*unsafe.Pointer)(unsafe.Pointer(&attrValues[0])),
-		C.CFIndex(len(attrKeys)),
+		security.CFIndex(len(attrKeys)),
 		nil,
 		nil,
 	)
-	if attrDict == 0 {
-		return 0, errors.New("xcrypto: failed to create attributes dictionary")
+	if attrDict == nil {
+		return nil, errors.New("xcrypto: failed to create attributes dictionary")
 	}
-	defer C.CFRelease(C.CFTypeRef(attrDict))
+	defer security.CFRelease(security.CFTypeRef(attrDict))
 
 	// Generate the SecKey
-	var errorRef C.CFErrorRef
-	key := C.SecKeyCreateWithData(encodedKeyCF, attrDict, &errorRef)
+	var errorRef security.CFErrorRef
+	key := security.SecKeyCreateWithData(encodedKeyCF, attrDict, &errorRef)
 	if err := goCFErrorRef(errorRef); err != nil {
-		return 0, err
+		return nil, err
 	}
 	return key, nil
 }
 
 // createSecKeyRandom creates a new SecKey with the provided attributes dictionary.
-func createSecKeyRandom(keyType C.CFStringRef, keySize int) ([]byte, C.SecKeyRef, error) {
-	keyAttrs := C.CFDictionaryCreateMutable(C.kCFAllocatorDefault, 0, nil, nil)
-	if keyAttrs == 0 {
-		return nil, 0, errors.New("failed to create key attributes dictionary")
+func createSecKeyRandom(keyType security.CFStringRef, keySize int) ([]byte, security.SecKeyRef, error) {
+	keyAttrs := security.CFDictionaryCreateMutable(security.KCFAllocatorDefault, 0, nil, nil)
+	if keyAttrs == nil {
+		return nil, nil, errors.New("failed to create key attributes dictionary")
 	}
-	defer C.CFRelease(C.CFTypeRef(keyAttrs))
+	defer security.CFRelease(security.CFTypeRef(keyAttrs))
 
-	C.CFDictionarySetValue(
+	security.CFDictionarySetValue(
 		keyAttrs,
-		unsafe.Pointer(C.kSecAttrKeyType),
+		unsafe.Pointer(security.KSecAttrKeyType),
 		unsafe.Pointer(keyType),
 	)
 
-	C.CFDictionarySetValue(
+	cfNum := security.CFNumberCreate(security.KCFAllocatorDefault, security.KCFNumberIntType, unsafe.Pointer(&keySize))
+	defer security.CFRelease(security.CFTypeRef(cfNum))
+
+	security.CFDictionarySetValue(
 		keyAttrs,
-		unsafe.Pointer(C.kSecAttrKeySizeInBits),
-		unsafe.Pointer(C.CFNumberCreate(C.kCFAllocatorDefault, C.kCFNumberIntType, unsafe.Pointer(&keySize))),
+		unsafe.Pointer(security.KSecAttrKeySizeInBits),
+		unsafe.Pointer(cfNum),
 	)
 
 	// Generate the private key
-	var errorRef C.CFErrorRef
-	var privKeyRef C.SecKeyRef = C.SecKeyCreateRandomKey(C.CFDictionaryRef(keyAttrs), &errorRef)
+	var errorRef security.CFErrorRef
+	privKeyRef := security.SecKeyCreateRandomKey(security.CFDictionaryRef(keyAttrs), &errorRef)
 	if err := goCFErrorRef(errorRef); err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
 
 	// Export the private key as DER
-	privData := C.SecKeyCopyExternalRepresentation(privKeyRef, &errorRef)
+	privData := security.SecKeyCopyExternalRepresentation(privKeyRef, &errorRef)
 	if err := goCFErrorRef(errorRef); err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
-	defer C.CFRelease(C.CFTypeRef(privData))
+	defer security.CFRelease(security.CFTypeRef(privData))
 
 	privKeyDER := cfDataToBytes(privData)
 	if privKeyDER == nil {
-		return nil, 0, errors.New("failed to convert CFData to bytes")
+		return nil, nil, errors.New("failed to convert CFData to bytes")
 	}
 	return privKeyDER, privKeyRef, nil
 }

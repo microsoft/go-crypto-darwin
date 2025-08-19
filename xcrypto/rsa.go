@@ -1,45 +1,46 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <Security/Security.h>
-import "C"
 import (
 	"crypto"
 	"errors"
 	"hash"
 	"runtime"
 	"strconv"
+	"unsafe"
+
+	"github.com/microsoft/go-crypto-darwin/internal/security"
 )
 
 // GenerateKeyRSA generates an RSA key pair on macOS.
 // asn1Data is encoded as PKCS#1 ASN1 DER.
 func GenerateKeyRSA(bits int) (asn1Data []byte, err error) {
-	privKeyDER, privKeyRef, err := createSecKeyRandom(C.kSecAttrKeyTypeRSA, bits)
+	privKeyDER, privKeyRef, err := createSecKeyRandom(security.KSecAttrKeyTypeRSA, bits)
 	if err != nil {
 		return nil, err
 	}
-	C.CFRelease(C.CFTypeRef(privKeyRef))
+	security.CFRelease(security.CFTypeRef(privKeyRef))
 	return privKeyDER, nil
 }
 
 type PublicKeyRSA struct {
 	// _pkey MUST NOT be accessed directly. Instead, use the withKey method.
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 }
 
 func (k *PublicKeyRSA) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
 // NewPublicKeyRSA creates a new RSA public key from ASN1 DER encoded data.
 func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
-	pubKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPublic)
+	pubKeyRef, err := createSecKeyWithData(asn1Data, security.KSecAttrKeyTypeRSA, security.KSecAttrKeyClassPublic)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +50,7 @@ func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
 	return key, nil
 }
 
-func (k *PublicKeyRSA) withKey(f func(C.SecKeyRef) C.int) C.int {
+func (k *PublicKeyRSA) withKey(f func(security.SecKeyRef) error) error {
 	// Because of the finalizer, any time key is passed to cgo, that call must
 	// be followed by a call to runtime.KeepAlive, to make sure k is not
 	// collected (and finalized) before the cgo call returns.
@@ -59,18 +60,18 @@ func (k *PublicKeyRSA) withKey(f func(C.SecKeyRef) C.int) C.int {
 
 type PrivateKeyRSA struct {
 	// _pkey MUST NOT be accessed directly. Instead, use the withKey method.
-	_pkey C.SecKeyRef
+	_pkey security.SecKeyRef
 }
 
 func (k *PrivateKeyRSA) finalize() {
-	if k._pkey != 0 {
-		C.CFRelease(C.CFTypeRef(k._pkey))
+	if k._pkey != nil {
+		security.CFRelease(security.CFTypeRef(k._pkey))
 	}
 }
 
 // NewPrivateKeyRSA creates a new RSA private key from ASN1 DER encoded data.
 func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
-	privKeyRef, err := createSecKeyWithData(asn1Data, C.kSecAttrKeyTypeRSA, C.kSecAttrKeyClassPrivate)
+	privKeyRef, err := createSecKeyWithData(asn1Data, security.KSecAttrKeyTypeRSA, security.KSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -81,17 +82,17 @@ func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 }
 
 func (k *PrivateKeyRSA) PublicKey() *PublicKeyRSA {
-	var pubKeyRef C.SecKeyRef
-	k.withKey(func(key C.SecKeyRef) C.int {
-		pubKeyRef = C.SecKeyCopyPublicKey(k._pkey)
-		return 0
+	var pubKeyRef security.SecKeyRef
+	k.withKey(func(key security.SecKeyRef) error {
+		pubKeyRef = security.SecKeyCopyPublicKey(k._pkey)
+		return nil
 	})
 	pubKey := &PublicKeyRSA{_pkey: pubKeyRef}
 	runtime.SetFinalizer(pubKey, (*PublicKeyRSA).finalize)
 	return pubKey
 }
 
-func (k *PrivateKeyRSA) withKey(f func(C.SecKeyRef) C.int) C.int {
+func (k *PrivateKeyRSA) withKey(f func(security.SecKeyRef) error) error {
 	// Because of the finalizer, any time _pkey is passed to cgo, that call must
 	// be followed by a call to runtime.KeepAlive, to make sure k is not
 	// collected (and finalized) before the cgo call returns.
@@ -132,13 +133,13 @@ func SignRSAPKCS1v15(priv *PrivateKeyRSA, h crypto.Hash, hashed []byte) ([]byte,
 }
 
 func VerifyRSAPKCS1v15(pub *PublicKeyRSA, h crypto.Hash, hashed, sig []byte) error {
-	if pub.withKey(func(key C.SecKeyRef) C.int {
-		size := C.SecKeyGetBlockSize(key)
+	if pub.withKey(func(key security.SecKeyRef) error {
+		size := security.SecKeyGetBlockSize(key)
 		if len(sig) < int(size) {
-			return 0
+			return errors.New("crypto/rsa: signature too short")
 		}
-		return 1
-	}) == 0 {
+		return nil
+	}) != nil {
 		return errors.New("crypto/rsa: verification error")
 	}
 	return evpVerify(pub.withKey, algorithmTypePKCS1v15Sig, h, hashed, sig)
@@ -176,19 +177,32 @@ func (e *cfError) Error() string {
 	return "CFError(" + strconv.Itoa(e.code) + "): " + e.message
 }
 
-func goCFErrorRef(ref C.CFErrorRef) error {
-	if ref == 0 {
+func goCFErrorRef(ref security.CFErrorRef) error {
+	if ref == nil {
 		return nil
 	}
 	var message string
-	if desc := C.CFErrorCopyDescription(ref); desc != C.CFStringRef(0) {
-		defer C.CFRelease(C.CFTypeRef(desc))
-		if cstr := C.CFStringGetCStringPtr(desc, C.kCFStringEncodingUTF8); cstr != nil {
-			message = C.GoString(cstr)
+	if desc := security.CFErrorCopyDescription(ref); desc != nil {
+		defer security.CFRelease(security.CFTypeRef(desc))
+		if cstr := security.CFStringGetCStringPtr(desc, security.KCFStringEncodingUTF8); cstr != nil {
+			message = string(cstrBytes(cstr))
 		}
 	}
 	return &cfError{
-		code:    int(C.CFErrorGetCode(ref)),
+		code:    int(security.CFErrorGetCode(ref)),
 		message: message,
 	}
+}
+
+// cstrBytes returns a byte slice containing the contents of the C string
+// pointed to by p. The slice does not include the terminating null byte.
+func cstrBytes(p *byte) []byte {
+	if p == nil {
+		return nil
+	}
+	end := unsafe.Pointer(p)
+	for *(*byte)(end) != 0 {
+		end = unsafe.Add(end, 1)
+	}
+	return unsafe.Slice((*byte)(unsafe.Pointer(p)), uintptr(end)-uintptr(unsafe.Pointer(p)))
 }

@@ -44,7 +44,15 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
+        if: matrix.language != 'cpp'
         uses: github/codeql-action/autobuild@96f518a34f7a870018057716cc4d7a5c014bd61c # v3.29.5
+
+      - name: Build dummy C file for CodeQL
+        if: matrix.language == 'cpp'
+        run: |
+          clang -c internal/cryptokit/zcryptokit.c  -o internal/cryptokit/zcryptokit.o
+          clang -c internal/commoncrypto/zcommoncrypto.c  -o internal/cryptokit/zcommoncrypto.o
+          clang -c internal/security/zsecurity.c  -o internal/cryptokit/zsecurity.o
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@96f518a34f7a870018057716cc4d7a5c014bd61c # v3.29.5

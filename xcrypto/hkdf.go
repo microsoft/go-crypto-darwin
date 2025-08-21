@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin && cgo
+//go:build cgo && darwin
 
 package xcrypto
 
 import (
+	"crypto"
 	"errors"
 	"hash"
 
@@ -29,9 +30,22 @@ func ExtractHKDF(h func() hash.Hash, secret, salt []byte) ([]byte, error) {
 		salt = make([]byte, hash.Size())
 	}
 
-	prk, err := cryptokit.ExtractHKDF(hash, secret, salt)
+	swiftHash, err := cryptoHashToSwift(hash)
 	if err != nil {
 		return nil, err
+	}
+
+	// Allocate buffer for derived key
+	prk := make([]byte, hash.Size())
+
+	result := cryptokit.ExtractHKDF(
+		swiftHash,
+		addr(secret), len(secret),
+		addr(salt), len(salt),
+		addr(prk), len(prk),
+	)
+	if result != 0 {
+		return nil, errors.New("HKDF derivation failed")
 	}
 
 	return prk, nil
@@ -57,10 +71,38 @@ func ExpandHKDF(h func() hash.Hash, pseudorandomKey, info []byte, keyLength int)
 		return nil, errors.New("requested key length exceeds maximum allowable size")
 	}
 
-	expandedKey, err := cryptokit.ExpandHKDF(hash, pseudorandomKey, info, keyLength)
+	swiftHash, err := cryptoHashToSwift(hash)
 	if err != nil {
 		return nil, err
 	}
 
+	// Allocate buffer for derived key
+	expandedKey := make([]byte, keyLength)
+
+	result := cryptokit.ExpandHKDF(
+		swiftHash,
+		addr(pseudorandomKey), len(pseudorandomKey),
+		addr(info), len(info),
+		addr(expandedKey), len(expandedKey),
+	)
+	if result != 0 {
+		return nil, errors.New("HKDF derivation failed")
+	}
+
 	return expandedKey, nil
+}
+
+func cryptoHashToSwift(hash crypto.Hash) (int32, error) {
+	switch hash {
+	case crypto.SHA1:
+		return 1, nil
+	case crypto.SHA256:
+		return 2, nil
+	case crypto.SHA384:
+		return 3, nil
+	case crypto.SHA512:
+		return 4, nil
+	default:
+		return 0, errors.New("unsupported hash function")
+	}
 }

@@ -10,7 +10,6 @@ import (
 	"hash"
 
 	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
-	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
@@ -57,13 +56,13 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 // Mapping Go hash functions to CommonCrypto hash constants
 func hashToCCDigestPBKDF2(hash hash.Hash) (commoncrypto.CCPseudoRandomAlgorithm, error) {
 	switch hash.(type) {
-	case cryptokit.SHA1Hash:
+	case sha1Hash:
 		return commoncrypto.KCCPRFHmacAlgSHA1, nil
-	case cryptokit.SHA256Hash:
+	case sha256Hash:
 		return commoncrypto.KCCPRFHmacAlgSHA256, nil
-	case cryptokit.SHA384Hash:
+	case sha384Hash:
 		return commoncrypto.KCCPRFHmacAlgSHA384, nil
-	case cryptokit.SHA512Hash:
+	case sha512Hash:
 		return commoncrypto.KCCPRFHmacAlgSHA512, nil
 	default:
 		return 0, errors.New("unsupported hash function")

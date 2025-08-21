@@ -1,12 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+// Dummy cgo-less file to satisfy the build constraints.
 
-//go:build go1.25 && darwin
+//go:build darwin
 
 package cryptokit
-
-import (
-	"hash"
-)
-
-type HashCloner = hash.Cloner

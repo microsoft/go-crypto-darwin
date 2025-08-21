@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
@@ -133,15 +133,15 @@ func (h *cryptoKitHMAC) BlockSize() int {
 
 func hashToHMACEnum(h hash.Hash) int {
 	switch h.(type) {
-	case MD5Hash:
+	case md5Hash:
 		return 1
-	case SHA1Hash:
+	case sha1Hash:
 		return 2
-	case SHA256Hash:
+	case sha256Hash:
 		return 3
-	case SHA384Hash:
+	case sha384Hash:
 		return 4
-	case SHA512Hash:
+	case sha512Hash:
 		return 5
 	default:
 		return 0

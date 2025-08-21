@@ -24,16 +24,16 @@ const (
 )
 
 var (
-	MD5BlockSize    = int(cryptokit.HashBlockSize(md5))
-	MD5Size         = int(cryptokit.HashSize(md5))
-	SHA1BlockSize   = int(cryptokit.HashBlockSize(sha1))
-	SHA1Size        = int(cryptokit.HashSize(sha1))
-	SHA256BlockSize = int(cryptokit.HashBlockSize(sha256))
-	SHA256Size      = int(cryptokit.HashSize(sha256))
-	SHA384BlockSize = int(cryptokit.HashBlockSize(sha384))
-	SHA384Size      = int(cryptokit.HashSize(sha384))
-	SHA512BlockSize = int(cryptokit.HashBlockSize(sha512))
-	SHA512Size      = int(cryptokit.HashSize(sha512))
+	md5BlockSize    = int(cryptokit.HashBlockSize(md5))
+	md5Size         = int(cryptokit.HashSize(md5))
+	sha1BlockSize   = int(cryptokit.HashBlockSize(sha1))
+	sha1Size        = int(cryptokit.HashSize(sha1))
+	sha256BlockSize = int(cryptokit.HashBlockSize(sha256))
+	sha256Size      = int(cryptokit.HashSize(sha256))
+	sha384BlockSize = int(cryptokit.HashBlockSize(sha384))
+	sha384Size      = int(cryptokit.HashSize(sha384))
+	sha512BlockSize = int(cryptokit.HashBlockSize(sha512))
+	sha512Size      = int(cryptokit.HashSize(sha512))
 )
 
 type evpHash struct {
@@ -164,23 +164,23 @@ func (h *evpHash) Size() int {
 	return h.size
 }
 
-type MD5Hash struct {
+type md5Hash struct {
 	*evpHash
 }
 
-type SHA1Hash struct {
+type sha1Hash struct {
 	*evpHash
 }
 
-type SHA256Hash struct {
+type sha256Hash struct {
 	*evpHash
 }
 
-type SHA384Hash struct {
+type sha384Hash struct {
 	*evpHash
 }
 
-type SHA512Hash struct {
+type sha512Hash struct {
 	*evpHash
 }
 
@@ -214,55 +214,55 @@ func SHA512(p []byte) (sum [64]byte) {
 
 // NewMD5 initializes a new MD5 hasher.
 func NewMD5() hash.Hash {
-	return MD5Hash{
+	return md5Hash{
 		evpHash: newEVPHash(
 			int32(md5),
-			MD5BlockSize,
-			MD5Size,
+			md5BlockSize,
+			md5Size,
 		),
 	}
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
-	return SHA1Hash{
+	return sha1Hash{
 		evpHash: newEVPHash(
 			int32(sha1),
-			SHA1BlockSize,
-			SHA1Size,
+			sha1BlockSize,
+			sha1Size,
 		),
 	}
 }
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
-	return SHA256Hash{
+	return sha256Hash{
 		evpHash: newEVPHash(
 			int32(sha256),
-			SHA256BlockSize,
-			SHA256Size,
+			sha256BlockSize,
+			sha256Size,
 		),
 	}
 }
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
-	return SHA384Hash{
+	return sha384Hash{
 		evpHash: newEVPHash(
 			int32(sha384),
-			SHA384BlockSize,
-			SHA384Size,
+			sha384BlockSize,
+			sha384Size,
 		),
 	}
 }
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
-	return SHA512Hash{
+	return sha512Hash{
 		evpHash: newEVPHash(
 			int32(sha512),
-			SHA512BlockSize,
-			SHA512Size,
+			sha512BlockSize,
+			sha512Size,
 		),
 	}
 }

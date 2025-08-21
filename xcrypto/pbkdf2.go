@@ -1,18 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 import (
 	"errors"
 	"hash"
-	"unsafe"
 
-	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
 func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
@@ -32,16 +29,24 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 	derivedKey := make([]byte, keyLen)
 
 	// Call CommonCrypto's PBKDF2 implementation
-	status := C.CCKeyDerivationPBKDF(
-		C.kCCPBKDF2,                              // PBKDF2 algorithm
-		sbase(password), C.size_t(len(password)), // Password and its length
-		base(salt), C.size_t(len(salt)), // Salt and its length
-		ccDigest,     // Digest algorithm
-		C.uint(iter), // Iteration count
-		(*C.uchar)(unsafe.Pointer(&derivedKey[0])), C.size_t(keyLen), // Output buffer for derived key and its length
+	var passwordPtr *uint8
+	if len(password) > 0 {
+		passwordPtr = &password[0]
+	}
+	var saltPtr *uint8
+	if len(salt) > 0 {
+		saltPtr = &salt[0]
+	}
+	status := commoncrypto.CCKeyDerivationPBKDF(
+		commoncrypto.KCCPBKDF2,     // PBKDF2 algorithm
+		passwordPtr, len(password), // Password pointer and its length
+		saltPtr, len(salt), // Salt pointer and its length
+		ccDigest,                    // Digest algorithm
+		commoncrypto.Unsigned(iter), // Iteration count
+		&derivedKey[0], keyLen,      // Output buffer for derived key and its length
 	)
 
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		return nil, errors.New("PBKDF2 key derivation failed")
 	}
 
@@ -49,16 +54,16 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 }
 
 // Mapping Go hash functions to CommonCrypto hash constants
-func hashToCCDigestPBKDF2(hash hash.Hash) (C.CCAlgorithm, error) {
+func hashToCCDigestPBKDF2(hash hash.Hash) (commoncrypto.CCPseudoRandomAlgorithm, error) {
 	switch hash.(type) {
-	case cryptokit.SHA1Hash:
-		return C.kCCPRFHmacAlgSHA1, nil
-	case cryptokit.SHA256Hash:
-		return C.kCCPRFHmacAlgSHA256, nil
-	case cryptokit.SHA384Hash:
-		return C.kCCPRFHmacAlgSHA384, nil
-	case cryptokit.SHA512Hash:
-		return C.kCCPRFHmacAlgSHA512, nil
+	case SHA1Hash:
+		return commoncrypto.KCCPRFHmacAlgSHA1, nil
+	case SHA256Hash:
+		return commoncrypto.KCCPRFHmacAlgSHA256, nil
+	case SHA384Hash:
+		return commoncrypto.KCCPRFHmacAlgSHA384, nil
+	case SHA512Hash:
+		return commoncrypto.KCCPRFHmacAlgSHA512, nil
 	default:
 		return 0, errors.New("unsupported hash function")
 	}

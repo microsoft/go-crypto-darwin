@@ -3,7 +3,7 @@
 
 //go:build go1.25 && darwin
 
-package cryptokit
+package xcrypto
 
 import (
 	"hash"

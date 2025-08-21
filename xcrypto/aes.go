@@ -1,17 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
+//go:build cgo && darwin
 
 package xcrypto
 
-// #include <CommonCrypto/CommonCrypto.h>
-import "C"
 import (
 	"crypto/cipher"
 	"errors"
 	"slices"
 
+	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
@@ -27,7 +26,7 @@ const (
 
 const (
 	// AES block size is the same for all key sizes
-	aesBlockSize         = C.kCCBlockSizeAES128
+	aesBlockSize         = commoncrypto.KCCBlockSizeAES128
 	gcmTagSize           = 16
 	gcmStandardNonceSize = 12
 	// TLS 1.2 additional data is constructed as:
@@ -43,14 +42,14 @@ const (
 
 type aesCipher struct {
 	key  []byte
-	kind C.CCAlgorithm
+	kind commoncrypto.CCAlgorithm
 }
 
 func NewAESCipher(key []byte) (cipher.Block, error) {
-	var alg C.CCAlgorithm
+	var alg commoncrypto.CCAlgorithm
 	switch len(key) {
 	case 16, 24, 32:
-		alg = C.kCCAlgorithmAES
+		alg = commoncrypto.KCCAlgorithmAES
 	default:
 		return nil, errors.New("crypto/aes: invalid key size")
 	}
@@ -75,20 +74,20 @@ func (c *aesCipher) Encrypt(dst, src []byte) {
 		panic("crypto/aes: invalid buffer overlap")
 	}
 
-	status := C.CCCrypt(
-		C.kCCEncrypt,          // Operation
-		C.CCAlgorithm(c.kind), // Algorithm
-		0,                     // Options
-		pbase(c.key),          // Key
-		C.size_t(len(c.key)),  // Key length
-		nil,                   // IV
-		pbase(src),            // Input
-		C.size_t(blockSize),   // Input length
-		pbase(dst),            // Output
-		C.size_t(blockSize),   // Output length
-		nil,                   // Output length
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCEncrypt,          // Operation
+		commoncrypto.CCAlgorithm(c.kind), // Algorithm
+		0,                                // Options
+		pbase(c.key),                     // Key
+		int(len(c.key)),                  // Key length
+		nil,                              // IV
+		pbase(src),                       // Input
+		int(blockSize),                   // Input length
+		pbase(dst),                       // Output
+		int(blockSize),                   // Output length
+		nil,                              // Output length
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/aes: encryption failed")
 	}
 }
@@ -105,20 +104,20 @@ func (c *aesCipher) Decrypt(dst, src []byte) {
 		panic("crypto/aes: invalid buffer overlap")
 	}
 
-	status := C.CCCrypt(
-		C.kCCDecrypt,          // Operation
-		C.CCAlgorithm(c.kind), // Algorithm
-		0,                     // Options
-		pbase(c.key),          // Key
-		C.size_t(len(c.key)),  // Key length
-		nil,                   // IV
-		pbase(src),            // Input
-		C.size_t(blockSize),   // Input length
-		pbase(dst),            // Output
-		C.size_t(blockSize),   // Output length
-		nil,                   // Output length
+	status := commoncrypto.CCCrypt(
+		commoncrypto.KCCDecrypt,          // Operation
+		commoncrypto.CCAlgorithm(c.kind), // Algorithm
+		0,                                // Options
+		pbase(c.key),                     // Key
+		int(len(c.key)),                  // Key length
+		nil,                              // IV
+		pbase(src),                       // Input
+		int(blockSize),                   // Input length
+		pbase(dst),                       // Output
+		int(blockSize),                   // Output length
+		nil,                              // Output length
 	)
-	if status != C.kCCSuccess {
+	if status != commoncrypto.KCCSuccess {
 		panic("crypto/aes: decryption failed")
 	}
 }
@@ -211,7 +210,14 @@ func (g *aesGCM) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
 	}
 
 	tag := out[len(out)-gcmTagSize:]
-	err := cryptokit.EncryptAESGCM(g.key, plaintext, nonce, additionalData, out[:len(out)-gcmTagSize], tag)
+	err := cryptokit.EncryptAESGCM(
+		addr(g.key), len(g.key),
+		addr(plaintext), len(plaintext),
+		addr(nonce), len(nonce),
+		addr(additionalData), len(additionalData),
+		addr(out[:len(out)-gcmTagSize]), len(out[:len(out)-gcmTagSize]),
+		addr(tag),
+	)
 	if err != 0 {
 		panic("cipher: encryption failed")
 	}
@@ -242,7 +248,14 @@ func (g *aesGCM) SealWithRandomNonce(out, nonce, plaintext, additionalData []byt
 	tag := out[len(out)-gcmTagSize:]
 	// Generate a random nonce
 	RandReader.Read(nonce)
-	err := cryptokit.EncryptAESGCM(g.key, plaintext, nonce, additionalData, out[:len(out)-gcmTagSize], tag)
+	err := cryptokit.EncryptAESGCM(
+		addr(g.key), len(g.key),
+		addr(plaintext), len(plaintext),
+		addr(nonce), len(nonce),
+		addr(additionalData), len(additionalData),
+		addr(out[:len(out)-gcmTagSize]), len(out[:len(out)-gcmTagSize]),
+		addr(tag),
+	)
 	if err != 0 {
 		panic("cipher: encryption failed")
 	}
@@ -278,7 +291,15 @@ func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, er
 		panic("cipher: invalid buffer overlap")
 	}
 
-	decSize, err := cryptokit.DecryptAESGCM(g.key, ciphertext, nonce, additionalData, tag, out)
+	var decSize int
+	err := cryptokit.DecryptAESGCM(
+		addr(g.key), len(g.key),
+		addr(ciphertext), len(ciphertext),
+		addr(nonce), len(nonce),
+		addr(additionalData), len(additionalData),
+		addr(tag), len(tag),
+		addr(out), &decSize,
+	)
 	if err != 0 || int(decSize) != len(ciphertext) {
 		// If the decrypted data size does not match, zero out `out` and return `errOpen`
 		for i := range out {
@@ -310,11 +331,11 @@ func NewGCMTLS13(block cipher.Block) (cipher.AEAD, error) {
 }
 
 func (c *aesCipher) NewCBCEncrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCEncrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCEncrypt, c.kind, c.key, iv)
 }
 
 func (c *aesCipher) NewCBCDecrypter(iv []byte) cipher.BlockMode {
-	return newCBC(C.kCCDecrypt, c.kind, c.key, iv)
+	return newCBC(commoncrypto.KCCDecrypt, c.kind, c.key, iv)
 }
 
 // sliceForAppend is a mirror of crypto/cipher.sliceForAppend.

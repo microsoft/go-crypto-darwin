@@ -14,7 +14,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
@@ -200,7 +199,7 @@ func TestHash_Clone(t *testing.T) {
 			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
-			h := cryptoToHash(ch)().(cryptokit.HashCloner)
+			h := cryptoToHash(ch)().(xcrypto.HashCloner)
 			_, err := h.Write(msg)
 			if err != nil {
 				t.Fatal(err)

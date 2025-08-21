@@ -8,9 +8,9 @@
 #ifndef _GO_SECURITY_SHIMS_H // only include this header once
 #define _GO_SECURITY_SHIMS_H
 
-#include <stdlib.h>  // size_t
-#include <stdint.h>  // uint64_t
 #include <stdbool.h> // bool
+#include <stdint.h>  // uint64_t
+#include <stdlib.h>  // size_t
 
 // The following includes are used by the checkheader tool.
 // #include <Security/Security.h>
@@ -32,19 +32,19 @@ typedef int32_t CFIndex;
 typedef CFStringRef SecKeyAlgorithm;
 
 typedef enum {
-    kSecKeyOperationTypeSign = 0,
-    kSecKeyOperationTypeVerify = 1,
-    kSecKeyOperationTypeEncrypt = 2,
-    kSecKeyOperationTypeDecrypt = 3,
-    kSecKeyOperationTypeKeyExchange = 4
+  kSecKeyOperationTypeSign = 0,
+  kSecKeyOperationTypeVerify = 1,
+  kSecKeyOperationTypeEncrypt = 2,
+  kSecKeyOperationTypeDecrypt = 3,
+  kSecKeyOperationTypeKeyExchange = 4
 } SecKeyOperationType;
 
 typedef enum {
-    kCFStringEncodingUTF8 = 0x08000100
+  kCFStringEncodingUTF8 = 0x08000100
 } CFStringEncoding;
 
 typedef enum {
-    kCFNumberIntType = 9
+  kCFNumberIntType = 9
 } CFNumberType;
 
 extern const SecRandomRef kSecRandomDefault;

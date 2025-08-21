@@ -6,6 +6,7 @@
 package xcrypto
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
@@ -37,7 +38,7 @@ func (k PrivateKeyEd25519) Public() PublicKeyEd25519 {
 // GenerateKeyEd25519 generates a new Ed25519 private key.
 func GenerateKeyEd25519() PrivateKeyEd25519 {
 	pkeyPriv := make([]byte, privateKeySizeEd25519)
-	cryptokit.GenerateKeyEd25519(pkeyPriv)
+	cryptokit.GenerateKeyEd25519(addr(pkeyPriv))
 	return pkeyPriv
 }
 
@@ -57,9 +58,9 @@ func NewPublicKeyEd25519(pub []byte) (PublicKeyEd25519, error) {
 		panic("ed25519: bad public key length: " + strconv.Itoa(len(pub)))
 	}
 	pkey := make([]byte, publicKeySizeEd25519)
-	err := cryptokit.NewPublicKeyEd25519(pkey, pub)
-	if err != nil {
-		return nil, err
+	result := cryptokit.NewPublicKeyEd25519(addr(pkey), addr(pub))
+	if result != 0 {
+		return nil, errors.New("failed to create Ed25519 public key")
 	}
 	return pkey, nil
 }
@@ -77,9 +78,9 @@ func NewPrivateKeyEd25519FromSeed(seed []byte) (PrivateKeyEd25519, error) {
 		panic("ed25519: bad seed length: " + strconv.Itoa(len(seed)))
 	}
 	pkey := make([]byte, privateKeySizeEd25519)
-	err := cryptokit.NewPrivateKeyEd25519FromSeed(pkey, seed)
-	if err != nil {
-		return nil, err
+	result := cryptokit.NewPrivateKeyEd25519FromSeed(addr(pkey), addr(seed))
+	if result != 0 {
+		return nil, errors.New("failed to generate Ed25519 key from seed")
 	}
 	return pkey, nil
 }
@@ -87,14 +88,37 @@ func NewPrivateKeyEd25519FromSeed(seed []byte) (PrivateKeyEd25519, error) {
 // SignEd25519 signs the message with priv and returns a signature.
 func SignEd25519(priv PrivateKeyEd25519, message []byte) ([]byte, error) {
 	sig := make([]byte, signatureSizeEd25519)
-	err := cryptokit.SignEd25519(sig, priv, message)
-	if err != nil {
-		return nil, err
+	result := cryptokit.SignEd25519(addr(priv), addr(message), len(message), addr(sig))
+	if result < 0 {
+		switch result {
+		case -1:
+			return nil, errors.New("invalid inputs to SignEd25519")
+		case -2:
+			return nil, errors.New("failed to reconstruct private key")
+		case -3:
+			return nil, errors.New("failed to sign the message")
+		case -4:
+			return nil, errors.New("signature buffer too small")
+		default:
+			return nil, errors.New("unknown error in SignEd25519")
+		}
 	}
 	return sig, nil
 }
 
 // VerifyEd25519 reports whether sig is a valid signature of message by pub.
 func VerifyEd25519(pub PublicKeyEd25519, message, sig []byte) error {
-	return cryptokit.VerifyEd25519(pub, message, sig)
+	result := cryptokit.VerifyEd25519(addr(pub), addr(message), len(message), addr(sig))
+	switch result {
+	case 1:
+		return nil // Valid signature
+	case 0:
+		return errors.New("ed25519: invalid signature")
+	case -1:
+		return errors.New("invalid inputs to VerifyEd25519")
+	case -2:
+		return errors.New("failed to reconstruct public key")
+	default:
+		return errors.New("unknown error in VerifyEd25519")
+	}
 }

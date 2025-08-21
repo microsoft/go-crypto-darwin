@@ -44,15 +44,7 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
-        if: matrix.language != 'cpp'
         uses: github/codeql-action/autobuild@96f518a34f7a870018057716cc4d7a5c014bd61c # v3.29.5
-
-      - name: Build dummy C file for CodeQL
-        if: matrix.language == 'cpp'
-        run: |
-          # Create a dummy C file to ensure CodeQL can analyze C code
-          echo '#include "cryptokit.h"' > internal/cryptokit/cryptokit_codeql.c
-          clang -c internal/cryptokit/cryptokit_codeql.c -o internal/cryptokit/cryptokit_codeql.o
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@96f518a34f7a870018057716cc4d7a5c014bd61c # v3.29.5

@@ -5,4 +5,5 @@
 package security
 
 //go:generate go run ../../cmd/checkheader -shim shims.h
-//go:generate go run ../../cmd/mkcgo -out zsecurity.go -package security shims.h
+//go:generate go run ../../cmd/mkcgo -out zsecurity.go -mode cgo -package security shims.h
+//go:generate go run ../../cmd/mkcgo -out zsecurity.go -mode nocgo -package security shims.h

@@ -19,35 +19,35 @@ func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
 
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecRandomDefault_ptr kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kCFAllocatorDefault_ptr kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyTypeECSECPrimeRandom_ptr kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyTypeRSA_ptr kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClassPublic_ptr kSecAttrKeyClassPublic "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClassPrivate_ptr kSecAttrKeyClassPrivate "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyType_ptr kSecAttrKeyType "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeySizeInBits_ptr kSecAttrKeySizeInBits "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClass_ptr kSecAttrKeyClass "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard_ptr kSecKeyAlgorithmECDHKeyExchangeStandard "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1_ptr kSecKeyAlgorithmRSASignatureDigestPSSSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224_ptr kSecKeyAlgorithmRSASignatureDigestPSSSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256_ptr kSecKeyAlgorithmRSASignatureDigestPSSSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384_ptr kSecKeyAlgorithmRSASignatureDigestPSSSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512_ptr kSecKeyAlgorithmRSASignatureDigestPSSSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionRaw_ptr kSecKeyAlgorithmRSAEncryptionRaw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1_ptr kSecKeyAlgorithmRSAEncryptionPKCS1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw_ptr kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1_ptr kSecKeyAlgorithmRSAEncryptionOAEPSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224_ptr kSecKeyAlgorithmRSAEncryptionOAEPSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256_ptr kSecKeyAlgorithmRSAEncryptionOAEPSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384_ptr kSecKeyAlgorithmRSAEncryptionOAEPSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512_ptr kSecKeyAlgorithmRSAEncryptionOAEPSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962_ptr kSecKeyAlgorithmECDSASignatureDigestX962 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kCFAllocatorDefault kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyTypeECSECPrimeRandom kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyTypeRSA kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClassPublic kSecAttrKeyClassPublic "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClassPrivate kSecAttrKeyClassPrivate "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyType kSecAttrKeyType "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeySizeInBits kSecAttrKeySizeInBits "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecAttrKeyClass kSecAttrKeyClass "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard kSecKeyAlgorithmECDHKeyExchangeStandard "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 kSecKeyAlgorithmRSASignatureDigestPSSSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 kSecKeyAlgorithmRSASignatureDigestPSSSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 kSecKeyAlgorithmRSASignatureDigestPSSSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384 kSecKeyAlgorithmRSASignatureDigestPSSSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512 kSecKeyAlgorithmRSASignatureDigestPSSSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionRaw kSecKeyAlgorithmRSAEncryptionRaw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1 kSecKeyAlgorithmRSAEncryptionPKCS1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1 kSecKeyAlgorithmRSAEncryptionOAEPSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224 kSecKeyAlgorithmRSAEncryptionOAEPSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256 kSecKeyAlgorithmRSAEncryptionOAEPSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384 kSecKeyAlgorithmRSAEncryptionOAEPSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512 kSecKeyAlgorithmRSAEncryptionOAEPSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962 kSecKeyAlgorithmECDSASignatureDigestX962 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 
 //go:cgo_import_dynamic _mkcgo_CFDataCreate CFDataCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
 //go:cgo_import_dynamic _mkcgo_CFDataGetBytePtr CFDataGetBytePtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
@@ -113,67 +113,196 @@ const (
 )
 
 var (
-	_mkcgo_kSecRandomDefault_ptr                                *SecRandomRef
-	_mkcgo_kCFAllocatorDefault_ptr                              *CFAllocatorRef
-	_mkcgo_kSecAttrKeyTypeECSECPrimeRandom_ptr                  *CFStringRef
-	_mkcgo_kSecAttrKeyTypeRSA_ptr                               *CFStringRef
-	_mkcgo_kSecAttrKeyClassPublic_ptr                           *CFStringRef
-	_mkcgo_kSecAttrKeyClassPrivate_ptr                          *CFStringRef
-	_mkcgo_kSecAttrKeyType_ptr                                  *CFStringRef
-	_mkcgo_kSecAttrKeySizeInBits_ptr                            *CFStringRef
-	_mkcgo_kSecAttrKeyClass_ptr                                 *CFStringRef
-	_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard_ptr          *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1_ptr        *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224_ptr      *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256_ptr      *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384_ptr      *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512_ptr      *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionRaw_ptr                 *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1_ptr               *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1_ptr   *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224_ptr *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256_ptr *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384_ptr *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512_ptr *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw_ptr    *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1_ptr            *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224_ptr          *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256_ptr          *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384_ptr          *CFStringRef
-	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512_ptr          *CFStringRef
-	_mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962_ptr         *CFStringRef
+	_mkcgo_kSecRandomDefault                                SecRandomRef
+	_mkcgo_kCFAllocatorDefault                              CFAllocatorRef
+	_mkcgo_kSecAttrKeyTypeECSECPrimeRandom                  CFStringRef
+	_mkcgo_kSecAttrKeyTypeRSA                               CFStringRef
+	_mkcgo_kSecAttrKeyClassPublic                           CFStringRef
+	_mkcgo_kSecAttrKeyClassPrivate                          CFStringRef
+	_mkcgo_kSecAttrKeyType                                  CFStringRef
+	_mkcgo_kSecAttrKeySizeInBits                            CFStringRef
+	_mkcgo_kSecAttrKeyClass                                 CFStringRef
+	_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard          CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1        CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224      CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256      CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384      CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512      CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionRaw                 CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1               CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1   CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw    CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1            CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224          CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256          CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384          CFStringRef
+	_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512          CFStringRef
+	_mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962         CFStringRef
 )
 
+//go:noinline
+func _mkcgo_addr_kSecRandomDefault() *SecRandomRef { return &_mkcgo_kSecRandomDefault }
+
+//go:noinline
+func _mkcgo_addr_kCFAllocatorDefault() *CFAllocatorRef { return &_mkcgo_kCFAllocatorDefault }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom() *CFStringRef {
+	return &_mkcgo_kSecAttrKeyTypeECSECPrimeRandom
+}
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyTypeRSA() *CFStringRef { return &_mkcgo_kSecAttrKeyTypeRSA }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyClassPublic() *CFStringRef { return &_mkcgo_kSecAttrKeyClassPublic }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyClassPrivate() *CFStringRef { return &_mkcgo_kSecAttrKeyClassPrivate }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyType() *CFStringRef { return &_mkcgo_kSecAttrKeyType }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeySizeInBits() *CFStringRef { return &_mkcgo_kSecAttrKeySizeInBits }
+
+//go:noinline
+func _mkcgo_addr_kSecAttrKeyClass() *CFStringRef { return &_mkcgo_kSecAttrKeyClass }
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmECDHKeyExchangeStandard() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA1() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA224() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA256() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA384() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA512() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionRaw() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionRaw
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionPKCS1() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA1() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA224() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA256() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA384() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA512() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+}
+
+//go:noinline
+func _mkcgo_addr_kSecKeyAlgorithmECDSASignatureDigestX962() *CFStringRef {
+	return &_mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962
+}
+
 var (
-	KSecRandomDefault                                SecRandomRef   = nil
-	KCFAllocatorDefault                              CFAllocatorRef = nil
-	KSecAttrKeyTypeECSECPrimeRandom                  CFStringRef    = *_mkcgo_kSecAttrKeyTypeECSECPrimeRandom_ptr
-	KSecAttrKeyTypeRSA                               CFStringRef    = *_mkcgo_kSecAttrKeyTypeRSA_ptr
-	KSecAttrKeyClassPublic                           CFStringRef    = *_mkcgo_kSecAttrKeyClassPublic_ptr
-	KSecAttrKeyClassPrivate                          CFStringRef    = *_mkcgo_kSecAttrKeyClassPrivate_ptr
-	KSecAttrKeyType                                  CFStringRef    = *_mkcgo_kSecAttrKeyType_ptr
-	KSecAttrKeySizeInBits                            CFStringRef    = *_mkcgo_kSecAttrKeySizeInBits_ptr
-	KSecAttrKeyClass                                 CFStringRef    = *_mkcgo_kSecAttrKeyClass_ptr
-	KSecKeyAlgorithmECDHKeyExchangeStandard          CFStringRef    = *_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard_ptr
-	KSecKeyAlgorithmRSASignatureDigestPSSSHA1        CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1_ptr
-	KSecKeyAlgorithmRSASignatureDigestPSSSHA224      CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224_ptr
-	KSecKeyAlgorithmRSASignatureDigestPSSSHA256      CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256_ptr
-	KSecKeyAlgorithmRSASignatureDigestPSSSHA384      CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384_ptr
-	KSecKeyAlgorithmRSASignatureDigestPSSSHA512      CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512_ptr
-	KSecKeyAlgorithmRSAEncryptionRaw                 CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionRaw_ptr
-	KSecKeyAlgorithmRSAEncryptionPKCS1               CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1   CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512_ptr
-	KSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw    CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw_ptr
-	KSecKeyAlgorithmRSAEncryptionOAEPSHA1            CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1_ptr
-	KSecKeyAlgorithmRSAEncryptionOAEPSHA224          CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224_ptr
-	KSecKeyAlgorithmRSAEncryptionOAEPSHA256          CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256_ptr
-	KSecKeyAlgorithmRSAEncryptionOAEPSHA384          CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384_ptr
-	KSecKeyAlgorithmRSAEncryptionOAEPSHA512          CFStringRef    = *_mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512_ptr
-	KSecKeyAlgorithmECDSASignatureDigestX962         CFStringRef    = *_mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962_ptr
+	KSecRandomDefault                                SecRandomRef   = *_mkcgo_addr_kSecRandomDefault()
+	KCFAllocatorDefault                              CFAllocatorRef = *_mkcgo_addr_kCFAllocatorDefault()
+	KSecAttrKeyTypeECSECPrimeRandom                  CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom()
+	KSecAttrKeyTypeRSA                               CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeRSA()
+	KSecAttrKeyClassPublic                           CFStringRef    = *_mkcgo_addr_kSecAttrKeyClassPublic()
+	KSecAttrKeyClassPrivate                          CFStringRef    = *_mkcgo_addr_kSecAttrKeyClassPrivate()
+	KSecAttrKeyType                                  CFStringRef    = *_mkcgo_addr_kSecAttrKeyType()
+	KSecAttrKeySizeInBits                            CFStringRef    = *_mkcgo_addr_kSecAttrKeySizeInBits()
+	KSecAttrKeyClass                                 CFStringRef    = *_mkcgo_addr_kSecAttrKeyClass()
+	KSecKeyAlgorithmECDHKeyExchangeStandard          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmECDHKeyExchangeStandard()
+	KSecKeyAlgorithmRSASignatureDigestPSSSHA1        CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA1()
+	KSecKeyAlgorithmRSASignatureDigestPSSSHA224      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA224()
+	KSecKeyAlgorithmRSASignatureDigestPSSSHA256      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA256()
+	KSecKeyAlgorithmRSASignatureDigestPSSSHA384      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA384()
+	KSecKeyAlgorithmRSASignatureDigestPSSSHA512      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA512()
+	KSecKeyAlgorithmRSAEncryptionRaw                 CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionRaw()
+	KSecKeyAlgorithmRSAEncryptionPKCS1               CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionPKCS1()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1   CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512()
+	KSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw    CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw()
+	KSecKeyAlgorithmRSAEncryptionOAEPSHA1            CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA1()
+	KSecKeyAlgorithmRSAEncryptionOAEPSHA224          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA224()
+	KSecKeyAlgorithmRSAEncryptionOAEPSHA256          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA256()
+	KSecKeyAlgorithmRSAEncryptionOAEPSHA384          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA384()
+	KSecKeyAlgorithmRSAEncryptionOAEPSHA512          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA512()
+	KSecKeyAlgorithmECDSASignatureDigestX962         CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmECDSASignatureDigestX962()
 )
 
 var _mkcgo_CFDataCreate_trampoline_addr uintptr

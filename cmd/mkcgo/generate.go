@@ -746,7 +746,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		} else {
 			frameworkPath = "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 		}
-		fmt.Fprintf(w, "//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_%s_ptr %s \"%s\"\n", extName, extName, frameworkPath)
+		fmt.Fprintf(w, "//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -912,9 +912,17 @@ func generateNocgoExterns(externs []*mkcgo.Extern, w io.Writer) {
 		// Use the base type without pointer and const
 		baseType := strings.TrimPrefix(ext.Type, "*")
 		baseType = strings.TrimPrefix(baseType, "const ")
-		fmt.Fprintf(w, "\t_mkcgo_%s_ptr *%s\n", ext.Name, baseType)
+		fmt.Fprintf(w, "\t_mkcgo_%s %s\n", ext.Name, baseType)
 	}
 	fmt.Fprintf(w, ")\n\n")
+
+	for _, ext := range externs {
+		// Use the base type without pointer and const
+		baseType := strings.TrimPrefix(ext.Type, "*")
+		baseType = strings.TrimPrefix(baseType, "const ")
+		fmt.Fprintf(w, "//go:noinline\n")
+		fmt.Fprintf(w, "func _mkcgo_addr_%s() *%s { return &_mkcgo_%s }\n", ext.Name, baseType, ext.Name)
+	}
 
 	// Then, generate the actual variables that dereference the pointers
 	fmt.Fprintf(w, "var (\n")
@@ -930,13 +938,7 @@ func generateNocgoExterns(externs []*mkcgo.Extern, w io.Writer) {
 		baseType := strings.TrimPrefix(ext.Type, "*")
 		baseType = strings.TrimPrefix(baseType, "const ")
 
-		// For most externs, we dereference the pointer.
-		// For some like nil defaults, we keep them as nil
-		if strings.Contains(ext.Name, "Default") && (strings.Contains(ext.Name, "Allocator") || strings.Contains(ext.Name, "Random")) {
-			fmt.Fprintf(w, "\t%s %s = nil\n", goName, baseType)
-		} else {
-			fmt.Fprintf(w, "\t%s %s = *_mkcgo_%s_ptr\n", goName, baseType, ext.Name)
-		}
+		fmt.Fprintf(w, "\t%s %s = *_mkcgo_addr_%s()\n", goName, baseType, ext.Name)
 	}
 	fmt.Fprintf(w, ")\n\n")
 }

@@ -7,17 +7,7 @@
 #include "go_asm.h"
 #include "textflag.h"
 
-TEXT ·_mkcgo_asm_CCCryptorCreateWithMode(SB),NOSPLIT,$0-96
-	// Set up arguments for the syscall
-	MOVD	$0, R8		// tweakLength
-	MOVD	$0, R9		// numRounds
-	MOVD	$0, R10		// options
-	MOVD	$0, R11		// cryptorRef
-	BL	(R12)
-
-    RET
-
-TEXT ·syscallNRaw(SB),NOSPLIT,$16-8
+TEXT ·syscallNRaw(SB),NOSPLIT,$16
 	STP	(R19, R20), 16(RSP) // save old R19, R20
 	MOVD	R0, R19	// save struct pointer
 	MOVD	RSP, R20	// save stack pointer

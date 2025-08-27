@@ -7,6 +7,7 @@
 package commoncrypto
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
 )
@@ -108,7 +109,8 @@ func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key uns
 var _mkcgo_CCCryptorCreateWithMode_trampoline_addr uintptr
 
 func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv unsafe.Pointer, key unsafe.Pointer, keyLength int, tweak unsafe.Pointer, tweakLength int, numRounds int32, options uint32, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	r0, _, _ := syscallN(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
+	fmt.Println(op, mode, alg, padding, iv, key, keyLength, tweak, tweakLength, numRounds, options, cryptorRef)
+	r0, _, _ := _mkcgo_asm_CCCryptorCreateWithMode(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(unsafe.Pointer(cryptorRef)))
 	return CCCryptorStatus(r0)
 }
 

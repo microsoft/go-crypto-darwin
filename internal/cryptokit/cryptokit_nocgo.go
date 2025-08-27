@@ -4,7 +4,7 @@
 
 //go:build !cgo && darwin
 
-package commoncrypto
+package cryptokit
 
 import (
 	"syscall"
@@ -40,9 +40,6 @@ func noescape(p unsafe.Pointer) unsafe.Pointer {
 	x := uintptr(p)
 	return unsafe.Pointer(x ^ 0)
 }
-
-//go:noescape
-func _mkcgo_asm_CCCryptorCreateWithMode(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 uintptr) uintptr
 
 //go:noescape
 func syscallNRaw(args unsafe.Pointer)

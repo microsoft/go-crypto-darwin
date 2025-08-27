@@ -746,7 +746,8 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		} else {
 			frameworkPath = "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 		}
-		fmt.Fprintf(w, "//go:cgo_import_dynamic github.com/microsoft/go-crypto-darwin/internal/security._mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
+		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
+		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -784,23 +785,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		}
 		generateNocgoFn(fn, w)
 	}
-}
-
-// generateNocgoAliases generates Go type aliases for nocgo mode.
-func generateNocgoAliases(externs []*mkcgo.Extern, w io.Writer) {
-	seenTypes := make(map[string]bool)
-
-	// Extract types from extern variables
-	for _, ext := range externs {
-		// Extract the base type (remove pointer and const prefix if present)
-		baseType := strings.TrimPrefix(ext.Type, "*")
-		baseType = strings.TrimPrefix(baseType, "const ")
-		if !seenTypes[baseType] && baseType != "void" {
-			fmt.Fprintf(w, "type %s unsafe.Pointer\n", baseType)
-			seenTypes[baseType] = true
-		}
-	}
-	fmt.Fprintf(w, "\n")
 }
 
 // generateNocgoAllAliases generates Go type aliases for nocgo mode from both externs and function signatures.

@@ -22,6 +22,9 @@ TEXT ·_mkcgo_asm_CCCryptorCreateWithMode(SB),NOSPLIT,$0-104
 	MOVD	p10+80(FP), R10
 	MOVD	p11+88(FP), R11
 
+	// Add enough space to contain the stack arguments 
+	// + 16 bytes as scratch space 
+	// + optionally 8 bytes for alignment
 	SUB	$32, RSP
 	MOVD	R8, 0(RSP)
 	MOVW	R9, 8(RSP)

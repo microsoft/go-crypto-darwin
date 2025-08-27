@@ -103,7 +103,6 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 //go:cgo_import_dynamic _mkcgo_SecKeyVerifySignature SecKeyVerifySignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_SecRandomCopyBytes SecRandomCopyBytes "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 
-type Unsigned = uint32
 type Boolean unsafe.Pointer
 type SecRandomRef unsafe.Pointer
 type SecKeyRef unsafe.Pointer

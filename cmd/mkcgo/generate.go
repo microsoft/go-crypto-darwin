@@ -794,10 +794,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 func generateNocgoAllAliases(externs []*mkcgo.Extern, funcs []*mkcgo.Func, typedefs []*mkcgo.TypeDef, w io.Writer) {
 	seenTypes := make(map[string]bool)
 
-	// Add standard C type aliases that are commonly needed
-	fmt.Fprintf(w, "type Unsigned = uint32\n")
-	seenTypes["Unsigned"] = true
-
 	// Handle typedefs first, as they can create proper type aliases
 	for _, typedef := range typedefs {
 		baseType := extractBaseType(typedef.Type)

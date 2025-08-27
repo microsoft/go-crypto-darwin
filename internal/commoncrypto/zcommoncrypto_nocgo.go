@@ -27,9 +27,9 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 //go:cgo_import_dynamic _mkcgo_CCCryptorUpdate CCCryptorUpdate "/usr/lib/libSystem.B.dylib"
 //go:cgo_import_dynamic _mkcgo_CCKeyDerivationPBKDF CCKeyDerivationPBKDF "/usr/lib/libSystem.B.dylib"
 
-type Unsigned = uint32
 type CCCryptorRef unsafe.Pointer
 type CCModeOptions = uint32
+type Unsigned uint32
 
 type CCOperation int32
 

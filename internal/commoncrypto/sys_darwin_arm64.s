@@ -7,13 +7,32 @@
 #include "go_asm.h"
 #include "textflag.h"
 
-TEXT ·_mkcgo_asm_CCCryptorCreateWithMode(SB),NOSPLIT,$0-96
+TEXT ·_mkcgo_asm_CCCryptorCreateWithMode(SB),NOSPLIT,$0-104
 	// Set up arguments for the syscall
-	MOVD	$0, R8		// tweakLength
-	MOVD	$0, R9		// numRounds
-	MOVD	$0, R10		// options
-	MOVD	$0, R11		// cryptorRef
-	BL	(R12)
+	MOVD	p0+0(FP), R0
+	MOVD	p1+8(FP), R1
+	MOVD	p2+16(FP), R2
+	MOVD	p3+24(FP), R3
+	MOVD	p4+32(FP), R4
+	MOVD	p5+40(FP), R5
+	MOVD	p6+48(FP), R6
+	MOVD	p7+56(FP), R7
+	MOVD	p8+64(FP), R8
+	MOVD	p9+72(FP), R9
+	MOVD	p10+80(FP), R10
+	MOVD	p11+88(FP), R11
+
+	SUB	$32, RSP
+	MOVD	R8, 0(RSP)
+	MOVW	R9, 8(RSP)
+	MOVW	R10, 12(RSP)
+	MOVD	R11, 16(RSP)
+
+	BL	_mkcgo_CCCryptorCreateWithMode(SB)
+
+	ADD $32, RSP
+
+	MOVW	R0, r1+96(FP)	// return value
 
     RET
 

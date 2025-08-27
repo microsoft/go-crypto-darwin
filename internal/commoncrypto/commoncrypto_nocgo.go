@@ -42,7 +42,13 @@ func noescape(p unsafe.Pointer) unsafe.Pointer {
 }
 
 //go:noescape
-func _mkcgo_asm_CCCryptorCreateWithMode(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 uintptr) uintptr
+func _mkcgo_asm_CCCryptorCreateWithMode(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 uintptr) (r1 uintptr)
 
 //go:noescape
 func syscallNRaw(args unsafe.Pointer)
+
+//go:linkname entersyscall runtime.entersyscall
+func entersyscall()
+
+//go:linkname exitsyscall runtime.exitsyscall
+func exitsyscall()

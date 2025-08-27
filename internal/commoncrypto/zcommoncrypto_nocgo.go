@@ -7,7 +7,6 @@
 package commoncrypto
 
 import (
-	"fmt"
 	"syscall"
 	"unsafe"
 )
@@ -95,8 +94,8 @@ const (
 var _mkcgo_CCCrypt_trampoline_addr uintptr
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, dataIn unsafe.Pointer, dataInLength int, dataOut unsafe.Pointer, dataOutAvailable int, dataOutMoved *int) CCCryptorStatus {
-	r0, _, _ := syscallN(_mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
-	return CCCryptorStatus(r0)
+	//r0, _, _ := syscallN(_mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
+	return CCCryptorStatus(-1)
 }
 
 var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
@@ -106,11 +105,10 @@ func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key uns
 	return CCCryptorStatus(r0)
 }
 
-var _mkcgo_CCCryptorCreateWithMode_trampoline_addr uintptr
-
 func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv unsafe.Pointer, key unsafe.Pointer, keyLength int, tweak unsafe.Pointer, tweakLength int, numRounds int32, options uint32, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	fmt.Println(op, mode, alg, padding, iv, key, keyLength, tweak, tweakLength, numRounds, options, cryptorRef)
-	r0, _, _ := _mkcgo_asm_CCCryptorCreateWithMode(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(unsafe.Pointer(cryptorRef)))
+	entersyscall()
+	r0 := _mkcgo_asm_CCCryptorCreateWithMode(uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
+	exitsyscall()
 	return CCCryptorStatus(r0)
 }
 

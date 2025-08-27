@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// TODO: remove cgo tag once cgoless hash is available
 //go:build cgo
 
 package xcrypto_test

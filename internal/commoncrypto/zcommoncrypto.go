@@ -65,7 +65,6 @@ type CCOptions = C.CCOptions
 type CCPBKDFAlgorithm = C.CCPBKDFAlgorithm
 type CCPadding = C.CCPadding
 type CCPseudoRandomAlgorithm = C.CCPseudoRandomAlgorithm
-type Unsigned = C.unsigned
 
 //go:nosplit
 func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
@@ -97,6 +96,6 @@ func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn unsafe.Pointer, dataInLengt
 	return C._mkcgo_CCCryptorUpdate(cryptorRef, dataIn, C.size_t(dataInLength), dataOut, C.size_t(dataOutAvailable), (*C.size_t)(unsafe.Pointer(dataOutMoved)))
 }
 
-func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password *byte, passwordLen int, salt *uint8, saltLen int, prf CCPseudoRandomAlgorithm, rounds Unsigned, derivedKey *uint8, derivedKeyLen int) CCCryptorStatus {
-	return C._mkcgo_CCKeyDerivationPBKDF(algorithm, (*C.char)(unsafe.Pointer(password)), C.size_t(passwordLen), (*C.uint8_t)(unsafe.Pointer(salt)), C.size_t(saltLen), prf, rounds, (*C.uint8_t)(unsafe.Pointer(derivedKey)), C.size_t(derivedKeyLen))
+func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password *byte, passwordLen int, salt *uint8, saltLen int, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey *uint8, derivedKeyLen int) CCCryptorStatus {
+	return C._mkcgo_CCKeyDerivationPBKDF(algorithm, (*C.char)(unsafe.Pointer(password)), C.size_t(passwordLen), (*C.uint8_t)(unsafe.Pointer(salt)), C.size_t(saltLen), prf, C.uint(rounds), (*C.uint8_t)(unsafe.Pointer(derivedKey)), C.size_t(derivedKeyLen))
 }

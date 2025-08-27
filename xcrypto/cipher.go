@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build cgo && darwin
+//go:build darwin
 
 package xcrypto
 
@@ -21,14 +21,14 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 	var blockSize int
 	switch kind {
 	case commoncrypto.KCCAlgorithmAES:
-		blockSize = aesBlockSize
+		blockSize = commoncrypto.KCCBlockSizeAES128
 	case commoncrypto.KCCAlgorithmDES, commoncrypto.KCCAlgorithm3DES:
-		blockSize = desBlockSize
+		blockSize = commoncrypto.KCCBlockSizeDES
 	default:
 		panic("invalid algorithm")
 	}
 
-	// Create and initialize the cbcMode struct with CCCryptorCreate here
+	// Create and initialize the cbcMode struct with CCCryptorCreateWithMode here
 	x := &cbcCipher{blockSize: blockSize}
 	status := commoncrypto.CCCryptorCreateWithMode(
 		operation,                      // Specifies whether encryption or decryption is performed (kCCEncrypt or kCCDecrypt).
@@ -46,7 +46,7 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 	)
 
 	if status != commoncrypto.KCCSuccess {
-		panic("crypto/des: CCCryptorCreate failed")
+		panic("crypto/des: CCCryptorCreateWithMode failed")
 	}
 
 	runtime.SetFinalizer(x, (*cbcCipher).finalize)

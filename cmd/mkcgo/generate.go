@@ -508,6 +508,7 @@ var cstdTypesToGo = map[string]string{
 	"int64_t":            "int64",
 	"uint64_t":           "uint64",
 	"int":                "int32",
+	"unsigned":           "uint32",
 	"unsigned int":       "uint32",
 	"long":               "int32",
 	"unsigned long":      "uint32",
@@ -525,6 +526,7 @@ var cstdTypesToGo = map[string]string{
 // Most C don't need any special handling, only the ones that have spaces.
 var cstdTypesToCgo = map[string]string{
 	"signed char":        "schar",
+	"unsigned":           "uint",
 	"unsigned char":      "uchar",
 	"unsigned short":     "ushort",
 	"unsigned int":       "uint",
@@ -713,6 +715,20 @@ func goSymName(name string) string {
 	return strings.ToUpper(name[:1]) + name[1:]
 }
 
+// getFrameworkPath returns the framework path for a given symbol name.
+func getFrameworkPath(symbolName string) string {
+	switch {
+	case strings.Contains(symbolName, "CF"):
+		return "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+	case strings.Contains(symbolName, "CC"):
+		return "/usr/lib/libSystem.B.dylib"
+	case strings.Contains(symbolName, "Sec"):
+		return "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+	default:
+		panic("unknown symbol: " + symbolName)
+	}
+}
+
 // generateNocgoGo generates Go source file for nocgo mode from src.
 func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	// Output header notice and package declaration.
@@ -739,13 +755,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	// Generate cgo_import_dynamic directives for extern variables
 	for _, ext := range src.Externs {
 		extName := ext.Name
-		var frameworkPath string
-		// TODO: we shouldn't be hardcoding the framework paths
-		if strings.Contains(extName, "CF") {
-			frameworkPath = "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-		} else {
-			frameworkPath = "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-		}
+		frameworkPath := getFrameworkPath(extName)
 		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
 		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
 	}
@@ -757,14 +767,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 			continue
 		}
 		fnName := fn.Name
-		var frameworkPath string
-
-		// TODO: we shouldn't be hardcoding the framework paths
-		if strings.Contains(fnName, "CF") {
-			frameworkPath = "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-		} else {
-			frameworkPath = "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-		}
+		frameworkPath := getFrameworkPath(fnName)
 		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
 	}
 	fmt.Fprintf(w, "\n")
@@ -790,6 +793,10 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 // generateNocgoAllAliases generates Go type aliases for nocgo mode from both externs and function signatures.
 func generateNocgoAllAliases(externs []*mkcgo.Extern, funcs []*mkcgo.Func, typedefs []*mkcgo.TypeDef, w io.Writer) {
 	seenTypes := make(map[string]bool)
+
+	// Add standard C type aliases that are commonly needed
+	fmt.Fprintf(w, "type Unsigned = uint32\n")
+	seenTypes["Unsigned"] = true
 
 	// Handle typedefs first, as they can create proper type aliases
 	for _, typedef := range typedefs {
@@ -831,6 +838,11 @@ func generateNocgoAllAliases(externs []*mkcgo.Extern, funcs []*mkcgo.Func, typed
 			if needsTypeAlias(baseType) && !seenTypes[baseType] {
 				fmt.Fprintf(w, "type %s unsafe.Pointer\n", baseType)
 				seenTypes[baseType] = true
+			}
+			// Handle standard C types that need aliases
+			if baseType == "unsigned" && !seenTypes["Unsigned"] {
+				fmt.Fprintf(w, "type Unsigned uint32\n")
+				seenTypes["Unsigned"] = true
 			}
 		}
 
@@ -973,9 +985,12 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 	} else if numParams <= 6 {
 		syscallFunc = "syscall_syscall6"
 		maxArgs = 6
-	} else {
+	} else if numParams <= 9 {
 		syscallFunc = "syscall_syscall9"
 		maxArgs = 9
+	} else {
+		syscallFunc = "syscallN"
+		maxArgs = numParams
 	}
 
 	// Generate the syscall invocation with proper argument handling
@@ -987,17 +1002,25 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 	// Add actual parameters
 	for i, param := range fn.Params {
+		if i >= maxArgs {
+			break // Skip parameters beyond what the syscall function can handle
+		}
+
 		paramName := param.Name
 		if paramName == "" {
 			paramName = fmt.Sprintf("arg%d", i)
 		}
 
-		// Convert parameter to uintptr, handling pointers correctly
+		// Convert parameter to uintptr, handling different types correctly
 		goType := convertCTypeToNocgoType(param.Type)
 		if strings.HasPrefix(goType, "*") {
 			// Pointer types need to go through unsafe.Pointer
 			fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+		} else if goType == "int32" || goType == "int" || strings.Contains(goType, "CC") {
+			// Enum types and integers can be cast directly to uintptr
+			fmt.Fprintf(w, ", uintptr(%s)", paramName)
 		} else {
+			// Other types
 			fmt.Fprintf(w, ", uintptr(%s)", paramName)
 		}
 	}
@@ -1014,6 +1037,9 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		if strings.HasPrefix(goRetType, "*") {
 			// Pointer return types need to go through unsafe.Pointer
 			fmt.Fprintf(w, "\treturn (%s)(unsafe.Pointer(r0))\n", goRetType)
+		} else if goRetType == "int32" || goRetType == "int" || strings.Contains(goRetType, "CC") {
+			// Enum types and integers can be cast directly from uintptr
+			fmt.Fprintf(w, "\treturn %s(r0)\n", goRetType)
 		} else {
 			fmt.Fprintf(w, "\treturn %s(r0)\n", goRetType)
 		}
@@ -1044,16 +1070,36 @@ func convertCTypeToNocgoType(cType string) string {
 		return ""
 	case originalType == "int" || originalType == "int32_t":
 		return "int32"
+	case originalType == "unsigned" || originalType == "unsigned int":
+		return "uint32"
+	case originalType == "uint32_t":
+		return "uint32"
 	case originalType == "size_t":
 		return "int"
+	case originalType == "size_t*" || (baseType == "size_t" && pointerCount == 1):
+		return "*int"
 	case originalType == "Boolean":
 		return "int32"
+	case baseType == "CCModeOptions":
+		// CCModeOptions is uint32_t
+		if pointerCount > 0 {
+			return "*uint32"
+		}
+		return "uint32"
+	case baseType == "CCOperation" || baseType == "CCAlgorithm" || baseType == "CCCryptorStatus" ||
+		baseType == "CCMode" || baseType == "CCOptions" || baseType == "CCPadding" ||
+		baseType == "CCPBKDFAlgorithm" || baseType == "CCPseudoRandomAlgorithm":
+		// These are enum types that should remain as their proper type
+		if pointerCount > 0 {
+			return "*" + baseType
+		}
+		return baseType
 	case baseType == "SecRandomRef" || baseType == "SecKeyRef" || baseType == "CFDataRef" ||
 		baseType == "CFTypeRef" || baseType == "CFStringRef" || baseType == "CFDictionaryRef" ||
 		baseType == "CFMutableDictionaryRef" || baseType == "CFNumberRef" || baseType == "CFErrorRef" ||
 		baseType == "CFAllocatorRef" || baseType == "SecKeyAlgorithm" || baseType == "SecKeyOperationType" ||
 		baseType == "CFIndex" || baseType == "CFDictionaryKeyCallBacks" || baseType == "CFDictionaryValueCallBacks" ||
-		baseType == "CFNumberType" || baseType == "CFStringEncoding":
+		baseType == "CFNumberType" || baseType == "CFStringEncoding" || baseType == "CCCryptorRef":
 		// Use the type name directly for these framework types
 		if pointerCount > 0 {
 			return "*" + baseType

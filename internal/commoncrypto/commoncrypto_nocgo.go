@@ -29,7 +29,9 @@ func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {
 	if libcArgs.n != 0 {
 		libcArgs.args = uintptr(noescape(unsafe.Pointer(&args[0])))
 	}
+	entersyscall()
 	syscallNRaw(unsafe.Pointer(&libcArgs))
+	exitsyscall()
 	return libcArgs.r1, libcArgs.r2, 0
 }
 

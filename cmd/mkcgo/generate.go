@@ -1013,8 +1013,6 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 	// Generate the syscall invocation with proper argument handling
 	if syscallFunc == "syscallN" {
-		// For syscallN, we need to wrap with entersyscall/exitsyscall
-		fmt.Fprintf(w, "\tentersyscall()\n")
 		if fn.Ret != "" && fn.Ret != "void" {
 			fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
 		} else {
@@ -1080,11 +1078,6 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		fmt.Fprintf(w, ", 0")
 	}
 	fmt.Fprintf(w, ")\n")
-
-	// For syscallN, add exitsyscall after the call
-	if syscallFunc == "syscallN" {
-		fmt.Fprintf(w, "\texitsyscall()\n")
-	}
 
 	// Generate return statement
 	if fn.Ret != "" && fn.Ret != "void" {

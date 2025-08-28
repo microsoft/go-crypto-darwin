@@ -738,18 +738,28 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 
 	// Check if we need syscallN (functions with more than 9 parameters)
 	needsSyscallN := false
+	needsRuntime := false
 	for _, fn := range src.Funcs {
 		if !fnCalledFromGo(fn) {
 			continue
 		}
 		if len(fn.Params) > 9 {
 			needsSyscallN = true
+		}
+		// Check if we need runtime import for CCCryptorCreateWithMode
+		if fn.Name == "CCCryptorCreateWithMode" && len(fn.Params) > 9 {
+			needsRuntime = true
+		}
+		if needsSyscallN && needsRuntime {
 			break
 		}
 	}
 
 	// Import necessary packages for nocgo mode
 	fmt.Fprintf(w, "import (\n")
+	if needsRuntime {
+		fmt.Fprintf(w, "\t\"runtime\"\n")
+	}
 	fmt.Fprintf(w, "\t\"syscall\"\n")
 	fmt.Fprintf(w, "\t\"unsafe\"\n")
 	fmt.Fprintf(w, ")\n\n")
@@ -1011,73 +1021,121 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		maxArgs = numParams
 	}
 
-	// Generate the syscall invocation with proper argument handling
-	if syscallFunc == "syscallN" {
+	// Special handling for CCCryptorCreateWithMode which has architecture-specific parameter passing
+	if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" {
+		// Generate architecture-specific code
+		fmt.Fprintf(w, "\tvar r0 uintptr\n")
+		fmt.Fprintf(w, "\tif runtime.GOARCH == \"arm64\" {\n")
+
+		// ARM64 version - combine numRounds and options
 		if fn.Ret != "" && fn.Ret != "void" {
-			fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName)
 		} else {
-			fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
-		}
-	} else {
-		if fn.Ret != "" && fn.Ret != "void" {
-			fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
-		} else {
-			fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
-		}
-	}
-
-	// Add actual parameters
-	skipNext := false
-	for i, param := range fn.Params {
-		if i >= maxArgs {
-			break // Skip parameters beyond what the syscall function can handle
+			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName)
 		}
 
-		// Skip this parameter if it was already handled in the previous iteration
-		if skipNext {
-			skipNext = false
-			continue
-		}
-
-		paramName := param.Name
-		if paramName == "" {
-			paramName = fmt.Sprintf("arg%d", i)
-		}
-
-		// Special handling for CCCryptorCreateWithMode: combine numRounds and options into a single parameter
-		if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" && i == 9 && len(fn.Params) > 10 {
-			// This is the numRounds parameter (index 9), and we have options at index 10
-			// Combine them: numRounds<<32 | options
-			nextParam := fn.Params[10]
-			nextParamName := nextParam.Name
-			if nextParamName == "" {
-				nextParamName = fmt.Sprintf("arg%d", 10)
+		// Add parameters for ARM64 (combine numRounds and options)
+		for i, param := range fn.Params {
+			paramName := param.Name
+			if paramName == "" {
+				paramName = fmt.Sprintf("arg%d", i)
 			}
-			fmt.Fprintf(w, ", uintptr(%s)<<32|uintptr(%s)", paramName, nextParamName)
-			// Skip the next parameter since we've already handled it
-			skipNext = true
-			continue
-		}
 
-		// Convert parameter to uintptr, handling different types correctly
-		goType := convertCTypeToNocgoType(param.Type)
-		if strings.HasPrefix(goType, "*") {
-			// Pointer types need to go through unsafe.Pointer
-			fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
-		} else if goType == "int32" || goType == "int" || strings.Contains(goType, "CC") {
-			// Enum types and integers can be cast directly to uintptr
-			fmt.Fprintf(w, ", uintptr(%s)", paramName)
+			if i < 9 {
+				// Regular parameter handling for first 9 parameters
+				goType := convertCTypeToNocgoType(param.Type)
+				if strings.HasPrefix(goType, "*") {
+					fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+				} else {
+					fmt.Fprintf(w, ", uintptr(%s)", paramName)
+				}
+			} else if i == 9 && len(fn.Params) > 10 {
+				// This is numRounds (index 9), combine with options (index 10)
+				nextParam := fn.Params[10]
+				nextParamName := nextParam.Name
+				if nextParamName == "" {
+					nextParamName = fmt.Sprintf("arg%d", 10)
+				}
+				fmt.Fprintf(w, ", uintptr(%s)<<32|uintptr(%s)", paramName, nextParamName)
+			} else if i == 11 {
+				// This is cryptorRef (the last parameter)
+				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+			}
+		}
+		fmt.Fprintf(w, ")\n")
+
+		fmt.Fprintf(w, "\t} else {\n")
+
+		// Non-ARM64 version - keep numRounds and options separate
+		if fn.Ret != "" && fn.Ret != "void" {
+			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName)
 		} else {
-			// Other types
-			fmt.Fprintf(w, ", uintptr(%s)", paramName)
+			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName)
 		}
-	}
 
-	// Pad with zeros to reach the required argument count
-	for i := numParams; i < maxArgs; i++ {
-		fmt.Fprintf(w, ", 0")
+		// Add all parameters for non-ARM64
+		for i, param := range fn.Params {
+			paramName := param.Name
+			if paramName == "" {
+				paramName = fmt.Sprintf("arg%d", i)
+			}
+
+			goType := convertCTypeToNocgoType(param.Type)
+			if strings.HasPrefix(goType, "*") {
+				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+			} else {
+				fmt.Fprintf(w, ", uintptr(%s)", paramName)
+			}
+		}
+		fmt.Fprintf(w, ")\n")
+		fmt.Fprintf(w, "\t}\n")
+	} else {
+		// Generate the syscall invocation with proper argument handling for other functions
+		if syscallFunc == "syscallN" {
+			if fn.Ret != "" && fn.Ret != "void" {
+				fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+			} else {
+				fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
+			}
+		} else {
+			if fn.Ret != "" && fn.Ret != "void" {
+				fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+			} else {
+				fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
+			}
+		}
+
+		// Add actual parameters
+		for i, param := range fn.Params {
+			if i >= maxArgs {
+				break // Skip parameters beyond what the syscall function can handle
+			}
+
+			paramName := param.Name
+			if paramName == "" {
+				paramName = fmt.Sprintf("arg%d", i)
+			}
+
+			// Convert parameter to uintptr, handling different types correctly
+			goType := convertCTypeToNocgoType(param.Type)
+			if strings.HasPrefix(goType, "*") {
+				// Pointer types need to go through unsafe.Pointer
+				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+			} else if goType == "int32" || goType == "int" || strings.Contains(goType, "CC") {
+				// Enum types and integers can be cast directly to uintptr
+				fmt.Fprintf(w, ", uintptr(%s)", paramName)
+			} else {
+				// Other types
+				fmt.Fprintf(w, ", uintptr(%s)", paramName)
+			}
+		}
+
+		// Pad with zeros to reach the required argument count
+		for i := numParams; i < maxArgs; i++ {
+			fmt.Fprintf(w, ", 0")
+		}
+		fmt.Fprintf(w, ")\n")
 	}
-	fmt.Fprintf(w, ")\n")
 
 	// Generate return statement
 	if fn.Ret != "" && fn.Ret != "void" {

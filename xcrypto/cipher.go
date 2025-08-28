@@ -21,9 +21,9 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 	var blockSize int
 	switch kind {
 	case commoncrypto.KCCAlgorithmAES:
-		blockSize = commoncrypto.KCCBlockSizeAES128
+		blockSize = aesBlockSize
 	case commoncrypto.KCCAlgorithmDES, commoncrypto.KCCAlgorithm3DES:
-		blockSize = commoncrypto.KCCBlockSizeDES
+		blockSize = desBlockSize
 	default:
 		panic("invalid algorithm")
 	}

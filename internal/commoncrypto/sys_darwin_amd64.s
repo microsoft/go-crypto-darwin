@@ -7,18 +7,15 @@
 #include "go_asm.h"
 #include "textflag.h"
 
-#define maxArgs 42
-
-TEXT ·syscallNRaw(SB),NOSPLIT,$16
+TEXT ·syscallNRaw(SB),NOSPLIT,$16-8
 	MOVQ	SP, AX
 	MOVQ	AX, 8(SP)
+	MOVQ	args+0(FP), DI
 	MOVQ	DI, 0(SP)
 
 	MOVQ	libcCallInfo_fn(DI), R13
 	MOVQ	libcCallInfo_n(DI), CX
-	MOVQ	libcCallInfo_args(DI), DI
-
-	SUBQ	$(maxArgs*8), SP	// room for args
+	MOVQ	libcCallInfo_args(DI), R10
 
 	// Fast version, do not store args on the stack.
 	CMPL	CX, $0;	JE	_0args
@@ -28,48 +25,46 @@ TEXT ·syscallNRaw(SB),NOSPLIT,$16
 	CMPL	CX, $4;	JE	_4args
 	CMPL	CX, $5;	JE	_5args
 	CMPL	CX, $6;	JE	_6args
-	CMPL	CX, $7;	JE	_7args
-	CMPL	CX, $8;	JE	_8args
-	CMPL	CX, $9;	JE	_9args
 
-	// Check we have enough room for args.
-	CMPL	CX, $maxArgs
-	JLE	2(PC)
-	INT	$3			// not enough room -> crash
+	// Reserve stack space for remaining args
+	MOVQ	CX, R12
+	SUBQ	$6, R12
+	ADDQ	$1, R12 // make even number of words for stack alignment
+	ANDQ	$~1, R12
+	SHLQ	$3, R12
+	SUBQ	R12, SP
 
 	// Copy args to the stack.
-	MOVQ	DI, SI
+	// CX: count of stack arguments (n-6)
+	// SI: &args[6]
+	// DI: copy of RSP
+	SUBQ	$6, CX
+	MOVQ	R10, SI
+	ADDQ	$(8*6), SI
 	MOVQ	SP, DI
 	CLD
 	REP; MOVSQ
-	MOVQ	SP, DI
 
-_9args:
-	MOVQ	72(DI), R12
-_8args:
-	MOVQ	56(DI), R11
-_7args:
-	MOVQ	48(DI), R10
 _6args:
-	MOVQ	40(DI), R9
+	MOVQ	(5*8)(R10), R9
 _5args:
-	MOVQ	32(DI), R8
+	MOVQ	(4*8)(R10), R8
 _4args:
-	MOVQ	24(DI), CX
+	MOVQ	(3*8)(R10), CX
 _3args:
-	MOVQ	16(DI), DX
+	MOVQ	(2*8)(R10), DX
 _2args:
-	MOVQ	8(DI), SI
+	MOVQ	(1*8)(R10), SI
 _1args:
-	MOVQ	0(DI), DI
+	MOVQ	(0*8)(R10), DI
 _0args:
 
-	XORL	AX, AX	      // vararg: say "no float args"
+	XORL	AX, AX	    // vararg: say "no float args"
 
 	// Call stdcall function.
 	CALL	R13
 
-	ADDQ	$(maxArgs*8), SP
+	ADDQ	R12, SP		// free stack space
 
 	// Return result.
 	MOVQ	0(SP), DI

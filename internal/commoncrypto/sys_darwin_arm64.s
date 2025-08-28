@@ -68,21 +68,6 @@ _1args:
 	MOVD	(0*8)(R12), R0
 _0args:
 
-	// If fn is declared as vararg, we have to pass the vararg arguments on the stack.
-	// (Because ios decided not to adhere to the standard arm64 calling convention, sigh...)
-	// The only libSystem calls we support with vararg are open, fcntl, ioctl,
-	// which are all of the form fn(x, y, ...), and openat, which is of the form fn(x, y, z, ...).
-	// So we just need to put the  3rd and the 4th arg on the stack as well.
-	// Note that historically openat has been called with syscall6, so we need to handle that case too.
-	// If we ever have other vararg libSystem calls, we might need to handle more cases.
-	MOVD	libcCallInfo_n(R19), R12
-	CMP	$3,	R12; BNE 2(PC);
-	MOVD	R2, (RSP)
-	CMP $4, R12; BNE 2(PC);
-	MOVD	R3, (RSP)
-	CMP $6, R12; BNE 2(PC);
-	MOVD	R3, (RSP)
-
 	MOVD	libcCallInfo_fn(R19), R12
 	BL	(R12)
 

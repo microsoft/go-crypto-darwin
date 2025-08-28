@@ -736,6 +736,18 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	fmt.Fprintf(w, "//go:build !cgo && darwin\n\n")
 	fmt.Fprintf(w, "package %s\n\n", *packageName)
 
+	// Check if we need syscallN (functions with more than 9 parameters)
+	needsSyscallN := false
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		if len(fn.Params) > 9 {
+			needsSyscallN = true
+			break
+		}
+	}
+
 	// Import necessary packages for nocgo mode
 	fmt.Fprintf(w, "import (\n")
 	fmt.Fprintf(w, "\t\"syscall\"\n")
@@ -745,12 +757,22 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	// Generate linkname declarations for syscall functions
 	fmt.Fprintf(w, "//go:linkname syscall_syscall syscall.syscall\n")
 	fmt.Fprintf(w, "//go:linkname syscall_syscall6 syscall.syscall6\n")
-	fmt.Fprintf(w, "//go:linkname syscall_syscall9 syscall.syscall9\n\n")
+	fmt.Fprintf(w, "//go:linkname syscall_syscall9 syscall.syscall9\n")
+	if needsSyscallN {
+		fmt.Fprintf(w, "//go:linkname entersyscall runtime.entersyscall\n")
+		fmt.Fprintf(w, "//go:linkname exitsyscall runtime.exitsyscall\n")
+	}
+	fmt.Fprintf(w, "\n")
 
 	// Generate function signatures for syscall functions
 	fmt.Fprintf(w, "func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
 	fmt.Fprintf(w, "func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
-	fmt.Fprintf(w, "func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)\n\n")
+	fmt.Fprintf(w, "func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
+	if needsSyscallN {
+		fmt.Fprintf(w, "func entersyscall()\n")
+		fmt.Fprintf(w, "func exitsyscall()\n")
+	}
+	fmt.Fprintf(w, "\n")
 
 	// Generate cgo_import_dynamic directives for extern variables
 	for _, ext := range src.Externs {
@@ -990,21 +1012,53 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 	}
 
 	// Generate the syscall invocation with proper argument handling
-	if fn.Ret != "" && fn.Ret != "void" {
-		fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+	if syscallFunc == "syscallN" {
+		// For syscallN, we need to wrap with entersyscall/exitsyscall
+		fmt.Fprintf(w, "\tentersyscall()\n")
+		if fn.Ret != "" && fn.Ret != "void" {
+			fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+		} else {
+			fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
+		}
 	} else {
-		fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
+		if fn.Ret != "" && fn.Ret != "void" {
+			fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
+		} else {
+			fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
+		}
 	}
 
 	// Add actual parameters
+	skipNext := false
 	for i, param := range fn.Params {
 		if i >= maxArgs {
 			break // Skip parameters beyond what the syscall function can handle
 		}
 
+		// Skip this parameter if it was already handled in the previous iteration
+		if skipNext {
+			skipNext = false
+			continue
+		}
+
 		paramName := param.Name
 		if paramName == "" {
 			paramName = fmt.Sprintf("arg%d", i)
+		}
+
+		// Special handling for CCCryptorCreateWithMode: combine numRounds and options into a single parameter
+		if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" && i == 9 && len(fn.Params) > 10 {
+			// This is the numRounds parameter (index 9), and we have options at index 10
+			// Combine them: numRounds<<32 | options
+			nextParam := fn.Params[10]
+			nextParamName := nextParam.Name
+			if nextParamName == "" {
+				nextParamName = fmt.Sprintf("arg%d", 10)
+			}
+			fmt.Fprintf(w, ", uintptr(%s)<<32|uintptr(%s)", paramName, nextParamName)
+			// Skip the next parameter since we've already handled it
+			skipNext = true
+			continue
 		}
 
 		// Convert parameter to uintptr, handling different types correctly
@@ -1026,6 +1080,11 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		fmt.Fprintf(w, ", 0")
 	}
 	fmt.Fprintf(w, ")\n")
+
+	// For syscallN, add exitsyscall after the call
+	if syscallFunc == "syscallN" {
+		fmt.Fprintf(w, "\texitsyscall()\n")
+	}
 
 	// Generate return statement
 	if fn.Ret != "" && fn.Ret != "void" {

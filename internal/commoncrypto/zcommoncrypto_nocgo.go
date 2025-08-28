@@ -14,10 +14,14 @@ import (
 //go:linkname syscall_syscall syscall.syscall
 //go:linkname syscall_syscall6 syscall.syscall6
 //go:linkname syscall_syscall9 syscall.syscall9
+//go:linkname entersyscall runtime.entersyscall
+//go:linkname exitsyscall runtime.exitsyscall
 
 func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
+func entersyscall()
+func exitsyscall()
 
 //go:cgo_import_dynamic _mkcgo_CCCrypt CCCrypt "/usr/lib/libSystem.B.dylib"
 //go:cgo_import_dynamic _mkcgo_CCCryptorCreate CCCryptorCreate "/usr/lib/libSystem.B.dylib"
@@ -94,8 +98,10 @@ const (
 var _mkcgo_CCCrypt_trampoline_addr uintptr
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, dataIn unsafe.Pointer, dataInLength int, dataOut unsafe.Pointer, dataOutAvailable int, dataOutMoved *int) CCCryptorStatus {
-	//r0, _, _ := syscallN(_mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
-	return CCCryptorStatus(-1)
+	entersyscall()
+	r0, _, _ := syscallN(_mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
+	exitsyscall()
+	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
@@ -105,9 +111,11 @@ func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key uns
 	return CCCryptorStatus(r0)
 }
 
+var _mkcgo_CCCryptorCreateWithMode_trampoline_addr uintptr
+
 func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv unsafe.Pointer, key unsafe.Pointer, keyLength int, tweak unsafe.Pointer, tweakLength int, numRounds int32, options uint32, cryptorRef *CCCryptorRef) CCCryptorStatus {
 	entersyscall()
-	r0 := _mkcgo_asm_CCCryptorCreateWithMode(uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
+	r0, _, _ := syscallN(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds)<<32|uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
 	exitsyscall()
 	return CCCryptorStatus(r0)
 }

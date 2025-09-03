@@ -7,15 +7,15 @@
 #include "go_asm.h"
 #include "textflag.h"
 
-TEXT ·syscallNRaw(SB),NOSPLIT,$16-8
-	MOVQ	SP, AX
-	MOVQ	AX, 8(SP)
+TEXT ·syscallNRaw(SB),NOSPLIT,$8-8
 	MOVQ	args+0(FP), DI
 	MOVQ	DI, 0(SP)
 
 	MOVQ	libcCallInfo_fn(DI), R13
 	MOVQ	libcCallInfo_n(DI), CX
 	MOVQ	libcCallInfo_args(DI), R10
+
+	MOVQ	SP, R14 // store original SP in a callee-saved register
 
 	// Fast version, do not store args on the stack.
 	CMPL	CX, $0;	JE	_0args
@@ -29,10 +29,11 @@ TEXT ·syscallNRaw(SB),NOSPLIT,$16-8
 	// Reserve stack space for remaining args
 	MOVQ	CX, R12
 	SUBQ	$6, R12
-	ADDQ	$1, R12 // make even number of words for stack alignment
-	ANDQ	$~1, R12
 	SHLQ	$3, R12
 	SUBQ	R12, SP
+
+	SUBQ	$16, SP
+	ANDQ	$~15, SP	// alignment for gcc ABI
 
 	// Copy args to the stack.
 	// CX: count of stack arguments (n-6)
@@ -64,11 +65,10 @@ _0args:
 	// Call stdcall function.
 	CALL	R13
 
-	ADDQ	R12, SP		// free stack space
+	MOVQ	R14, SP		// free stack space
 
 	// Return result.
 	MOVQ	0(SP), DI
-	MOVQ	8(SP), SP
 	MOVQ	AX, libcCallInfo_r1(DI)
 	MOVQ    DX, libcCallInfo_r2(DI)
 

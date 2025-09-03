@@ -34,7 +34,6 @@ func exitsyscall()
 
 type CCCryptorRef unsafe.Pointer
 type CCModeOptions = uint32
-type Unsigned uint32
 
 type CCOperation int32
 

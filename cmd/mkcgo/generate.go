@@ -795,8 +795,8 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	}
 	fmt.Fprintf(w, "\n")
 
-	// Generate all type aliases (from externs, functions, and typedefs)
-	generateNocgoAllAliases(src.Externs, src.Funcs, src.TypeDefs, w)
+	// Generate all type aliases
+	generateNocgoAliases(src.TypeDefs, w)
 
 	// Generate enums
 	generateNocgoEnums(src.Enums, w)
@@ -813,65 +813,20 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	}
 }
 
-// generateNocgoAllAliases generates Go type aliases for nocgo mode from both externs and function signatures.
-func generateNocgoAllAliases(externs []*mkcgo.Extern, funcs []*mkcgo.Func, typedefs []*mkcgo.TypeDef, w io.Writer) {
+// generateNocgoAliases generates Go type aliases for nocgo mode.
+func generateNocgoAliases(typedefs []*mkcgo.TypeDef, w io.Writer) {
 	seenTypes := make(map[string]bool)
 
 	// Handle typedefs first, as they can create proper type aliases
 	for _, typedef := range typedefs {
-		baseType := extractBaseType(typedef.Type)
-		if needsTypeAlias(baseType) {
-			fmt.Fprintf(w, "type %s = %s\n", typedef.Name, baseType)
+		// For basic types, make it an alias to the appropriate Go type
+		goType, _ := cTypeToGo(typedef.Type, false)
+		if goType != "" && goType != "unsafe.Pointer" {
+			fmt.Fprintf(w, "type %s = %s\n", typedef.Name, goType)
 			seenTypes[typedef.Name] = true
 		} else {
-			// For basic types, make it an alias to the appropriate Go type
-			goType, _ := cTypeToGo(typedef.Type, false)
-			if goType != "" && goType != "unsafe.Pointer" {
-				fmt.Fprintf(w, "type %s = %s\n", typedef.Name, goType)
-				seenTypes[typedef.Name] = true
-			} else {
-				fmt.Fprintf(w, "type %s unsafe.Pointer\n", typedef.Name)
-				seenTypes[typedef.Name] = true
-			}
-		}
-	}
-
-	// Extract types from extern variables
-	for _, ext := range externs {
-		baseType := extractBaseType(ext.Type)
-		if baseType != "void" && !seenTypes[baseType] {
-			fmt.Fprintf(w, "type %s unsafe.Pointer\n", baseType)
-			seenTypes[baseType] = true
-		}
-	}
-
-	// Extract types from function signatures
-	for _, fn := range funcs {
-		if !fnCalledFromGo(fn) {
-			continue
-		}
-
-		// Extract types from function parameters
-		for _, param := range fn.Params {
-			baseType := extractBaseType(param.Type)
-			if needsTypeAlias(baseType) && !seenTypes[baseType] {
-				fmt.Fprintf(w, "type %s unsafe.Pointer\n", baseType)
-				seenTypes[baseType] = true
-			}
-			// Handle standard C types that need aliases
-			if baseType == "unsigned" && !seenTypes["Unsigned"] {
-				fmt.Fprintf(w, "type Unsigned uint32\n")
-				seenTypes["Unsigned"] = true
-			}
-		}
-
-		// Extract type from return value
-		if fn.Ret != "" && fn.Ret != "void" {
-			baseType := extractBaseType(fn.Ret)
-			if needsTypeAlias(baseType) && !seenTypes[baseType] {
-				fmt.Fprintf(w, "type %s unsafe.Pointer\n", baseType)
-				seenTypes[baseType] = true
-			}
+			fmt.Fprintf(w, "type %s unsafe.Pointer\n", typedef.Name)
+			seenTypes[typedef.Name] = true
 		}
 	}
 
@@ -896,23 +851,6 @@ func generateNocgoEnums(enums []*mkcgo.Enum, w io.Writer) {
 		}
 		fmt.Fprintf(w, ")\n\n")
 	}
-}
-
-// extractBaseType extracts the base type name from a C type string.
-func extractBaseType(cType string) string {
-	cType = strings.TrimSpace(cType)
-	cType = strings.TrimPrefix(cType, "const ")
-	cType = strings.TrimSuffix(cType, "*")
-	cType = strings.TrimSpace(cType)
-	return cType
-}
-
-// needsTypeAlias returns true if the type needs a type alias definition.
-func needsTypeAlias(baseType string) bool {
-	return strings.HasSuffix(baseType, "Ref") ||
-		baseType == "SecKeyAlgorithm" ||
-		baseType == "CFDictionaryKeyCallBacks" ||
-		baseType == "CFDictionaryValueCallBacks"
 }
 
 // generateNocgoExterns generates Go extern variables for nocgo mode.

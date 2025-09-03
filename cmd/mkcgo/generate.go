@@ -948,6 +948,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 	}
 
 	// Special handling for CCCryptorCreateWithMode which has architecture-specific parameter passing
+	// TODO: generalize this code.
 	if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" {
 		// Generate architecture-specific code
 		fmt.Fprintf(w, "\tvar r0 uintptr\n")

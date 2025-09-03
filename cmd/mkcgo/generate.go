@@ -862,36 +862,24 @@ func generateNocgoExterns(externs []*mkcgo.Extern, w io.Writer) {
 	// First, generate pointer variables for extern symbols
 	fmt.Fprintf(w, "var (\n")
 	for _, ext := range externs {
-		// Use the base type without pointer and const
-		baseType := strings.TrimPrefix(ext.Type, "*")
-		baseType = strings.TrimPrefix(baseType, "const ")
-		fmt.Fprintf(w, "\t_mkcgo_%s %s\n", ext.Name, baseType)
+		goType, _ := cTypeToGo(ext.Type, false)
+		fmt.Fprintf(w, "\t_mkcgo_%s %s\n", ext.Name, goType)
 	}
 	fmt.Fprintf(w, ")\n\n")
 
 	for _, ext := range externs {
-		// Use the base type without pointer and const
-		baseType := strings.TrimPrefix(ext.Type, "*")
-		baseType = strings.TrimPrefix(baseType, "const ")
+		goType, _ := cTypeToGo(ext.Type, false)
 		fmt.Fprintf(w, "//go:noinline\n")
-		fmt.Fprintf(w, "func _mkcgo_addr_%s() *%s { return &_mkcgo_%s }\n", ext.Name, baseType, ext.Name)
+		fmt.Fprintf(w, "func _mkcgo_addr_%s() *%s { return &_mkcgo_%s }\n", ext.Name, goType, ext.Name)
 	}
 
 	// Then, generate the actual variables that dereference the pointers
 	fmt.Fprintf(w, "var (\n")
 	for _, ext := range externs {
 		// Convert extern names to Go variable names
-		goName := ext.Name
-		if strings.HasPrefix(goName, "k") {
-			// Convert kSecRandomDefault to KSecRandomDefault
-			goName = "K" + goName[1:]
-		}
-
-		// Use the base type without pointer and const
-		baseType := strings.TrimPrefix(ext.Type, "*")
-		baseType = strings.TrimPrefix(baseType, "const ")
-
-		fmt.Fprintf(w, "\t%s %s = *_mkcgo_addr_%s()\n", goName, baseType, ext.Name)
+		goName := goSymName(ext.Name)
+		goType, _ := cTypeToGo(ext.Type, false)
+		fmt.Fprintf(w, "\t%s %s = *_mkcgo_addr_%s()\n", goName, goType, ext.Name)
 	}
 	fmt.Fprintf(w, ")\n\n")
 }

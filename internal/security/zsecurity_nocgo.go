@@ -103,7 +103,7 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 //go:cgo_import_dynamic _mkcgo_SecKeyVerifySignature SecKeyVerifySignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_SecRandomCopyBytes SecRandomCopyBytes "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 
-type Boolean unsafe.Pointer
+type Boolean = byte
 type SecRandomRef unsafe.Pointer
 type SecKeyRef unsafe.Pointer
 type CFDataRef unsafe.Pointer
@@ -481,16 +481,16 @@ func SecKeyGetBlockSize(key SecKeyRef) int {
 
 var _mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr uintptr
 
-func SecKeyIsAlgorithmSupported(key SecKeyRef, operation SecKeyOperationType, algorithm SecKeyAlgorithm) int32 {
+func SecKeyIsAlgorithmSupported(key SecKeyRef, operation SecKeyOperationType, algorithm SecKeyAlgorithm) Boolean {
 	r0, _, _ := syscall_syscall(_mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr, uintptr(key), uintptr(operation), uintptr(algorithm))
-	return int32(r0)
+	return Boolean(r0)
 }
 
 var _mkcgo_SecKeyVerifySignature_trampoline_addr uintptr
 
-func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData CFDataRef, signature CFDataRef, error *CFErrorRef) int32 {
+func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData CFDataRef, signature CFDataRef, error *CFErrorRef) Boolean {
 	r0, _, _ := syscall_syscall6(_mkcgo_SecKeyVerifySignature_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(signedData), uintptr(signature), uintptr(unsafe.Pointer(error)), 0)
-	return int32(r0)
+	return Boolean(r0)
 }
 
 var _mkcgo_SecRandomCopyBytes_trampoline_addr uintptr

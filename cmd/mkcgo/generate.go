@@ -834,7 +834,7 @@ func generateNocgoAllAliases(externs []*mkcgo.Extern, funcs []*mkcgo.Func, typed
 			seenTypes[typedef.Name] = true
 		} else {
 			// For basic types, make it an alias to the appropriate Go type
-			goType := convertCTypeToNocgoType(typedef.Type)
+			goType, _ := cTypeToGo(typedef.Type, false)
 			if goType != "" && goType != "unsafe.Pointer" {
 				fmt.Fprintf(w, "type %s = %s\n", typedef.Name, goType)
 				seenTypes[typedef.Name] = true
@@ -986,7 +986,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		}
 
 		// Convert C types to Go types for nocgo mode
-		goType := convertCTypeToNocgoType(param.Type)
+		goType, _ := cTypeToGo(param.Type, false)
 		paramName := param.Name
 		if paramName == "" {
 			paramName = fmt.Sprintf("arg%d", i)
@@ -997,7 +997,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 	// Generate return type
 	if fn.Ret != "" && fn.Ret != "void" {
-		goRetType := convertCTypeToNocgoType(fn.Ret)
+		goRetType, _ := cTypeToGo(fn.Ret, false)
 		fmt.Fprintf(w, " %s", goRetType)
 	}
 
@@ -1043,7 +1043,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 			if i < 9 {
 				// Regular parameter handling for first 9 parameters
-				goType := convertCTypeToNocgoType(param.Type)
+				goType, _ := cTypeToGo(param.Type, false)
 				if strings.HasPrefix(goType, "*") {
 					fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
 				} else {
@@ -1080,7 +1080,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 				paramName = fmt.Sprintf("arg%d", i)
 			}
 
-			goType := convertCTypeToNocgoType(param.Type)
+			goType, _ := cTypeToGo(param.Type, false)
 			if strings.HasPrefix(goType, "*") {
 				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
 			} else {
@@ -1117,7 +1117,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 			}
 
 			// Convert parameter to uintptr, handling different types correctly
-			goType := convertCTypeToNocgoType(param.Type)
+			goType, _ := cTypeToGo(param.Type, false)
 			if strings.HasPrefix(goType, "*") {
 				// Pointer types need to go through unsafe.Pointer
 				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
@@ -1139,7 +1139,7 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 	// Generate return statement
 	if fn.Ret != "" && fn.Ret != "void" {
-		goRetType := convertCTypeToNocgoType(fn.Ret)
+		goRetType, _ := cTypeToGo(fn.Ret, false)
 		if strings.HasPrefix(goRetType, "*") {
 			// Pointer return types need to go through unsafe.Pointer
 			fmt.Fprintf(w, "\treturn (%s)(unsafe.Pointer(r0))\n", goRetType)
@@ -1152,93 +1152,6 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 	}
 
 	fmt.Fprintf(w, "}\n\n")
-}
-
-// convertCTypeToNocgoType converts C types to appropriate Go types for nocgo mode.
-func convertCTypeToNocgoType(cType string) string {
-	cType = strings.TrimSpace(cType)
-	originalType := cType
-
-	// Remove const and pointer prefixes to get the base type
-	baseType := strings.TrimPrefix(cType, "const ")
-	baseType = strings.TrimSpace(baseType)
-
-	// Count and remove all trailing asterisks
-	pointerCount := 0
-	for strings.HasSuffix(baseType, "*") {
-		pointerCount++
-		baseType = strings.TrimSuffix(baseType, "*")
-		baseType = strings.TrimSpace(baseType)
-	}
-
-	switch {
-	case originalType == "void":
-		return ""
-	case originalType == "int" || originalType == "int32_t":
-		return "int32"
-	case originalType == "unsigned" || originalType == "unsigned int":
-		return "uint32"
-	case originalType == "uint32_t":
-		return "uint32"
-	case originalType == "size_t":
-		return "int"
-	case originalType == "size_t*" || (baseType == "size_t" && pointerCount == 1):
-		return "*int"
-	case originalType == "Boolean":
-		return "int32"
-	case baseType == "CCModeOptions":
-		// CCModeOptions is uint32_t
-		if pointerCount > 0 {
-			return "*uint32"
-		}
-		return "uint32"
-	case baseType == "CCOperation" || baseType == "CCAlgorithm" || baseType == "CCCryptorStatus" ||
-		baseType == "CCMode" || baseType == "CCOptions" || baseType == "CCPadding" ||
-		baseType == "CCPBKDFAlgorithm" || baseType == "CCPseudoRandomAlgorithm":
-		// These are enum types that should remain as their proper type
-		if pointerCount > 0 {
-			return "*" + baseType
-		}
-		return baseType
-	case baseType == "SecRandomRef" || baseType == "SecKeyRef" || baseType == "CFDataRef" ||
-		baseType == "CFTypeRef" || baseType == "CFStringRef" || baseType == "CFDictionaryRef" ||
-		baseType == "CFMutableDictionaryRef" || baseType == "CFNumberRef" || baseType == "CFErrorRef" ||
-		baseType == "CFAllocatorRef" || baseType == "SecKeyAlgorithm" || baseType == "SecKeyOperationType" ||
-		baseType == "CFIndex" || baseType == "CFDictionaryKeyCallBacks" || baseType == "CFDictionaryValueCallBacks" ||
-		baseType == "CFNumberType" || baseType == "CFStringEncoding" || baseType == "CCCryptorRef":
-		// Use the type name directly for these framework types
-		if pointerCount > 0 {
-			return "*" + baseType
-		}
-		return baseType
-	case baseType == "uint8_t":
-		if pointerCount > 0 {
-			return "*uint8"
-		}
-		return "uint8"
-	case baseType == "byte":
-		if pointerCount > 0 {
-			return "*byte"
-		}
-		return "byte"
-	case baseType == "char":
-		if pointerCount > 0 {
-			return "*byte"
-		}
-		return "byte"
-	case baseType == "void":
-		if pointerCount >= 2 {
-			// Double pointer (void **) becomes *unsafe.Pointer
-			return "*unsafe.Pointer"
-		} else if pointerCount == 1 {
-			return "unsafe.Pointer"
-		}
-		return ""
-	case pointerCount > 0:
-		return "unsafe.Pointer"
-	default:
-		return "unsafe.Pointer"
-	}
 }
 
 // generateAssembly generates the assembly trampoline file for nocgo mode.

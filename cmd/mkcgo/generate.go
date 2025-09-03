@@ -716,17 +716,8 @@ func goSymName(name string) string {
 }
 
 // getFrameworkPath returns the framework path for a given symbol name.
-func getFrameworkPath(symbolName string) string {
-	switch {
-	case strings.Contains(symbolName, "CF"):
-		return "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-	case strings.Contains(symbolName, "CC"):
-		return "/usr/lib/libSystem.B.dylib"
-	case strings.Contains(symbolName, "Sec"):
-		return "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-	default:
-		panic("unknown symbol: " + symbolName)
-	}
+func getFrameworkPath(dylib mkcgo.Framework) string {
+	return fmt.Sprintf("/System/Library/Frameworks/%s.framework/Versions/%s/%s", dylib.Name, dylib.Version, dylib.Name)
 }
 
 // generateNocgoGo generates Go source file for nocgo mode from src.
@@ -787,7 +778,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	// Generate cgo_import_dynamic directives for extern variables
 	for _, ext := range src.Externs {
 		extName := ext.Name
-		frameworkPath := getFrameworkPath(extName)
+		frameworkPath := getFrameworkPath(ext.Framework)
 		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
 		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
 	}
@@ -799,7 +790,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 			continue
 		}
 		fnName := fn.Name
-		frameworkPath := getFrameworkPath(fnName)
+		frameworkPath := getFrameworkPath(fn.Framework)
 		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
 	}
 	fmt.Fprintf(w, "\n")

@@ -24,13 +24,13 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 func entersyscall()
 func exitsyscall()
 
-//go:cgo_import_dynamic _mkcgo_CCCrypt CCCrypt "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCCryptorCreate CCCryptorCreate "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCCryptorCreateWithMode CCCryptorCreateWithMode "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCCryptorRelease CCCryptorRelease "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCCryptorReset CCCryptorReset "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCCryptorUpdate CCCryptorUpdate "/usr/lib/libSystem.B.dylib"
-//go:cgo_import_dynamic _mkcgo_CCKeyDerivationPBKDF CCKeyDerivationPBKDF "/usr/lib/libSystem.B.dylib"
+//go:cgo_import_dynamic _mkcgo_CCCrypt CCCrypt "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCCryptorCreate CCCryptorCreate "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCCryptorCreateWithMode CCCryptorCreateWithMode "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCCryptorRelease CCCryptorRelease "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCCryptorReset CCCryptorReset "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCCryptorUpdate CCCryptorUpdate "/System/Library/Frameworks/System.framework/Versions/B/System"
+//go:cgo_import_dynamic _mkcgo_CCKeyDerivationPBKDF CCKeyDerivationPBKDF "/System/Library/Frameworks/System.framework/Versions/B/System"
 
 type CCCryptorRef unsafe.Pointer
 type CCModeOptions = uint32

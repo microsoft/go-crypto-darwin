@@ -19,10 +19,10 @@ func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)
 func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
 
-//go:cgo_import_dynamic _mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecRandomDefault _mkcgo_kSecRandomDefault
 //go:cgo_import_dynamic _mkcgo_kCFAllocatorDefault kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
 //go:linkname _mkcgo_kCFAllocatorDefault _mkcgo_kCFAllocatorDefault
+//go:cgo_import_dynamic _mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:linkname _mkcgo_kSecRandomDefault _mkcgo_kSecRandomDefault
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeECSECPrimeRandom kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:linkname _mkcgo_kSecAttrKeyTypeECSECPrimeRandom _mkcgo_kSecAttrKeyTypeECSECPrimeRandom
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeRSA kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
@@ -142,8 +142,8 @@ const (
 )
 
 var (
-	_mkcgo_kSecRandomDefault                                SecRandomRef
 	_mkcgo_kCFAllocatorDefault                              CFAllocatorRef
+	_mkcgo_kSecRandomDefault                                SecRandomRef
 	_mkcgo_kSecAttrKeyTypeECSECPrimeRandom                  CFStringRef
 	_mkcgo_kSecAttrKeyTypeRSA                               CFStringRef
 	_mkcgo_kSecAttrKeyClassPublic                           CFStringRef
@@ -174,10 +174,10 @@ var (
 )
 
 //go:noinline
-func _mkcgo_addr_kSecRandomDefault() *SecRandomRef { return &_mkcgo_kSecRandomDefault }
+func _mkcgo_addr_kCFAllocatorDefault() *CFAllocatorRef { return &_mkcgo_kCFAllocatorDefault }
 
 //go:noinline
-func _mkcgo_addr_kCFAllocatorDefault() *CFAllocatorRef { return &_mkcgo_kCFAllocatorDefault }
+func _mkcgo_addr_kSecRandomDefault() *SecRandomRef { return &_mkcgo_kSecRandomDefault }
 
 //go:noinline
 func _mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom() *CFStringRef {
@@ -303,8 +303,8 @@ func _mkcgo_addr_kSecKeyAlgorithmECDSASignatureDigestX962() *CFStringRef {
 }
 
 var (
-	KSecRandomDefault                                SecRandomRef   = *_mkcgo_addr_kSecRandomDefault()
 	KCFAllocatorDefault                              CFAllocatorRef = *_mkcgo_addr_kCFAllocatorDefault()
+	KSecRandomDefault                                SecRandomRef   = *_mkcgo_addr_kSecRandomDefault()
 	KSecAttrKeyTypeECSECPrimeRandom                  CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom()
 	KSecAttrKeyTypeRSA                               CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeRSA()
 	KSecAttrKeyClassPublic                           CFStringRef    = *_mkcgo_addr_kSecAttrKeyClassPublic()

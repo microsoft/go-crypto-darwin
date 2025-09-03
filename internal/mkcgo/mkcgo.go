@@ -32,8 +32,9 @@ type TypeDef struct {
 
 // Extern describes an extern variable.
 type Extern struct {
-	Name string
-	Type string
+	Name      string
+	Type      string
+	Framework Framework
 }
 
 // Enum describes an enum block.
@@ -48,8 +49,14 @@ type EnumValue struct {
 	Value string
 }
 
-// FuncAttrs contains attributes of a function.
-type FuncAttrs struct {
+// Framework describes a framework
+type Framework struct {
+	Name    string
+	Version string
+}
+
+// Attrs contains attributes of a C symbol.
+type Attrs struct {
 	Tags             []TagAttr
 	VariadicTarget   string
 	Optional         bool
@@ -58,9 +65,10 @@ type FuncAttrs struct {
 	NoEscape         bool
 	NoCallback       bool
 	NoCheckPtrParams []string
+	Framework        Framework
 }
 
-func (attrs *FuncAttrs) String() string {
+func (attrs *Attrs) String() string {
 	var bld strings.Builder
 	if len(attrs.Tags) != 0 {
 		bld.Write([]byte(fmt.Sprintf("%s", attrs.Tags)))
@@ -97,12 +105,19 @@ func (attrs *FuncAttrs) String() string {
 		}
 		bld.WriteByte(')')
 	}
+	if len(attrs.Framework.Name) != 0 {
+		bld.WriteString(", framework(")
+		bld.WriteString(attrs.Framework.Name)
+		bld.WriteString(", ")
+		bld.WriteString(attrs.Framework.Version)
+		bld.WriteByte(')')
+	}
 	return strings.TrimPrefix(bld.String(), ", ")
 }
 
 // Func describes a function.
 type Func struct {
-	FuncAttrs
+	Attrs
 	Name   string
 	Params []*Param
 	Ret    string
@@ -142,7 +157,7 @@ func (f *Func) String() string {
 		}
 	}
 	bld.WriteString(")")
-	if attrs := f.FuncAttrs.String(); attrs != "" {
+	if attrs := f.Attrs.String(); attrs != "" {
 		bld.WriteByte(' ')
 		bld.WriteString(attrs)
 	}
@@ -188,14 +203,14 @@ func (src *Source) Tags() []string {
 type attribute struct {
 	name        string
 	description string
-	handle      func(*FuncAttrs, ...string) error
+	handle      func(*Attrs, ...string) error
 }
 
 var attributes = [...]attribute{
 	{
 		name:        "tag",
 		description: "The function will be loaded together with other functions with the same tag. It can contain an optional name, which is the import name for the tag.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			var name string
 			if len(s) > 1 {
 				name = s[1]
@@ -207,7 +222,7 @@ var attributes = [...]attribute{
 	{
 		name:        "variadic",
 		description: "The function has variadic arguments, and its name is a custom wrapper for the actual C name, defined in this attribute.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			opts.VariadicTarget = s[0]
 			return nil
 		},
@@ -215,7 +230,7 @@ var attributes = [...]attribute{
 	{
 		name:        "optional",
 		description: "The function is optional",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			opts.Optional = true
 			return nil
 		},
@@ -223,7 +238,7 @@ var attributes = [...]attribute{
 	{
 		name:        "noerror",
 		description: "The function does not return an error, and the program will panic if the function returns an error.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			if opts.ErrCond != "" {
 				return errors.New("not allowed with errcond attribute")
 			}
@@ -234,7 +249,7 @@ var attributes = [...]attribute{
 	{
 		name:        "errcond",
 		description: "The function returns an error if the C function returns a value that matches the condition in this attribute.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			if opts.NoError {
 				return errors.New("not allowed with noerror attribute")
 			}
@@ -245,7 +260,7 @@ var attributes = [...]attribute{
 	{
 		name:        "noescape",
 		description: "The C function does not keep a copy of the Go pointer.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			opts.NoEscape = true
 			return nil
 		},
@@ -253,7 +268,7 @@ var attributes = [...]attribute{
 	{
 		name:        "nocallback",
 		description: "The C function does not call back into Go.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			opts.NoCallback = true
 			return nil
 		},
@@ -261,8 +276,19 @@ var attributes = [...]attribute{
 	{
 		name:        "nocheckptr",
 		description: "The parameter will be hidden from the Go compiler.",
-		handle: func(opts *FuncAttrs, s ...string) error {
+		handle: func(opts *Attrs, s ...string) error {
 			opts.NoCheckPtrParams = append(opts.NoCheckPtrParams, s[0])
+			return nil
+		},
+	},
+	{
+		name:        "framework",
+		description: "The function is part of a framework.",
+		handle: func(opts *Attrs, s ...string) error {
+			if len(s) != 2 {
+				return errors.New("requires 2 arguments")
+			}
+			opts.Framework = Framework{Name: s[0], Version: s[1]}
 			return nil
 		},
 	},

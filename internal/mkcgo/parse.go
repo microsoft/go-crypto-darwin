@@ -143,18 +143,25 @@ func (src *Source) addTypeDef(line string) error {
 }
 
 func (src *Source) addExtern(line string) error {
-	after := strings.TrimSuffix(line, ";")
-	idx := strings.LastIndex(after, " ")
+	line = strings.TrimSuffix(line, ";")
+	var attrs Attrs
+	var err error
+	line, err = extractAttributes(line, &attrs)
+	if err != nil {
+		return fmt.Errorf("can't extract extern attributes: %w", err)
+	}
+	idx := strings.LastIndex(line, " ")
 	if idx < 0 {
 		return errors.New("can't extract type name")
 	}
-	name, typ := normalizeParam(after[idx+1:], after[:idx])
+	name, typ := normalizeParam(line[idx+1:], line[:idx])
 	if err := src.addSymbol(name); err != nil {
 		return err
 	}
 	src.Externs = append(src.Externs, &Extern{
-		Name: name,
-		Type: typ,
+		Name:      name,
+		Type:      typ,
+		Framework: attrs.Framework,
 	})
 	return nil
 }
@@ -162,8 +169,8 @@ func (src *Source) addExtern(line string) error {
 // addFn parses string s and return created function Fn.
 func (src *Source) addFn(s string) error {
 	s = strings.TrimSuffix(s, ";")
-	var attrs FuncAttrs
-	s, err := extractFunctionAttributes(s, &attrs)
+	var attrs Attrs
+	s, err := extractAttributes(s, &attrs)
 	if err != nil {
 		return fmt.Errorf("can't extract function attributes: %w", err)
 	}
@@ -200,10 +207,10 @@ func (src *Source) addFn(s string) error {
 		return err
 	}
 	src.Funcs = append(src.Funcs, &Func{
-		Name:      name,
-		Ret:       ret,
-		FuncAttrs: attrs,
-		Params:    params,
+		Name:   name,
+		Ret:    ret,
+		Attrs:  attrs,
+		Params: params,
 	})
 	return nil
 }
@@ -286,10 +293,10 @@ func processComments(line string) (comment, remmaining string) {
 	return "", line
 }
 
-// extractFunctionAttributes extracts mkcgo attributes from string s.
+// extractAttributes extracts mkcgo attributes from string s.
 // The attributes format follows the GCC __attribute__ syntax as
 // described in https://gcc.gnu.org/onlinedocs/gcc/Attribute-Syntax.html.
-func extractFunctionAttributes(s string, fnAttrs *FuncAttrs) (string, error) {
+func extractAttributes(s string, fnAttrs *Attrs) (string, error) {
 	// There can be spaces between __attribute__ and the opening parenthesis.
 	prefix, body, found := strings.Cut(s, "__attribute__")
 	if !found {

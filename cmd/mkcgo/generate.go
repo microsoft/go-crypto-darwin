@@ -715,7 +715,7 @@ func goSymName(name string) string {
 	return strings.ToUpper(name[:1]) + name[1:]
 }
 
-// getFrameworkPath returns the framework path for a given symbol name.
+// getFrameworkPath returns the absolute framework path.
 func getFrameworkPath(dylib mkcgo.Framework) string {
 	return fmt.Sprintf("/System/Library/Frameworks/%s.framework/Versions/%s/%s", dylib.Name, dylib.Version, dylib.Name)
 }

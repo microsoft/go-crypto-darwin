@@ -114,7 +114,7 @@ var _mkcgo_CCCryptorCreateWithMode_trampoline_addr uintptr
 
 func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv unsafe.Pointer, key unsafe.Pointer, keyLength int, tweak unsafe.Pointer, tweakLength int, numRounds int32, options CCModeOptions, cryptorRef *CCCryptorRef) CCCryptorStatus {
 	var r0 uintptr
-	if runtime.GOARCH == "arm64" {
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
 		r0, _, _ = syscallN(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds)<<32|uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
 	} else {
 		r0, _, _ = syscallN(_mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(iv), uintptr(key), uintptr(keyLength), uintptr(tweak), uintptr(tweakLength), uintptr(numRounds), uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))

@@ -967,14 +967,16 @@ func generateNocgoExterns(externs []*mkcgo.Extern, w io.Writer) {
 	fmt.Fprintf(w, ")\n\n")
 }
 
+func trampolineName(fn *mkcgo.Func) string {
+	return fmt.Sprintf("_mkcgo_%s_trampoline_addr", fn.Name)
+}
+
 // generateNocgoFn generates Go function wrapper for nocgo mode.
 func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
-	fnName := fn.Name
 	goFnName := goSymName(fn.Name)
-	trampolineName := fmt.Sprintf("_mkcgo_%s_trampoline_addr", fnName)
 
 	// Generate trampoline address variable
-	fmt.Fprintf(w, "var %s uintptr\n\n", trampolineName)
+	fmt.Fprintf(w, "var %s uintptr\n\n", trampolineName(fn))
 
 	// Generate Go wrapper function
 	fmt.Fprintf(w, "func %s(", goFnName)
@@ -1006,32 +1008,27 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 	// Generate syscall invocation
 	numParams := len(fn.Params)
 	var syscallFunc string
-	var maxArgs int
 	if numParams <= 3 {
 		syscallFunc = "syscall_syscall"
-		maxArgs = 3
 	} else if numParams <= 6 {
 		syscallFunc = "syscall_syscall6"
-		maxArgs = 6
 	} else if numParams <= 9 {
 		syscallFunc = "syscall_syscall9"
-		maxArgs = 9
 	} else {
 		syscallFunc = "syscallN"
-		maxArgs = numParams
 	}
 
 	// Special handling for CCCryptorCreateWithMode which has architecture-specific parameter passing
 	if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" {
 		// Generate architecture-specific code
 		fmt.Fprintf(w, "\tvar r0 uintptr\n")
-		fmt.Fprintf(w, "\tif runtime.GOARCH == \"arm64\" {\n")
+		fmt.Fprintf(w, "\tif runtime.GOOS == \"darwin\" && runtime.GOARCH == \"arm64\" {\n")
 
 		// ARM64 version - combine numRounds and options
 		if fn.Ret != "" && fn.Ret != "void" {
-			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName)
+			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName(fn))
 		} else {
-			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName)
+			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName(fn))
 		}
 
 		// Add parameters for ARM64 (combine numRounds and options)
@@ -1067,74 +1064,10 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		fmt.Fprintf(w, "\t} else {\n")
 
 		// Non-ARM64 version - keep numRounds and options separate
-		if fn.Ret != "" && fn.Ret != "void" {
-			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName)
-		} else {
-			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName)
-		}
-
-		// Add all parameters for non-ARM64
-		for i, param := range fn.Params {
-			paramName := param.Name
-			if paramName == "" {
-				paramName = fmt.Sprintf("arg%d", i)
-			}
-
-			goType, _ := cTypeToGo(param.Type, false)
-			if strings.HasPrefix(goType, "*") {
-				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
-			} else {
-				fmt.Fprintf(w, ", uintptr(%s)", paramName)
-			}
-		}
-		fmt.Fprintf(w, ")\n")
+		generateNocgoFnBody(fn, false, w)
 		fmt.Fprintf(w, "\t}\n")
 	} else {
-		// Generate the syscall invocation with proper argument handling for other functions
-		if syscallFunc == "syscallN" {
-			if fn.Ret != "" && fn.Ret != "void" {
-				fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
-			} else {
-				fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
-			}
-		} else {
-			if fn.Ret != "" && fn.Ret != "void" {
-				fmt.Fprintf(w, "\tr0, _, _ := %s(%s", syscallFunc, trampolineName)
-			} else {
-				fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName)
-			}
-		}
-
-		// Add actual parameters
-		for i, param := range fn.Params {
-			if i >= maxArgs {
-				break // Skip parameters beyond what the syscall function can handle
-			}
-
-			paramName := param.Name
-			if paramName == "" {
-				paramName = fmt.Sprintf("arg%d", i)
-			}
-
-			// Convert parameter to uintptr, handling different types correctly
-			goType, _ := cTypeToGo(param.Type, false)
-			if strings.HasPrefix(goType, "*") {
-				// Pointer types need to go through unsafe.Pointer
-				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
-			} else if goType == "int32" || goType == "int" || strings.Contains(goType, "CC") {
-				// Enum types and integers can be cast directly to uintptr
-				fmt.Fprintf(w, ", uintptr(%s)", paramName)
-			} else {
-				// Other types
-				fmt.Fprintf(w, ", uintptr(%s)", paramName)
-			}
-		}
-
-		// Pad with zeros to reach the required argument count
-		for i := numParams; i < maxArgs; i++ {
-			fmt.Fprintf(w, ", 0")
-		}
-		fmt.Fprintf(w, ")\n")
+		generateNocgoFnBody(fn, true, w)
 	}
 
 	// Generate return statement
@@ -1143,15 +1076,71 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 		if strings.HasPrefix(goRetType, "*") {
 			// Pointer return types need to go through unsafe.Pointer
 			fmt.Fprintf(w, "\treturn (%s)(unsafe.Pointer(r0))\n", goRetType)
-		} else if goRetType == "int32" || goRetType == "int" || strings.Contains(goRetType, "CC") {
-			// Enum types and integers can be cast directly from uintptr
-			fmt.Fprintf(w, "\treturn %s(r0)\n", goRetType)
 		} else {
 			fmt.Fprintf(w, "\treturn %s(r0)\n", goRetType)
 		}
 	}
 
 	fmt.Fprintf(w, "}\n\n")
+}
+
+// generateNocgoFnBody generates Go function wrapper body for nocgo mode.
+func generateNocgoFnBody(fn *mkcgo.Func, newR0 bool, w io.Writer) {
+	// Generate syscall invocation
+	numParams := len(fn.Params)
+	var syscallFunc string
+	var maxArgs int
+	if numParams <= 3 {
+		syscallFunc = "syscall_syscall"
+		maxArgs = 3
+	} else if numParams <= 6 {
+		syscallFunc = "syscall_syscall6"
+		maxArgs = 6
+	} else if numParams <= 9 {
+		syscallFunc = "syscall_syscall9"
+		maxArgs = 9
+	} else {
+		syscallFunc = "syscallN"
+		maxArgs = numParams
+	}
+
+	// Generate the syscall invocation with proper argument handling for other functions
+	if fn.Ret != "" && fn.Ret != "void" {
+		colon := ":"
+		if !newR0 {
+			colon = ""
+		}
+		fmt.Fprintf(w, "\tr0, _, _ %s= %s(%s", colon, syscallFunc, trampolineName(fn))
+	} else {
+		fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName(fn))
+	}
+
+	// Add actual parameters
+	for i, param := range fn.Params {
+		if i >= maxArgs {
+			panic("too many parameters")
+		}
+
+		paramName := param.Name
+		if paramName == "" {
+			paramName = fmt.Sprintf("arg%d", i)
+		}
+
+		// Convert parameter to uintptr, handling different types correctly
+		goType, _ := cTypeToGo(param.Type, false)
+		if strings.HasPrefix(goType, "*") {
+			// Pointer types need to go through unsafe.Pointer
+			fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+		} else {
+			fmt.Fprintf(w, ", uintptr(%s)", paramName)
+		}
+	}
+
+	// Pad with zeros to reach the required argument count
+	for i := numParams; i < maxArgs; i++ {
+		fmt.Fprintf(w, ", 0")
+	}
+	fmt.Fprintf(w, ")\n")
 }
 
 // generateAssembly generates the assembly trampoline file for nocgo mode.

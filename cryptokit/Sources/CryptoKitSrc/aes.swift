@@ -4,7 +4,7 @@
 import CryptoKit
 import Foundation
 
-@_cdecl("encryptAESGCM")
+@_cdecl("go_encryptAESGCM")
 public func encryptAESGCM(
     keyPointer: UnsafePointer<UInt8>,
     keyLength: Int,
@@ -43,7 +43,7 @@ public func encryptAESGCM(
     }
 }
 
-@_cdecl("decryptAESGCM")
+@_cdecl("go_decryptAESGCM")
 public func decryptAESGCM(
     keyPointer: UnsafePointer<UInt8>,
     keyLength: Int,

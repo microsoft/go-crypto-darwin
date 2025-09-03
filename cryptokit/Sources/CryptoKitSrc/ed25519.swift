@@ -8,7 +8,7 @@ var publicKeySizeEd25519 = 32
 var signatureSizeEd25519 = 64
 var seedSizeEd25519 = 32
 
-@_cdecl("generateKeyEd25519")
+@_cdecl("go_generateKeyEd25519")
 public func generateKeyEd25519(keyPointer: UnsafeMutablePointer<UInt8>) -> Void {
     // Generate a private key using CryptoKit
     let privateKey = Curve25519.Signing.PrivateKey()
@@ -21,7 +21,7 @@ public func generateKeyEd25519(keyPointer: UnsafeMutablePointer<UInt8>) -> Void 
     privateKey.publicKey.rawRepresentation.copyBytes(to: keyPointer + publicKeySizeEd25519, count: publicKeySizeEd25519)
 }
 
-@_cdecl("newPrivateKeyEd25519FromSeed")
+@_cdecl("go_newPrivateKeyEd25519FromSeed")
 public func newPrivateKeyEd25519FromSeed(
     keyPointer: UnsafeMutablePointer<UInt8>,
     seedPointer: UnsafePointer<UInt8>
@@ -47,7 +47,7 @@ public func newPrivateKeyEd25519FromSeed(
     return 0
 }
 
-@_cdecl("newPublicKeyEd25519")
+@_cdecl("go_newPublicKeyEd25519")
 public func newPublicKeyEd25519(
     keyPointer: UnsafeMutablePointer<UInt8>,
     pubPointer: UnsafePointer<UInt8>
@@ -68,7 +68,7 @@ public func newPublicKeyEd25519(
     }
 }
 
-@_cdecl("signEd25519")
+@_cdecl("go_signEd25519")
 public func signEd25519(
     privateKeyPointer: UnsafePointer<UInt8>,
     messagePointer: UnsafePointer<UInt8>?,
@@ -117,7 +117,7 @@ public func signEd25519(
     return signature.count  // Return the number of bytes written
 }
 
-@_cdecl("verifyEd25519")
+@_cdecl("go_verifyEd25519")
 public func verifyEd25519(
     publicKeyPointer: UnsafePointer<UInt8>,
     messagePointer: UnsafePointer<UInt8>?,

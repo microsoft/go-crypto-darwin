@@ -12,8 +12,8 @@ import "C"
 import "unsafe"
 
 var (
-	KSecRandomDefault                                = C.kSecRandomDefault
 	KCFAllocatorDefault                              = C.kCFAllocatorDefault
+	KSecRandomDefault                                = C.kSecRandomDefault
 	KSecAttrKeyTypeECSECPrimeRandom                  = C.kSecAttrKeyTypeECSECPrimeRandom
 	KSecAttrKeyTypeRSA                               = C.kSecAttrKeyTypeRSA
 	KSecAttrKeyClassPublic                           = C.kSecAttrKeyClassPublic

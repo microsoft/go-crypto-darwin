@@ -499,6 +499,7 @@ func isStdType(t string) bool {
 
 // cstdTypesToGo maps C standard types to Go types.
 var cstdTypesToGo = map[string]string{
+	"bool":               "bool",
 	"int8_t":             "int8",
 	"uint8_t":            "uint8",
 	"int16_t":            "int16",
@@ -507,10 +508,13 @@ var cstdTypesToGo = map[string]string{
 	"uint32_t":           "uint32",
 	"int64_t":            "int64",
 	"uint64_t":           "uint64",
+	"short":              "int16",
+	"unsigned short":     "uint16",
 	"int":                "int32",
+	"unsigned":           "uint32",
 	"unsigned int":       "uint32",
-	"long":               "int32",
-	"unsigned long":      "uint32",
+	"long":               "int64",
+	"unsigned long":      "uint64",
 	"long long":          "int64",
 	"unsigned long long": "uint64",
 	"size_t":             "int",
@@ -525,6 +529,7 @@ var cstdTypesToGo = map[string]string{
 // Most C don't need any special handling, only the ones that have spaces.
 var cstdTypesToCgo = map[string]string{
 	"signed char":        "schar",
+	"unsigned":           "uint",
 	"unsigned char":      "uchar",
 	"unsigned short":     "ushort",
 	"unsigned int":       "uint",
@@ -711,4 +716,412 @@ func goSymName(name string) string {
 	}
 	// Uppercase the first letter.
 	return strings.ToUpper(name[:1]) + name[1:]
+}
+
+// getFrameworkPath returns the absolute framework path.
+func getFrameworkPath(dylib mkcgo.Framework) string {
+	return fmt.Sprintf("/System/Library/Frameworks/%s.framework/Versions/%s/%s", dylib.Name, dylib.Version, dylib.Name)
+}
+
+// generateNocgoGo generates Go source file for nocgo mode from src.
+func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
+	// Output header notice and package declaration.
+	printHeader(w)
+	fmt.Fprintf(w, "//go:build !cgo && darwin\n\n")
+	fmt.Fprintf(w, "package %s\n\n", *packageName)
+
+	// Check if we need syscallN (functions with more than 9 parameters)
+	needsSyscallN := false
+	needsRuntime := false
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		if len(fn.Params) > 9 {
+			needsSyscallN = true
+		}
+		// Check if we need runtime import for CCCryptorCreateWithMode
+		if fn.Name == "CCCryptorCreateWithMode" && len(fn.Params) > 9 {
+			needsRuntime = true
+		}
+		if needsSyscallN && needsRuntime {
+			break
+		}
+	}
+
+	// Import necessary packages for nocgo mode
+	fmt.Fprintf(w, "import (\n")
+	if needsRuntime {
+		fmt.Fprintf(w, "\t\"runtime\"\n")
+	}
+	fmt.Fprintf(w, "\t\"syscall\"\n")
+	fmt.Fprintf(w, "\t\"unsafe\"\n")
+	fmt.Fprintf(w, ")\n\n")
+
+	// Generate linkname declarations for syscall functions
+	fmt.Fprintf(w, "//go:linkname syscall_syscall syscall.syscall\n")
+	fmt.Fprintf(w, "//go:linkname syscall_syscall6 syscall.syscall6\n")
+	fmt.Fprintf(w, "//go:linkname syscall_syscall9 syscall.syscall9\n")
+	if needsSyscallN {
+		fmt.Fprintf(w, "//go:linkname entersyscall runtime.entersyscall\n")
+		fmt.Fprintf(w, "//go:linkname exitsyscall runtime.exitsyscall\n")
+	}
+	fmt.Fprintf(w, "\n")
+
+	// Generate function signatures for syscall functions
+	fmt.Fprintf(w, "func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
+	fmt.Fprintf(w, "func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
+	fmt.Fprintf(w, "func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
+	if needsSyscallN {
+		fmt.Fprintf(w, "func entersyscall()\n")
+		fmt.Fprintf(w, "func exitsyscall()\n")
+	}
+	fmt.Fprintf(w, "\n")
+
+	// Generate cgo_import_dynamic directives for extern variables
+	for _, ext := range src.Externs {
+		extName := ext.Name
+		frameworkPath := getFrameworkPath(ext.Framework)
+		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
+		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
+	}
+	fmt.Fprintf(w, "\n")
+
+	// Generate cgo_import_dynamic directives for each function
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		fnName := fn.Name
+		frameworkPath := getFrameworkPath(fn.Framework)
+		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
+	}
+	fmt.Fprintf(w, "\n")
+
+	// Generate all type aliases
+	generateNocgoAliases(src.TypeDefs, w)
+
+	// Generate enums
+	generateNocgoEnums(src.Enums, w)
+
+	// Generate extern variables
+	generateNocgoExterns(src.Externs, w)
+
+	// Generate trampoline address variables and wrapper functions
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		generateNocgoFn(src, fn, w)
+	}
+}
+
+// generateNocgoAliases generates Go type aliases for nocgo mode.
+func generateNocgoAliases(typedefs []*mkcgo.TypeDef, w io.Writer) {
+	seenTypes := make(map[string]bool)
+
+	// Handle typedefs first, as they can create proper type aliases
+	for _, typedef := range typedefs {
+		// For basic types, make it an alias to the appropriate Go type
+		goType, _ := cTypeToGo(typedef.Type, false)
+		if goType != "" && goType != "unsafe.Pointer" {
+			fmt.Fprintf(w, "type %s = %s\n", typedef.Name, goType)
+			seenTypes[typedef.Name] = true
+		} else {
+			fmt.Fprintf(w, "type %s unsafe.Pointer\n", typedef.Name)
+			seenTypes[typedef.Name] = true
+		}
+	}
+
+	fmt.Fprintf(w, "\n")
+}
+
+// generateNocgoEnums generates Go enum values for nocgo mode.
+func generateNocgoEnums(enums []*mkcgo.Enum, w io.Writer) {
+	for _, enum := range enums {
+		if enum.Type != "" {
+			// Generate the type alias
+			fmt.Fprintf(w, "type %s int32\n\n", enum.Type)
+		}
+
+		fmt.Fprintf(w, "const (\n")
+		for _, enumValue := range enum.Values {
+			if enum.Type != "" {
+				fmt.Fprintf(w, "\t%s %s = %s\n", goSymName(enumValue.Name), enum.Type, enumValue.Value)
+			} else {
+				fmt.Fprintf(w, "\t%s = %s\n", goSymName(enumValue.Name), enumValue.Value)
+			}
+		}
+		fmt.Fprintf(w, ")\n\n")
+	}
+}
+
+// generateNocgoExterns generates Go extern variables for nocgo mode.
+func generateNocgoExterns(externs []*mkcgo.Extern, w io.Writer) {
+	if len(externs) == 0 {
+		return
+	}
+
+	// First, generate pointer variables for extern symbols
+	fmt.Fprintf(w, "var (\n")
+	for _, ext := range externs {
+		goType, _ := cTypeToGo(ext.Type, false)
+		fmt.Fprintf(w, "\t_mkcgo_%s %s\n", ext.Name, goType)
+	}
+	fmt.Fprintf(w, ")\n\n")
+
+	for _, ext := range externs {
+		goType, _ := cTypeToGo(ext.Type, false)
+		fmt.Fprintf(w, "//go:noinline\n")
+		fmt.Fprintf(w, "func _mkcgo_addr_%s() *%s { return &_mkcgo_%s }\n", ext.Name, goType, ext.Name)
+	}
+
+	// Then, generate the actual variables that dereference the pointers
+	fmt.Fprintf(w, "var (\n")
+	for _, ext := range externs {
+		// Convert extern names to Go variable names
+		goName := goSymName(ext.Name)
+		goType, _ := cTypeToGo(ext.Type, false)
+		fmt.Fprintf(w, "\t%s %s = *_mkcgo_addr_%s()\n", goName, goType, ext.Name)
+	}
+	fmt.Fprintf(w, ")\n\n")
+}
+
+func trampolineName(fn *mkcgo.Func) string {
+	return fmt.Sprintf("_mkcgo_%s_trampoline_addr", fn.Name)
+}
+
+// generateNocgoFn generates Go function wrapper for nocgo mode.
+func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
+	goFnName := goSymName(fn.Name)
+
+	// Generate trampoline address variable
+	fmt.Fprintf(w, "var %s uintptr\n\n", trampolineName(fn))
+
+	// Generate Go wrapper function
+	fmt.Fprintf(w, "func %s(", goFnName)
+
+	// Generate parameters
+	for i, param := range fn.Params {
+		if i > 0 {
+			fmt.Fprintf(w, ", ")
+		}
+
+		// Convert C types to Go types for nocgo mode
+		goType, _ := cTypeToGo(param.Type, false)
+		paramName := param.Name
+		if paramName == "" {
+			paramName = fmt.Sprintf("arg%d", i)
+		}
+		fmt.Fprintf(w, "%s %s", paramName, goType)
+	}
+	fmt.Fprintf(w, ")")
+
+	// Generate return type
+	if fn.Ret != "" && fn.Ret != "void" {
+		goRetType, _ := cTypeToGo(fn.Ret, false)
+		fmt.Fprintf(w, " %s", goRetType)
+	}
+
+	fmt.Fprintf(w, " {\n")
+
+	// Special handling for MacOS ARM64 stack params
+	// Generate architecture-specific code
+	var tmp strings.Builder
+	macosArm64Params(src, fn.Params, &tmp)
+	needsSpecalHandling := strings.ContainsRune(tmp.String(), '|')
+	if needsSpecalHandling {
+		fmt.Fprintf(w, "\tvar r0 uintptr\n")
+		fmt.Fprintf(w, "\tif runtime.GOOS == \"darwin\" && runtime.GOARCH == \"arm64\" {\n")
+		fmt.Fprintf(w, "\t\t")
+		if fn.Ret != "" && fn.Ret != "void" {
+			fmt.Fprintf(w, "r0, _, _ = ")
+		}
+		fmt.Fprintf(w, "syscallN(%s, %s)\n", trampolineName(fn), tmp.String())
+		fmt.Fprintf(w, "\t} else {\n")
+	}
+	generateNocgoFnBody(fn, !needsSpecalHandling, w)
+	if needsSpecalHandling {
+		fmt.Fprintf(w, "\t}\n")
+	}
+
+	// Generate return statement
+	if fn.Ret != "" && fn.Ret != "void" {
+		goRetType, _ := cTypeToGo(fn.Ret, false)
+		if strings.HasPrefix(goRetType, "*") {
+			// Pointer return types need to go through unsafe.Pointer
+			fmt.Fprintf(w, "\treturn (%s)(unsafe.Pointer(r0))\n", goRetType)
+		} else {
+			fmt.Fprintf(w, "\treturn %s(r0)\n", goRetType)
+		}
+	}
+
+	fmt.Fprintf(w, "}\n\n")
+}
+
+// generateNocgoFnBody generates Go function wrapper body for nocgo mode.
+func generateNocgoFnBody(fn *mkcgo.Func, newR0 bool, w io.Writer) {
+	// Generate syscall invocation
+	numParams := len(fn.Params)
+	var syscallFunc string
+	var maxArgs int
+	if numParams <= 3 {
+		syscallFunc = "syscall_syscall"
+		maxArgs = 3
+	} else if numParams <= 6 {
+		syscallFunc = "syscall_syscall6"
+		maxArgs = 6
+	} else if numParams <= 9 {
+		syscallFunc = "syscall_syscall9"
+		maxArgs = 9
+	} else {
+		syscallFunc = "syscallN"
+		maxArgs = numParams
+	}
+
+	// Generate the syscall invocation with proper argument handling for other functions
+	if fn.Ret != "" && fn.Ret != "void" {
+		colon := ":"
+		if !newR0 {
+			colon = ""
+		}
+		fmt.Fprintf(w, "\tr0, _, _ %s= %s(%s", colon, syscallFunc, trampolineName(fn))
+	} else {
+		fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName(fn))
+	}
+
+	// Add actual parameters
+	for i, param := range fn.Params {
+		if i >= maxArgs {
+			panic("too many parameters")
+		}
+
+		paramName := param.Name
+		if paramName == "" {
+			paramName = fmt.Sprintf("arg%d", i)
+		}
+
+		// Convert parameter to uintptr, handling different types correctly
+		goType, _ := cTypeToGo(param.Type, false)
+		if strings.HasPrefix(goType, "*") {
+			// Pointer types need to go through unsafe.Pointer
+			fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
+		} else {
+			fmt.Fprintf(w, ", uintptr(%s)", paramName)
+		}
+	}
+
+	// Pad with zeros to reach the required argument count
+	for i := numParams; i < maxArgs; i++ {
+		fmt.Fprintf(w, ", 0")
+	}
+	fmt.Fprintf(w, ")\n")
+}
+
+// generateAssembly generates the assembly trampoline file for nocgo mode.
+func generateAssembly(src *mkcgo.Source, w io.Writer) {
+	printHeader(w)
+	fmt.Fprintf(w, "//go:build !cgo\n\n")
+	fmt.Fprintf(w, "#include \"textflag.h\"\n \n")
+
+	// Generate trampolines for each function
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+
+		fnName := fn.Name
+		fmt.Fprintf(w, "TEXT _mkcgo_%s_trampoline<>(SB),NOSPLIT,$0-0\n", fnName)
+		fmt.Fprintf(w, "    JMP _mkcgo_%s(SB)\n", fnName)
+		fmt.Fprintf(w, "GLOBL   ·_mkcgo_%s_trampoline_addr(SB), RODATA, $8\n", fnName)
+		fmt.Fprintf(w, "DATA    ·_mkcgo_%s_trampoline_addr(SB)/8, $_mkcgo_%s_trampoline<>(SB)\n\n", fnName, fnName)
+	}
+}
+
+// macosArm64Params writes the string representing the parameters
+// passed to a function on macOS ARM64. This platform is special
+// because the first 9 parameters are passed in registers, and
+// the rest are passed on the stack layed out using each type
+// natural alignment.
+func macosArm64Params(src *mkcgo.Source, params []*mkcgo.Param, w io.Writer) {
+	var stackOffset, lastShift int
+	shift := func(size int) {
+		v := lastShift + size
+		if v%size != 0 {
+			// Requires padding
+			pad := v % size
+			v += pad
+			stackOffset += pad
+		}
+		stackOffset += size
+		if v < 8 {
+			lastShift = v
+			fmt.Fprintf(w, "<<%d", 64-v*8)
+		} else {
+			lastShift = 0
+		}
+	}
+	for i, param := range params {
+		var goParam string
+		if goType, _ := cTypeToGo(param.Type, false); strings.HasPrefix(goType, "*") {
+			goParam = fmt.Sprintf("uintptr(unsafe.Pointer(%s))", param.Name)
+		} else {
+			goParam = fmt.Sprintf("uintptr(%s)", param.Name)
+		}
+		if i < 9 {
+			// Regular parameter handling for first 9 parameters.
+			if i != 0 {
+				fmt.Fprintf(w, ", ")
+			}
+			fmt.Fprint(w, goParam)
+			continue
+		}
+		paramSize := cTypeSize(src, param.Type)
+		if stackOffset%8 == 0 || stackOffset%8+paramSize > 8 {
+			fmt.Fprintf(w, ", ")
+		} else {
+			fmt.Fprintf(w, "|")
+		}
+		fmt.Fprintf(w, "%s", goParam)
+		shift(paramSize)
+	}
+}
+
+func cTypeSize(src *mkcgo.Source, name string) int {
+	if strings.Contains(name, "*") {
+		return 8
+	}
+	name = strings.TrimPrefix(name, "const ")
+	var stdType string
+	if isStdType(name) {
+		stdType = name
+	}
+	if stdType == "" {
+		for _, def := range src.TypeDefs {
+			if def.Name == name {
+				stdType = def.Type
+			}
+		}
+	}
+	if stdType == "" {
+		for _, enum := range src.Enums {
+			if enum.Type == name {
+				stdType = "uint32_t"
+			}
+		}
+	}
+	switch stdType {
+	case "bool", "int8_t", "uint8_t", "char", "unsigned char", "signed char":
+		return 1
+	case "int16_t", "uint16_t", "short", "unsigned short":
+		return 2
+	case "int32_t", "uint32_t", "int", "unsigned int", "float":
+		return 4
+	case "long", "long int", "unsigned long", "unsigned long int":
+		return 8
+	default:
+		// Consider all other types as 8 bytes.
+		// We don't support types larger than 64 bits for now.
+		return 8
+	}
 }

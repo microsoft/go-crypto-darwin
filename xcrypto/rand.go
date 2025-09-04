@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build cgo && darwin
+//go:build darwin
 
 package xcrypto
 
@@ -20,6 +20,7 @@ func (randReader) Read(b []byte) (int, error) {
 	if len(b) == 0 {
 		return 0, nil
 	}
+	// TODO: kSecRandomDefault is nil so this can be replaced
 	if security.SecRandomCopyBytes(security.KSecRandomDefault, len(b), unsafe.Pointer(&b[0])) != 0 {
 		return 0, errors.New("crypto/rand: unable to read from source")
 	}

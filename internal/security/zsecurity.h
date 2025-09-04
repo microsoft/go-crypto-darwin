@@ -25,8 +25,8 @@ typedef void* CFDictionaryValueCallBacks;
 typedef int32_t CFIndex;
 typedef CFStringRef SecKeyAlgorithm;
 
-extern const SecRandomRef kSecRandomDefault;
 extern const CFAllocatorRef kCFAllocatorDefault;
+extern const SecRandomRef kSecRandomDefault;
 extern const CFStringRef kSecAttrKeyTypeECSECPrimeRandom;
 extern const CFStringRef kSecAttrKeyTypeRSA;
 extern const CFStringRef kSecAttrKeyClassPublic;

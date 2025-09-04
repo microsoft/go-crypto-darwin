@@ -47,65 +47,65 @@ typedef enum {
   kCFNumberIntType = 9
 } CFNumberType;
 
-extern const SecRandomRef kSecRandomDefault;
-extern const CFAllocatorRef kCFAllocatorDefault;
-extern const CFStringRef kSecAttrKeyTypeECSECPrimeRandom;
-extern const CFStringRef kSecAttrKeyTypeRSA;
-extern const CFStringRef kSecAttrKeyClassPublic;
-extern const CFStringRef kSecAttrKeyClassPrivate;
-extern const CFStringRef kSecAttrKeyType;
-extern const CFStringRef kSecAttrKeySizeInBits;
-extern const CFStringRef kSecAttrKeyClass;
-extern const CFStringRef kSecKeyAlgorithmECDHKeyExchangeStandard;
+extern const CFAllocatorRef kCFAllocatorDefault __attribute__((framework(CoreFoundation, A)));
+extern const SecRandomRef kSecRandomDefault __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyTypeECSECPrimeRandom __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyTypeRSA __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyClassPublic __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyClassPrivate __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyType __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeySizeInBits __attribute__((framework(Security, A)));
+extern const CFStringRef kSecAttrKeyClass __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmECDHKeyExchangeStandard __attribute__((framework(Security, A)));
 // PSS
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA1;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA224;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA256;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA384;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA512;
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA1 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA224 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA256 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA384 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA512 __attribute__((framework(Security, A)));
 // RAW
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionRaw;
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionRaw __attribute__((framework(Security, A)));
 // PKCS1v15
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionPKCS1;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512;
-extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw;
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionPKCS1 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw __attribute__((framework(Security, A)));
 // OAEP
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA1;
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA224;
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA256;
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA384;
-extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA512;
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA1 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA224 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA256 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA384 __attribute__((framework(Security, A)));
+extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA512 __attribute__((framework(Security, A)));
 // ECDSA
-extern const CFStringRef kSecKeyAlgorithmECDSASignatureDigestX962;
+extern const CFStringRef kSecKeyAlgorithmECDSASignatureDigestX962 __attribute__((framework(Security, A)));
 
-int SecRandomCopyBytes(SecRandomRef rnd, size_t count, void *bytes) __attribute__((noescape, nocallback));
-SecKeyRef SecKeyCopyPublicKey(SecKeyRef key);
-SecKeyRef SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, CFErrorRef *error);
-SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error);
-CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef key, CFErrorRef *error);
-CFDataRef SecKeyCopyKeyExchangeResult(SecKeyRef privateKey, SecKeyAlgorithm algorithm, SecKeyRef publicKey, CFDictionaryRef parameters, CFErrorRef *error);
-CFDataRef SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, CFErrorRef *error);
-CFDataRef SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, CFErrorRef *error);
-CFDataRef SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef data, CFErrorRef *error);
-Boolean SecKeyVerifySignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef signedData, CFDataRef signature, CFErrorRef *error);
-Boolean SecKeyIsAlgorithmSupported(SecKeyRef key, SecKeyOperationType operation, SecKeyAlgorithm algorithm);
+int SecRandomCopyBytes(SecRandomRef rnd, size_t count, void *bytes) __attribute__((framework(Security, A), noescape, nocallback));
+SecKeyRef SecKeyCopyPublicKey(SecKeyRef key) __attribute__((framework(Security, A)));
+SecKeyRef SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, CFErrorRef *error) __attribute__((framework(Security, A)));
+SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));
+CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef key, CFErrorRef *error) __attribute__((framework(Security, A)));
+CFDataRef SecKeyCopyKeyExchangeResult(SecKeyRef privateKey, SecKeyAlgorithm algorithm, SecKeyRef publicKey, CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));
+CFDataRef SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, CFErrorRef *error) __attribute__((framework(Security, A)));
+CFDataRef SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, CFErrorRef *error) __attribute__((framework(Security, A)));
+CFDataRef SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef data, CFErrorRef *error) __attribute__((framework(Security, A)));
+Boolean SecKeyVerifySignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef signedData, CFDataRef signature, CFErrorRef *error) __attribute__((framework(Security, A)));
+Boolean SecKeyIsAlgorithmSupported(SecKeyRef key, SecKeyOperationType operation, SecKeyAlgorithm algorithm) __attribute__((framework(Security, A)));
+size_t SecKeyGetBlockSize(SecKeyRef key) __attribute__((framework(Security, A)));
 
-CFDataRef CFDataCreate(CFAllocatorRef allocator, const uint8_t *bytes, CFIndex length);
-CFDictionaryRef CFDictionaryCreate(CFAllocatorRef allocator, const void **keys, const void **values, CFIndex numValues, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks);
-CFMutableDictionaryRef CFDictionaryCreateMutable(CFAllocatorRef allocator, CFIndex capacity, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks);
-CFNumberRef CFNumberCreate(CFAllocatorRef allocator, CFNumberType theType, const void *valuePtr);
-CFIndex CFDataGetLength(CFDataRef data);
-const uint8_t *CFDataGetBytePtr(CFDataRef data);
-size_t SecKeyGetBlockSize(SecKeyRef key);
-void CFRelease(CFTypeRef cf);
-void CFDictionarySetValue(CFMutableDictionaryRef theDict, const void *key, const void *value);
-CFStringRef CFErrorCopyDescription(CFErrorRef error);
-const char *CFStringGetCStringPtr(CFStringRef str, CFStringEncoding encoding);
-CFIndex CFStringGetLength(CFStringRef str);
-CFIndex CFErrorGetCode(CFErrorRef error);
+CFDataRef CFDataCreate(CFAllocatorRef allocator, const uint8_t *bytes, CFIndex length) __attribute__((framework(CoreFoundation, A)));
+CFDictionaryRef CFDictionaryCreate(CFAllocatorRef allocator, const void **keys, const void **values, CFIndex numValues, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks) __attribute__((framework(CoreFoundation, A)));
+CFMutableDictionaryRef CFDictionaryCreateMutable(CFAllocatorRef allocator, CFIndex capacity, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks) __attribute__((framework(CoreFoundation, A)));
+CFNumberRef CFNumberCreate(CFAllocatorRef allocator, CFNumberType theType, const void *valuePtr) __attribute__((framework(CoreFoundation, A)));
+CFIndex CFDataGetLength(CFDataRef data) __attribute__((framework(CoreFoundation, A)));
+const uint8_t *CFDataGetBytePtr(CFDataRef data) __attribute__((framework(CoreFoundation, A)));
+void CFRelease(CFTypeRef cf) __attribute__((framework(CoreFoundation, A)));
+void CFDictionarySetValue(CFMutableDictionaryRef theDict, const void *key, const void *value) __attribute__((framework(CoreFoundation, A)));
+CFStringRef CFErrorCopyDescription(CFErrorRef error) __attribute__((framework(CoreFoundation, A)));
+const char *CFStringGetCStringPtr(CFStringRef str, CFStringEncoding encoding) __attribute__((framework(CoreFoundation, A)));
+CFIndex CFStringGetLength(CFStringRef str) __attribute__((framework(CoreFoundation, A)));
+CFIndex CFErrorGetCode(CFErrorRef error) __attribute__((framework(CoreFoundation, A)));
 
 #endif // _GO_SECURITY_SHIMS_H

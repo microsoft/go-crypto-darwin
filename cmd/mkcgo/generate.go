@@ -499,6 +499,7 @@ func isStdType(t string) bool {
 
 // cstdTypesToGo maps C standard types to Go types.
 var cstdTypesToGo = map[string]string{
+	"bool":               "bool",
 	"int8_t":             "int8",
 	"uint8_t":            "uint8",
 	"int16_t":            "int16",
@@ -507,6 +508,8 @@ var cstdTypesToGo = map[string]string{
 	"uint32_t":           "uint32",
 	"int64_t":            "int64",
 	"uint64_t":           "uint64",
+	"short":              "int16",
+	"unsigned short":     "uint16",
 	"int":                "int32",
 	"unsigned":           "uint32",
 	"unsigned int":       "uint32",
@@ -809,7 +812,7 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		if !fnCalledFromGo(fn) {
 			continue
 		}
-		generateNocgoFn(fn, w)
+		generateNocgoFn(src, fn, w)
 	}
 }
 
@@ -889,7 +892,7 @@ func trampolineName(fn *mkcgo.Func) string {
 }
 
 // generateNocgoFn generates Go function wrapper for nocgo mode.
-func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
+func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
 	goFnName := goSymName(fn.Name)
 
 	// Generate trampoline address variable
@@ -922,70 +925,24 @@ func generateNocgoFn(fn *mkcgo.Func, w io.Writer) {
 
 	fmt.Fprintf(w, " {\n")
 
-	// Generate syscall invocation
-	numParams := len(fn.Params)
-	var syscallFunc string
-	if numParams <= 3 {
-		syscallFunc = "syscall_syscall"
-	} else if numParams <= 6 {
-		syscallFunc = "syscall_syscall6"
-	} else if numParams <= 9 {
-		syscallFunc = "syscall_syscall9"
-	} else {
-		syscallFunc = "syscallN"
-	}
-
-	// Special handling for CCCryptorCreateWithMode which has architecture-specific parameter passing
-	// TODO: generalize this code.
-	if fn.Name == "CCCryptorCreateWithMode" && syscallFunc == "syscallN" {
-		// Generate architecture-specific code
+	// Special handling for MacOS ARM64 stack params
+	// Generate architecture-specific code
+	var tmp strings.Builder
+	macosArm64Params(src, fn.Params, &tmp)
+	needsSpecalHandling := strings.ContainsRune(tmp.String(), '|')
+	if needsSpecalHandling {
 		fmt.Fprintf(w, "\tvar r0 uintptr\n")
 		fmt.Fprintf(w, "\tif runtime.GOOS == \"darwin\" && runtime.GOARCH == \"arm64\" {\n")
-
-		// ARM64 version - combine numRounds and options
+		fmt.Fprintf(w, "\t\t")
 		if fn.Ret != "" && fn.Ret != "void" {
-			fmt.Fprintf(w, "\t\tr0, _, _ = %s(%s", syscallFunc, trampolineName(fn))
-		} else {
-			fmt.Fprintf(w, "\t\t%s(%s", syscallFunc, trampolineName(fn))
+			fmt.Fprintf(w, "r0, _, _ = ")
 		}
-
-		// Add parameters for ARM64 (combine numRounds and options)
-		for i, param := range fn.Params {
-			paramName := param.Name
-			if paramName == "" {
-				paramName = fmt.Sprintf("arg%d", i)
-			}
-
-			if i < 9 {
-				// Regular parameter handling for first 9 parameters
-				goType, _ := cTypeToGo(param.Type, false)
-				if strings.HasPrefix(goType, "*") {
-					fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
-				} else {
-					fmt.Fprintf(w, ", uintptr(%s)", paramName)
-				}
-			} else if i == 9 && len(fn.Params) > 10 {
-				// This is numRounds (index 9), combine with options (index 10)
-				nextParam := fn.Params[10]
-				nextParamName := nextParam.Name
-				if nextParamName == "" {
-					nextParamName = fmt.Sprintf("arg%d", 10)
-				}
-				fmt.Fprintf(w, ", uintptr(%s)<<32|uintptr(%s)", paramName, nextParamName)
-			} else if i == 11 {
-				// This is cryptorRef (the last parameter)
-				fmt.Fprintf(w, ", uintptr(unsafe.Pointer(%s))", paramName)
-			}
-		}
-		fmt.Fprintf(w, ")\n")
-
+		fmt.Fprintf(w, "syscallN(%s, %s)\n", trampolineName(fn), tmp.String())
 		fmt.Fprintf(w, "\t} else {\n")
-
-		// Non-ARM64 version - keep numRounds and options separate
-		generateNocgoFnBody(fn, false, w)
+	}
+	generateNocgoFnBody(fn, !needsSpecalHandling, w)
+	if needsSpecalHandling {
 		fmt.Fprintf(w, "\t}\n")
-	} else {
-		generateNocgoFnBody(fn, true, w)
 	}
 
 	// Generate return statement
@@ -1078,5 +1035,96 @@ func generateAssembly(src *mkcgo.Source, w io.Writer) {
 		fmt.Fprintf(w, "    JMP _mkcgo_%s(SB)\n", fnName)
 		fmt.Fprintf(w, "GLOBL   ·_mkcgo_%s_trampoline_addr(SB), RODATA, $8\n", fnName)
 		fmt.Fprintf(w, "DATA    ·_mkcgo_%s_trampoline_addr(SB)/8, $_mkcgo_%s_trampoline<>(SB)\n\n", fnName, fnName)
+	}
+}
+
+// macosArm64Params writes the string representing the parameters
+// passed to a function on macOS ARM64. This platform is special
+// because the first 9 parameters are passed in registers, and
+// the rest are passed on the stack layed out using each type
+// natural alignment.
+func macosArm64Params(src *mkcgo.Source, params []*mkcgo.Param, w io.Writer) {
+	var stackOffset, lastShift int
+	shift := func(size int) {
+		v := lastShift + size
+		if v%size != 0 {
+			// Requires padding
+			pad := v % size
+			v += pad
+			stackOffset += pad
+		}
+		stackOffset += size
+		if v < 8 {
+			lastShift = v
+			fmt.Fprintf(w, "<<%d", 64-v*8)
+		} else {
+			lastShift = 0
+		}
+	}
+	for i, param := range params {
+		var goParam string
+		if goType, _ := cTypeToGo(param.Type, false); strings.HasPrefix(goType, "*") {
+			goParam = fmt.Sprintf("uintptr(unsafe.Pointer(%s))", param.Name)
+		} else {
+			goParam = fmt.Sprintf("uintptr(%s)", param.Name)
+		}
+		if i < 9 {
+			// Regular parameter handling for first 9 parameters.
+			if i != 0 {
+				fmt.Fprintf(w, ", ")
+			}
+			fmt.Fprint(w, goParam)
+			continue
+		}
+		paramSize := cTypeSize(src, "darwin", "arm64", param.Type)
+		if stackOffset%8 == 0 || stackOffset%8+paramSize > 8 {
+			fmt.Fprintf(w, ", ")
+		} else {
+			fmt.Fprintf(w, "|")
+		}
+		fmt.Fprintf(w, "%s", goParam)
+		shift(paramSize)
+	}
+}
+
+func cTypeSize(src *mkcgo.Source, goos, goarch, name string) int {
+	if strings.Contains(name, "*") {
+		return 8
+	}
+	name = strings.TrimPrefix(name, "const ")
+	var stdType string
+	if isStdType(name) {
+		stdType = name
+	}
+	if stdType == "" {
+		for _, def := range src.TypeDefs {
+			if def.Name == name {
+				stdType = def.Type
+			}
+		}
+	}
+	if stdType == "" {
+		for _, enum := range src.Enums {
+			if enum.Type == name {
+				stdType = "uint32_t"
+			}
+		}
+	}
+	switch stdType {
+	case "bool", "int8_t", "uint8_t", "char", "unsigned char", "signed char":
+		return 1
+	case "int16_t", "uint16_t", "short", "unsigned short":
+		return 2
+	case "int32_t", "uint32_t", "int", "unsigned int", "float":
+		return 4
+	case "long", "long int", "unsigned long", "unsigned long int":
+		if goos == "windows" || goarch == "386" || goarch == "arm" {
+			return 4
+		}
+		return 8
+	default:
+		// Consider all other types as 8 bytes.
+		// We don't support types larger than 64 bits for now.
+		return 8
 	}
 }

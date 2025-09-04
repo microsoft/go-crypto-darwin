@@ -40,10 +40,10 @@ for arch in arm64 x86_64; do
 
     # copy to per-arch syso
     if [ "${arch}" = "arm64" ]; then
-        dest="../internal/cryptokit/Cryptokit_arm64.syso"
+        dest="../internal/cryptokit/CryptoKit_arm64.syso"
     else
         # map x86_64 to amd64 naming used by Go
-        dest="../internal/cryptokit/Cryptokit_amd64.syso"
+        dest="../internal/cryptokit/CryptoKit_amd64.syso"
     fi
     cp "${objfile}" "${dest}"
 

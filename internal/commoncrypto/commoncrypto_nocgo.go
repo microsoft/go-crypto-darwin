@@ -11,6 +11,11 @@ import (
 )
 
 // libcCallInfo is a structure used to pass parameters to the system call.
+// r1 and r2 capture the two pointer-sized return registers produced by the
+// underlying libc/system call. Many ABIs and the Go runtime's syscall
+// convention allow a system call to return up to two pointer-sized
+// values (r1, r2) plus an errno. We store both return registers here so the
+// assembly helper can populate them and Go callers can inspect them.
 type libcCallInfo struct {
 	fn     uintptr
 	n      uintptr // number of parameters

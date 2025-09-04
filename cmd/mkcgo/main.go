@@ -21,7 +21,7 @@ var (
 	fileName          = flag.String("out", "", "output file name (standard output if omitted)")
 	includeHeader     = flag.String("include", "", "include header file")
 	packageName       = flag.String("package", "", "package name")
-	mode              = flag.String("mode", "cgo", "mode: cgo (default), nocgo")
+	mode              = flag.String("mode", "cgo", "mode: cgo (default), nocgo, all")
 	private           = flag.Bool("private", false, "all Go generated symbols are kept unexported")
 	useDynamicLoading = flag.Bool("dynamic-loading", true, "use dynamic loading")
 	errors            = flag.Bool("errors", false, "enable error handling")
@@ -63,7 +63,7 @@ func main() {
 		return cmp.Compare(a.Name, b.Name)
 	})
 
-	if *mode == "nocgo" {
+	if *mode == "nocgo" || *mode == "all" {
 		// Generate nocgo mode files
 		var nocgoGoBuffer, assemblyBuffer bytes.Buffer
 		generateNocgoGo(&src, &nocgoGoBuffer)
@@ -93,7 +93,10 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-		return
+
+		if *mode == "nocgo" {
+			return
+		}
 	}
 
 	var gobuf, go124buf, hbuf, cbuf bytes.Buffer

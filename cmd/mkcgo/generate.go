@@ -1076,7 +1076,7 @@ func macosArm64Params(src *mkcgo.Source, params []*mkcgo.Param, w io.Writer) {
 			fmt.Fprint(w, goParam)
 			continue
 		}
-		paramSize := cTypeSize(src, "darwin", "arm64", param.Type)
+		paramSize := cTypeSize(src, param.Type)
 		if stackOffset%8 == 0 || stackOffset%8+paramSize > 8 {
 			fmt.Fprintf(w, ", ")
 		} else {
@@ -1087,7 +1087,7 @@ func macosArm64Params(src *mkcgo.Source, params []*mkcgo.Param, w io.Writer) {
 	}
 }
 
-func cTypeSize(src *mkcgo.Source, goos, goarch, name string) int {
+func cTypeSize(src *mkcgo.Source, name string) int {
 	if strings.Contains(name, "*") {
 		return 8
 	}
@@ -1118,9 +1118,6 @@ func cTypeSize(src *mkcgo.Source, goos, goarch, name string) int {
 	case "int32_t", "uint32_t", "int", "unsigned int", "float":
 		return 4
 	case "long", "long int", "unsigned long", "unsigned long int":
-		if goos == "windows" || goarch == "386" || goarch == "arm" {
-			return 4
-		}
 		return 8
 	default:
 		// Consider all other types as 8 bytes.

@@ -7,7 +7,8 @@
 #include "textflag.h"
  
 TEXT _mkcgo_go_MD5_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_MD5(SB)
+    MOVD $·_mkcgo_go_MD5(SB), R0
+    B (R0)
 GLOBL   ·_mkcgo_go_MD5_trampoline_addr(SB), RODATA, $8
 DATA    ·_mkcgo_go_MD5_trampoline_addr(SB)/8, $_mkcgo_go_MD5_trampoline<>(SB)
 

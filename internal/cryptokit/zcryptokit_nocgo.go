@@ -23,8 +23,11 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 func entersyscall()
 func exitsyscall()
 
-//go:cgo_import_static go_MD5
-//go:linkname go_MD5 _mkcgo_go_MD5
+//go:cgo_import_static _go_MD5
+//go:linkname go_MD5 go_MD5
+var go_MD5 byte
+var _mkcgo_go_MD5 = &go_MD5
+
 //go:cgo_import_static go_SHA1
 //go:linkname go_SHA1 _mkcgo_go_SHA1
 //go:cgo_import_static go_SHA256
@@ -78,7 +81,6 @@ func exitsyscall()
 //go:cgo_import_static go_verifyEd25519
 //go:linkname go_verifyEd25519 _mkcgo_go_verifyEd25519
 
-var go_MD5 uintptr
 var go_SHA1 uintptr
 var go_SHA256 uintptr
 var go_SHA384 uintptr

@@ -35,6 +35,7 @@ type Extern struct {
 	Name      string
 	Type      string
 	Framework Framework
+	Static    bool
 }
 
 // Enum describes an enum block.
@@ -66,6 +67,7 @@ type Attrs struct {
 	NoCallback       bool
 	NoCheckPtrParams []string
 	Framework        Framework
+	Static           bool
 }
 
 func (attrs *Attrs) String() string {
@@ -282,6 +284,14 @@ var attributes = [...]attribute{
 		},
 	},
 	{
+		name:        "static",
+		description: "Use static cgo import for this symbol.",
+		handle: func(opts *Attrs, s ...string) error {
+			opts.Static = true
+			return nil
+		},
+	},
+	{
 		name:        "framework",
 		description: "The function is part of a framework.",
 		handle: func(opts *Attrs, s ...string) error {
@@ -293,3 +303,5 @@ var attributes = [...]attribute{
 		},
 	},
 }
+
+// duplicate addExtern removed; parse.go provides addExtern implementation

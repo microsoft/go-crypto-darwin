@@ -37,90 +37,90 @@ func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
 	C._mkcgo_go_SHA512((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
 }
 
-func copyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
+func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	return C._mkcgo_go_copyHMAC(C.int32_t(hashAlgorithm), ptr)
 }
 
-func decryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, tag *uint8, tagLength int, out *uint8, outLength *int) int32 {
+func DecryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, tag *uint8, tagLength int, out *uint8, outLength *int) int32 {
 	return int32(C._mkcgo_go_decryptAESGCM((*C.uint8_t)(unsafe.Pointer(key)), C.size_t(keyLength), (*C.uint8_t)(unsafe.Pointer(data)), C.size_t(dataLength), (*C.uint8_t)(unsafe.Pointer(nonce)), C.size_t(nonceLength), (*C.uint8_t)(unsafe.Pointer(aad)), C.size_t(aadLength), (*C.uint8_t)(unsafe.Pointer(tag)), C.size_t(tagLength), (*C.uint8_t)(unsafe.Pointer(out)), (*C.size_t)(unsafe.Pointer(outLength))))
 }
 
-func encryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, cipherText *uint8, cipherTextLength int, tag *uint8) int32 {
+func EncryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, cipherText *uint8, cipherTextLength int, tag *uint8) int32 {
 	return int32(C._mkcgo_go_encryptAESGCM((*C.uint8_t)(unsafe.Pointer(key)), C.size_t(keyLength), (*C.uint8_t)(unsafe.Pointer(data)), C.size_t(dataLength), (*C.uint8_t)(unsafe.Pointer(nonce)), C.size_t(nonceLength), (*C.uint8_t)(unsafe.Pointer(aad)), C.size_t(aadLength), (*C.uint8_t)(unsafe.Pointer(cipherText)), C.size_t(cipherTextLength), (*C.uint8_t)(unsafe.Pointer(tag))))
 }
 
-func expandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
+func ExpandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
 	return int32(C._mkcgo_go_expandHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(prk)), C.size_t(prkLength), (*C.uint8_t)(unsafe.Pointer(info)), C.size_t(infoLength), (*C.uint8_t)(unsafe.Pointer(okm)), C.size_t(okmLength)))
 }
 
-func extractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
+func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
 	return int32(C._mkcgo_go_extractHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(secret)), C.size_t(secretLength), (*C.uint8_t)(unsafe.Pointer(salt)), C.size_t(saltLength), (*C.uint8_t)(unsafe.Pointer(prk)), C.size_t(prkLength)))
 }
 
-func finalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
+func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
 	C._mkcgo_go_finalizeHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(outputPointer)))
 }
 
-func freeHMAC(hashFunction int32, ptr unsafe.Pointer) {
+func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 	C._mkcgo_go_freeHMAC(C.int32_t(hashFunction), ptr)
 }
 
-func generateKeyEd25519(key *uint8) {
+func GenerateKeyEd25519(key *uint8) {
 	C._mkcgo_go_generateKeyEd25519((*C.uint8_t)(unsafe.Pointer(key)))
 }
 
-func hashBlockSize(hashAlgorithm int32) int32 {
+func HashBlockSize(hashAlgorithm int32) int32 {
 	return int32(C._mkcgo_go_hashBlockSize(C.int32_t(hashAlgorithm)))
 }
 
-func hashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
+func HashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	return C._mkcgo_go_hashCopy(C.int32_t(hashAlgorithm), ptr)
 }
 
-func hashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
+func HashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
 	C._mkcgo_go_hashFree(C.int32_t(hashAlgorithm), ptr)
 }
 
-func hashNew(hashAlgorithm int32) unsafe.Pointer {
+func HashNew(hashAlgorithm int32) unsafe.Pointer {
 	return C._mkcgo_go_hashNew(C.int32_t(hashAlgorithm))
 }
 
-func hashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
+func HashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
 	C._mkcgo_go_hashReset(C.int32_t(hashAlgorithm), ptr)
 }
 
-func hashSize(hashAlgorithm int32) int32 {
+func HashSize(hashAlgorithm int32) int32 {
 	return int32(C._mkcgo_go_hashSize(C.int32_t(hashAlgorithm)))
 }
 
-func hashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
+func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
 	C._mkcgo_go_hashSum(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(outputPointer)))
 }
 
-func hashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
+func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
 	C._mkcgo_go_hashWrite(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(data)), C.int(length))
 }
 
-func initHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
+func InitHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
 	return C._mkcgo_go_initHMAC(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(key)), C.int(keyLength))
 }
 
-func newPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
+func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
 	return int32(C._mkcgo_go_newPrivateKeyEd25519FromSeed((*C.uint8_t)(unsafe.Pointer(key)), (*C.uint8_t)(unsafe.Pointer(seed))))
 }
 
-func newPublicKeyEd25519(key *uint8, pub *uint8) int32 {
+func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
 	return int32(C._mkcgo_go_newPublicKeyEd25519((*C.uint8_t)(unsafe.Pointer(key)), (*C.uint8_t)(unsafe.Pointer(pub))))
 }
 
-func signEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
+func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
 	return int32(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(privateKey)), (*C.uint8_t)(unsafe.Pointer(message)), C.size_t(messageLength), (*C.uint8_t)(unsafe.Pointer(sigBuffer))))
 }
 
-func updateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
+func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
 	C._mkcgo_go_updateHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(data)), C.int(length))
 }
 
-func verifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
+func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
 	return int32(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(publicKey)), (*C.uint8_t)(unsafe.Pointer(message)), C.size_t(messageLength), (*C.uint8_t)(unsafe.Pointer(sig))))
 }

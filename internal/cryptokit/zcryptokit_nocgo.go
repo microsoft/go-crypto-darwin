@@ -24,62 +24,59 @@ func entersyscall()
 func exitsyscall()
 
 //go:cgo_import_static go_MD5
-//go:linkname go_MD5 _mkcgo_MD5
+//go:linkname go_MD5 _mkcgo_go_MD5
 //go:cgo_import_static go_SHA1
-//go:linkname go_SHA1 _mkcgo_SHA1
+//go:linkname go_SHA1 _mkcgo_go_SHA1
 //go:cgo_import_static go_SHA256
-//go:linkname go_SHA256 _mkcgo_SHA256
+//go:linkname go_SHA256 _mkcgo_go_SHA256
 //go:cgo_import_static go_SHA384
-//go:linkname go_SHA384 _mkcgo_SHA384
+//go:linkname go_SHA384 _mkcgo_go_SHA384
 //go:cgo_import_static go_SHA512
-//go:linkname go_SHA512 _mkcgo_SHA512
+//go:linkname go_SHA512 _mkcgo_go_SHA512
 //go:cgo_import_static go_copyHMAC
-//go:linkname go_copyHMAC _mkcgo_copyHMAC
+//go:linkname go_copyHMAC _mkcgo_go_copyHMAC
 //go:cgo_import_static go_decryptAESGCM
-//go:linkname go_decryptAESGCM _mkcgo_decryptAESGCM
+//go:linkname go_decryptAESGCM _mkcgo_go_decryptAESGCM
 //go:cgo_import_static go_encryptAESGCM
-//go:linkname go_encryptAESGCM _mkcgo_encryptAESGCM
+//go:linkname go_encryptAESGCM _mkcgo_go_encryptAESGCM
 //go:cgo_import_static go_expandHKDF
-//go:linkname go_expandHKDF _mkcgo_expandHKDF
+//go:linkname go_expandHKDF _mkcgo_go_expandHKDF
 //go:cgo_import_static go_extractHKDF
-//go:linkname go_extractHKDF _mkcgo_extractHKDF
+//go:linkname go_extractHKDF _mkcgo_go_extractHKDF
 //go:cgo_import_static go_finalizeHMAC
-//go:linkname go_finalizeHMAC _mkcgo_finalizeHMAC
+//go:linkname go_finalizeHMAC _mkcgo_go_finalizeHMAC
 //go:cgo_import_static go_freeHMAC
-//go:linkname go_freeHMAC _mkcgo_freeHMAC
+//go:linkname go_freeHMAC _mkcgo_go_freeHMAC
 //go:cgo_import_static go_generateKeyEd25519
-//go:linkname go_generateKeyEd25519 _mkcgo_generateKeyEd25519
-
+//go:linkname go_generateKeyEd25519 _mkcgo_go_generateKeyEd25519
 //go:cgo_import_static go_hashBlockSize
-//go:linkname go_hashBlockSize _mkcgo_hashBlockSize
-//go:linkname _mkcgo_hashBlockSize _mkcgo_hashBlockSize
-
+//go:linkname go_hashBlockSize _mkcgo_go_hashBlockSize
 //go:cgo_import_static go_hashCopy
-//go:linkname go_hashCopy _mkcgo_hashCopy
+//go:linkname go_hashCopy _mkcgo_go_hashCopy
 //go:cgo_import_static go_hashFree
-//go:linkname go_hashFree _mkcgo_hashFree
+//go:linkname go_hashFree _mkcgo_go_hashFree
 //go:cgo_import_static go_hashNew
-//go:linkname go_hashNew _mkcgo_hashNew
+//go:linkname go_hashNew _mkcgo_go_hashNew
 //go:cgo_import_static go_hashReset
-//go:linkname go_hashReset _mkcgo_hashReset
+//go:linkname go_hashReset _mkcgo_go_hashReset
 //go:cgo_import_static go_hashSize
-//go:linkname go_hashSize _mkcgo_hashSize
+//go:linkname go_hashSize _mkcgo_go_hashSize
 //go:cgo_import_static go_hashSum
-//go:linkname go_hashSum _mkcgo_hashSum
+//go:linkname go_hashSum _mkcgo_go_hashSum
 //go:cgo_import_static go_hashWrite
-//go:linkname go_hashWrite _mkcgo_hashWrite
+//go:linkname go_hashWrite _mkcgo_go_hashWrite
 //go:cgo_import_static go_initHMAC
-//go:linkname go_initHMAC _mkcgo_initHMAC
+//go:linkname go_initHMAC _mkcgo_go_initHMAC
 //go:cgo_import_static go_newPrivateKeyEd25519FromSeed
-//go:linkname go_newPrivateKeyEd25519FromSeed _mkcgo_newPrivateKeyEd25519FromSeed
+//go:linkname go_newPrivateKeyEd25519FromSeed _mkcgo_go_newPrivateKeyEd25519FromSeed
 //go:cgo_import_static go_newPublicKeyEd25519
-//go:linkname go_newPublicKeyEd25519 _mkcgo_newPublicKeyEd25519
+//go:linkname go_newPublicKeyEd25519 _mkcgo_go_newPublicKeyEd25519
 //go:cgo_import_static go_signEd25519
-//go:linkname go_signEd25519 _mkcgo_signEd25519
+//go:linkname go_signEd25519 _mkcgo_go_signEd25519
 //go:cgo_import_static go_updateHMAC
-//go:linkname go_updateHMAC _mkcgo_updateHMAC
+//go:linkname go_updateHMAC _mkcgo_go_updateHMAC
 //go:cgo_import_static go_verifyEd25519
-//go:linkname go_verifyEd25519 _mkcgo_verifyEd25519
+//go:linkname go_verifyEd25519 _mkcgo_go_verifyEd25519
 
 var go_MD5 uintptr
 var go_SHA1 uintptr
@@ -260,14 +257,14 @@ func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
 
 var _mkcgo_go_newPublicKeyEd25519_trampoline_addr uintptr
 
-func newPublicKeyEd25519(key *uint8, pub *uint8) int32 {
+func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
 	r0, _, _ := syscall_syscall(_mkcgo_go_newPublicKeyEd25519_trampoline_addr, uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)), 0)
 	return int32(r0)
 }
 
 var _mkcgo_go_signEd25519_trampoline_addr uintptr
 
-func signEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
+func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
 	r0, _, _ := syscall_syscall6(_mkcgo_go_signEd25519_trampoline_addr, uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)), 0, 0)
 	return int32(r0)
 }
@@ -280,7 +277,7 @@ func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int3
 
 var _mkcgo_go_verifyEd25519_trampoline_addr uintptr
 
-func verifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
+func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
 	r0, _, _ := syscall_syscall6(_mkcgo_go_verifyEd25519_trampoline_addr, uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)), 0, 0)
 	return int32(r0)
 }

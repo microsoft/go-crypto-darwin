@@ -697,6 +697,10 @@ func goSymName(name string) string {
 	if name == "" {
 		panic("empty name")
 	}
+	// Strip the 'go_' prefix commonly used in shims so Go symbols are nicer.
+	if strings.HasPrefix(name, "go_") {
+		name = name[3:]
+	}
 	ch, _ := utf8.DecodeRuneInString(name)
 	isPrivate := !unicode.IsUpper(ch)
 	if *private == isPrivate {
@@ -779,11 +783,39 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	fmt.Fprintf(w, "\n")
 
 	// Generate cgo_import_dynamic directives for extern variables
-	for _, ext := range src.Externs {
-		extName := ext.Name
-		frameworkPath := getFrameworkPath(ext.Framework)
-		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
-		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
+	useStaticImports := false
+	for _, c := range src.Comments {
+		if strings.TrimSpace(c) == "mkcgo:static_imports" {
+			useStaticImports = true
+			break
+		}
+	}
+	if useStaticImports {
+		for _, ext := range src.Externs {
+			extName := ext.Name
+			localName := extName
+			if !strings.HasPrefix(extName, "go_") {
+				localName = "go_" + extName
+			}
+			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+			fmt.Fprintf(w, "//go:linkname %s _mkcgo_%s\n", localName, extName)
+		}
+	} else {
+		for _, ext := range src.Externs {
+			extName := ext.Name
+			if ext.Static {
+				localName := extName
+				if !strings.HasPrefix(extName, "go_") {
+					localName = "go_" + extName
+				}
+				fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+				fmt.Fprintf(w, "//go:linkname %s _mkcgo_%s\n", localName, extName)
+				continue
+			}
+			frameworkPath := getFrameworkPath(ext.Framework)
+			fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
+			fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
+		}
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -794,7 +826,35 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		}
 		fnName := fn.Name
 		frameworkPath := getFrameworkPath(fn.Framework)
-		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
+		if useStaticImports || fn.Static {
+			localName := fnName
+			if !strings.HasPrefix(fnName, "go_") {
+				localName = "go_" + fnName
+			}
+			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+			fmt.Fprintf(w, "//go:linkname %s _mkcgo_%s\n", localName, fnName)
+		} else {
+			fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
+		}
+	}
+	fmt.Fprintf(w, "\n")
+
+	// For functions that were statically imported, declare a uintptr variable
+	// matching the local import name (e.g., "go_MD5"). This is needed so
+	// the generated nocgo code can reference the symbol address when using
+	// static imports.
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		if !useStaticImports && !fn.Static {
+			continue
+		}
+		localName := fn.Name
+		if !strings.HasPrefix(localName, "go_") {
+			localName = "go_" + localName
+		}
+		fmt.Fprintf(w, "var %s uintptr\n", localName)
 	}
 	fmt.Fprintf(w, "\n")
 

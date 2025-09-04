@@ -30,12 +30,12 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --global user.name "GitHub Actions"
-          git add internal/cryptokit/CryptoKit.o
+          git add internal/cryptokit/CryptoKit*.syso
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Update CryptoKit Object file"
+          git commit -m "Update CryptoKit Object files"
           BRANCH=autogen/update-cryptokit-obj-$(date +%s)
           git checkout -b $BRANCH
           git push origin $BRANCH

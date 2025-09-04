@@ -43,10 +43,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure PR does not contain CryptoKit.o
+      - name: Ensure PR does not contain CryptoKit.syso object files
         run: |
-          if git diff --name-only HEAD^ | grep -q internal/cryptokit/CryptoKit.o; then
-            echo "CryptoKit.o has been checked in. Please remove this from your PR."
+          if git diff --name-only HEAD^ | grep -E -q 'internal/cryptokit/(CryptoKit\.syso|Cryptokit_arm64\.syso|Cryptokit_amd64\.syso|CryptoKit_arm64\.syso)'; then
+            echo "CryptoKit/Cryptokit.syso files have been checked in. Please remove this from your PR."
             exit 1
           fi
   check-headers:

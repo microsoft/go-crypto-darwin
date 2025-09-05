@@ -38,7 +38,6 @@ public func encryptAESGCM(
         resultTag.copyBytes(to: tagPointer, count: sealedBox.tag.count)
         return 0
     } catch {
-        print("Encryption failed with error: \(error)")
         return 1
     }
 }
@@ -74,7 +73,6 @@ public func decryptAESGCM(
         outLength.pointee = decryptedData.count
         return 0
     } catch {
-        print("Decryption failed with error: \(error)")
         return 1
     }
 }

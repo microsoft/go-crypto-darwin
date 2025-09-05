@@ -23,263 +23,234 @@ func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 ui
 func entersyscall()
 func exitsyscall()
 
-//go:cgo_import_static _go_MD5
+//go:cgo_import_static go_MD5
 //go:linkname go_MD5 go_MD5
+//go:cgo_import_static go_SHA1
+//go:linkname go_SHA1 go_SHA1
+//go:cgo_import_static go_SHA256
+//go:linkname go_SHA256 go_SHA256
+//go:cgo_import_static go_SHA384
+//go:linkname go_SHA384 go_SHA384
+//go:cgo_import_static go_SHA512
+//go:linkname go_SHA512 go_SHA512
+//go:cgo_import_static go_copyHMAC
+//go:linkname go_copyHMAC go_copyHMAC
+//go:cgo_import_static go_decryptAESGCM
+//go:linkname go_decryptAESGCM go_decryptAESGCM
+//go:cgo_import_static go_encryptAESGCM
+//go:linkname go_encryptAESGCM go_encryptAESGCM
+//go:cgo_import_static go_expandHKDF
+//go:linkname go_expandHKDF go_expandHKDF
+//go:cgo_import_static go_extractHKDF
+//go:linkname go_extractHKDF go_extractHKDF
+//go:cgo_import_static go_finalizeHMAC
+//go:linkname go_finalizeHMAC go_finalizeHMAC
+//go:cgo_import_static go_freeHMAC
+//go:linkname go_freeHMAC go_freeHMAC
+//go:cgo_import_static go_generateKeyEd25519
+//go:linkname go_generateKeyEd25519 go_generateKeyEd25519
+//go:cgo_import_static go_hashBlockSize
+//go:linkname go_hashBlockSize go_hashBlockSize
+//go:cgo_import_static go_hashCopy
+//go:linkname go_hashCopy go_hashCopy
+//go:cgo_import_static go_hashFree
+//go:linkname go_hashFree go_hashFree
+//go:cgo_import_static go_hashNew
+//go:linkname go_hashNew go_hashNew
+//go:cgo_import_static go_hashReset
+//go:linkname go_hashReset go_hashReset
+//go:cgo_import_static go_hashSize
+//go:linkname go_hashSize go_hashSize
+//go:cgo_import_static go_hashSum
+//go:linkname go_hashSum go_hashSum
+//go:cgo_import_static go_hashWrite
+//go:linkname go_hashWrite go_hashWrite
+//go:cgo_import_static go_initHMAC
+//go:linkname go_initHMAC go_initHMAC
+//go:cgo_import_static go_newPrivateKeyEd25519FromSeed
+//go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
+//go:cgo_import_static go_newPublicKeyEd25519
+//go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
+//go:cgo_import_static go_signEd25519
+//go:linkname go_signEd25519 go_signEd25519
+//go:cgo_import_static go_updateHMAC
+//go:linkname go_updateHMAC go_updateHMAC
+//go:cgo_import_static go_verifyEd25519
+//go:linkname go_verifyEd25519 go_verifyEd25519
+
 var go_MD5 byte
 var _mkcgo_go_MD5 = &go_MD5
-
-//go:cgo_import_static go_SHA1
-//go:linkname go_SHA1 _mkcgo_go_SHA1
-//go:cgo_import_static go_SHA256
-//go:linkname go_SHA256 _mkcgo_go_SHA256
-//go:cgo_import_static go_SHA384
-//go:linkname go_SHA384 _mkcgo_go_SHA384
-//go:cgo_import_static go_SHA512
-//go:linkname go_SHA512 _mkcgo_go_SHA512
-//go:cgo_import_static go_copyHMAC
-//go:linkname go_copyHMAC _mkcgo_go_copyHMAC
-//go:cgo_import_static go_decryptAESGCM
-//go:linkname go_decryptAESGCM _mkcgo_go_decryptAESGCM
-//go:cgo_import_static go_encryptAESGCM
-//go:linkname go_encryptAESGCM _mkcgo_go_encryptAESGCM
-//go:cgo_import_static go_expandHKDF
-//go:linkname go_expandHKDF _mkcgo_go_expandHKDF
-//go:cgo_import_static go_extractHKDF
-//go:linkname go_extractHKDF _mkcgo_go_extractHKDF
-//go:cgo_import_static go_finalizeHMAC
-//go:linkname go_finalizeHMAC _mkcgo_go_finalizeHMAC
-//go:cgo_import_static go_freeHMAC
-//go:linkname go_freeHMAC _mkcgo_go_freeHMAC
-//go:cgo_import_static go_generateKeyEd25519
-//go:linkname go_generateKeyEd25519 _mkcgo_go_generateKeyEd25519
-//go:cgo_import_static go_hashBlockSize
-//go:linkname go_hashBlockSize _mkcgo_go_hashBlockSize
-//go:cgo_import_static go_hashCopy
-//go:linkname go_hashCopy _mkcgo_go_hashCopy
-//go:cgo_import_static go_hashFree
-//go:linkname go_hashFree _mkcgo_go_hashFree
-//go:cgo_import_static go_hashNew
-//go:linkname go_hashNew _mkcgo_go_hashNew
-//go:cgo_import_static go_hashReset
-//go:linkname go_hashReset _mkcgo_go_hashReset
-//go:cgo_import_static go_hashSize
-//go:linkname go_hashSize _mkcgo_go_hashSize
-//go:cgo_import_static go_hashSum
-//go:linkname go_hashSum _mkcgo_go_hashSum
-//go:cgo_import_static go_hashWrite
-//go:linkname go_hashWrite _mkcgo_go_hashWrite
-//go:cgo_import_static go_initHMAC
-//go:linkname go_initHMAC _mkcgo_go_initHMAC
-//go:cgo_import_static go_newPrivateKeyEd25519FromSeed
-//go:linkname go_newPrivateKeyEd25519FromSeed _mkcgo_go_newPrivateKeyEd25519FromSeed
-//go:cgo_import_static go_newPublicKeyEd25519
-//go:linkname go_newPublicKeyEd25519 _mkcgo_go_newPublicKeyEd25519
-//go:cgo_import_static go_signEd25519
-//go:linkname go_signEd25519 _mkcgo_go_signEd25519
-//go:cgo_import_static go_updateHMAC
-//go:linkname go_updateHMAC _mkcgo_go_updateHMAC
-//go:cgo_import_static go_verifyEd25519
-//go:linkname go_verifyEd25519 _mkcgo_go_verifyEd25519
-
-var go_SHA1 uintptr
-var go_SHA256 uintptr
-var go_SHA384 uintptr
-var go_SHA512 uintptr
-var go_copyHMAC uintptr
-var go_decryptAESGCM uintptr
-var go_encryptAESGCM uintptr
-var go_expandHKDF uintptr
-var go_extractHKDF uintptr
-var go_finalizeHMAC uintptr
-var go_freeHMAC uintptr
-var go_generateKeyEd25519 uintptr
-var go_hashBlockSize uintptr
-var go_hashCopy uintptr
-var go_hashFree uintptr
-var go_hashNew uintptr
-var go_hashReset uintptr
-var go_hashSize uintptr
-var go_hashSum uintptr
-var go_hashWrite uintptr
-var go_initHMAC uintptr
-var go_newPrivateKeyEd25519FromSeed uintptr
-var go_newPublicKeyEd25519 uintptr
-var go_signEd25519 uintptr
-var go_updateHMAC uintptr
-var go_verifyEd25519 uintptr
-
-var _mkcgo_go_MD5_trampoline_addr uintptr
+var go_SHA1 byte
+var _mkcgo_go_SHA1 = &go_SHA1
+var go_SHA256 byte
+var _mkcgo_go_SHA256 = &go_SHA256
+var go_SHA384 byte
+var _mkcgo_go_SHA384 = &go_SHA384
+var go_SHA512 byte
+var _mkcgo_go_SHA512 = &go_SHA512
+var go_copyHMAC byte
+var _mkcgo_go_copyHMAC = &go_copyHMAC
+var go_decryptAESGCM byte
+var _mkcgo_go_decryptAESGCM = &go_decryptAESGCM
+var go_encryptAESGCM byte
+var _mkcgo_go_encryptAESGCM = &go_encryptAESGCM
+var go_expandHKDF byte
+var _mkcgo_go_expandHKDF = &go_expandHKDF
+var go_extractHKDF byte
+var _mkcgo_go_extractHKDF = &go_extractHKDF
+var go_finalizeHMAC byte
+var _mkcgo_go_finalizeHMAC = &go_finalizeHMAC
+var go_freeHMAC byte
+var _mkcgo_go_freeHMAC = &go_freeHMAC
+var go_generateKeyEd25519 byte
+var _mkcgo_go_generateKeyEd25519 = &go_generateKeyEd25519
+var go_hashBlockSize byte
+var _mkcgo_go_hashBlockSize = &go_hashBlockSize
+var go_hashCopy byte
+var _mkcgo_go_hashCopy = &go_hashCopy
+var go_hashFree byte
+var _mkcgo_go_hashFree = &go_hashFree
+var go_hashNew byte
+var _mkcgo_go_hashNew = &go_hashNew
+var go_hashReset byte
+var _mkcgo_go_hashReset = &go_hashReset
+var go_hashSize byte
+var _mkcgo_go_hashSize = &go_hashSize
+var go_hashSum byte
+var _mkcgo_go_hashSum = &go_hashSum
+var go_hashWrite byte
+var _mkcgo_go_hashWrite = &go_hashWrite
+var go_initHMAC byte
+var _mkcgo_go_initHMAC = &go_initHMAC
+var go_newPrivateKeyEd25519FromSeed byte
+var _mkcgo_go_newPrivateKeyEd25519FromSeed = &go_newPrivateKeyEd25519FromSeed
+var go_newPublicKeyEd25519 byte
+var _mkcgo_go_newPublicKeyEd25519 = &go_newPublicKeyEd25519
+var go_signEd25519 byte
+var _mkcgo_go_signEd25519 = &go_signEd25519
+var go_updateHMAC byte
+var _mkcgo_go_updateHMAC = &go_updateHMAC
+var go_verifyEd25519 byte
+var _mkcgo_go_verifyEd25519 = &go_verifyEd25519
 
 func MD5(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_MD5_trampoline_addr, uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_MD5)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_SHA1_trampoline_addr uintptr
 
 func SHA1(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_SHA1_trampoline_addr, uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_SHA1)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_SHA256_trampoline_addr uintptr
 
 func SHA256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_SHA256_trampoline_addr, uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_SHA256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_SHA384_trampoline_addr uintptr
 
 func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_SHA384_trampoline_addr, uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_SHA384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_SHA512_trampoline_addr uintptr
 
 func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_SHA512_trampoline_addr, uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_SHA512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_copyHMAC_trampoline_addr uintptr
 
 func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(_mkcgo_go_copyHMAC_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 	return unsafe.Pointer(r0)
 }
-
-var _mkcgo_go_decryptAESGCM_trampoline_addr uintptr
 
 func DecryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, tag *uint8, tagLength int, out *uint8, outLength *int) int32 {
-	r0, _, _ := syscallN(_mkcgo_go_decryptAESGCM_trampoline_addr, uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(tag)), uintptr(tagLength), uintptr(unsafe.Pointer(out)), uintptr(unsafe.Pointer(outLength)))
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(_mkcgo_go_decryptAESGCM)), uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(tag)), uintptr(tagLength), uintptr(unsafe.Pointer(out)), uintptr(unsafe.Pointer(outLength)))
 	return int32(r0)
 }
-
-var _mkcgo_go_encryptAESGCM_trampoline_addr uintptr
 
 func EncryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, cipherText *uint8, cipherTextLength int, tag *uint8) int32 {
-	r0, _, _ := syscallN(_mkcgo_go_encryptAESGCM_trampoline_addr, uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(cipherText)), uintptr(cipherTextLength), uintptr(unsafe.Pointer(tag)))
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(_mkcgo_go_encryptAESGCM)), uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(cipherText)), uintptr(cipherTextLength), uintptr(unsafe.Pointer(tag)))
 	return int32(r0)
 }
-
-var _mkcgo_go_expandHKDF_trampoline_addr uintptr
 
 func ExpandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
-	r0, _, _ := syscall_syscall9(_mkcgo_go_expandHKDF_trampoline_addr, uintptr(hashFunction), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), uintptr(unsafe.Pointer(info)), uintptr(infoLength), uintptr(unsafe.Pointer(okm)), uintptr(okmLength), 0, 0)
+	r0, _, _ := syscall_syscall9(uintptr(unsafe.Pointer(_mkcgo_go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), uintptr(unsafe.Pointer(info)), uintptr(infoLength), uintptr(unsafe.Pointer(okm)), uintptr(okmLength), 0, 0)
 	return int32(r0)
 }
-
-var _mkcgo_go_extractHKDF_trampoline_addr uintptr
 
 func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
-	r0, _, _ := syscall_syscall9(_mkcgo_go_extractHKDF_trampoline_addr, uintptr(hashFunction), uintptr(unsafe.Pointer(secret)), uintptr(secretLength), uintptr(unsafe.Pointer(salt)), uintptr(saltLength), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), 0, 0)
+	r0, _, _ := syscall_syscall9(uintptr(unsafe.Pointer(_mkcgo_go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(secret)), uintptr(secretLength), uintptr(unsafe.Pointer(salt)), uintptr(saltLength), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), 0, 0)
 	return int32(r0)
 }
-
-var _mkcgo_go_finalizeHMAC_trampoline_addr uintptr
 
 func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_finalizeHMAC_trampoline_addr, uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_freeHMAC_trampoline_addr uintptr
 
 func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
-	syscall_syscall(_mkcgo_go_freeHMAC_trampoline_addr, uintptr(hashFunction), uintptr(ptr), 0)
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_freeHMAC)), uintptr(hashFunction), uintptr(ptr), 0)
 }
-
-var _mkcgo_go_generateKeyEd25519_trampoline_addr uintptr
 
 func GenerateKeyEd25519(key *uint8) {
-	syscall_syscall(_mkcgo_go_generateKeyEd25519_trampoline_addr, uintptr(unsafe.Pointer(key)), 0, 0)
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_generateKeyEd25519)), uintptr(unsafe.Pointer(key)), 0, 0)
 }
-
-var _mkcgo_go_hashBlockSize_trampoline_addr uintptr
 
 func HashBlockSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscall_syscall(_mkcgo_go_hashBlockSize_trampoline_addr, uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashBlockSize)), uintptr(hashAlgorithm), 0, 0)
 	return int32(r0)
 }
-
-var _mkcgo_go_hashCopy_trampoline_addr uintptr
 
 func HashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(_mkcgo_go_hashCopy_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 	return unsafe.Pointer(r0)
 }
-
-var _mkcgo_go_hashFree_trampoline_addr uintptr
 
 func HashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscall_syscall(_mkcgo_go_hashFree_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), 0)
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 }
-
-var _mkcgo_go_hashNew_trampoline_addr uintptr
 
 func HashNew(hashAlgorithm int32) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(_mkcgo_go_hashNew_trampoline_addr, uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashNew)), uintptr(hashAlgorithm), 0, 0)
 	return unsafe.Pointer(r0)
 }
-
-var _mkcgo_go_hashReset_trampoline_addr uintptr
 
 func HashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscall_syscall(_mkcgo_go_hashReset_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), 0)
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 }
 
-var _mkcgo_go_hashSize_trampoline_addr uintptr
-
 func HashSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscall_syscall(_mkcgo_go_hashSize_trampoline_addr, uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashSize)), uintptr(hashAlgorithm), 0, 0)
 	return int32(r0)
 }
 
-var _mkcgo_go_hashSum_trampoline_addr uintptr
-
 func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscall_syscall(_mkcgo_go_hashSum_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
+	syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
 }
-
-var _mkcgo_go_hashWrite_trampoline_addr uintptr
 
 func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscall_syscall6(_mkcgo_go_hashWrite_trampoline_addr, uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
+	syscall_syscall6(uintptr(unsafe.Pointer(_mkcgo_go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
 }
 
-var _mkcgo_go_initHMAC_trampoline_addr uintptr
-
 func InitHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(_mkcgo_go_initHMAC_trampoline_addr, uintptr(hashFunction), uintptr(unsafe.Pointer(key)), uintptr(keyLength))
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(key)), uintptr(keyLength))
 	return unsafe.Pointer(r0)
 }
 
-var _mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr uintptr
-
 func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
-	r0, _, _ := syscall_syscall(_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr, uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(seed)), 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(seed)), 0)
 	return int32(r0)
 }
-
-var _mkcgo_go_newPublicKeyEd25519_trampoline_addr uintptr
 
 func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
-	r0, _, _ := syscall_syscall(_mkcgo_go_newPublicKeyEd25519_trampoline_addr, uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)), 0)
+	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(_mkcgo_go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)), 0)
 	return int32(r0)
 }
-
-var _mkcgo_go_signEd25519_trampoline_addr uintptr
 
 func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
-	r0, _, _ := syscall_syscall6(_mkcgo_go_signEd25519_trampoline_addr, uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)), 0, 0)
+	r0, _, _ := syscall_syscall6(uintptr(unsafe.Pointer(_mkcgo_go_signEd25519)), uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)), 0, 0)
 	return int32(r0)
 }
 
-var _mkcgo_go_updateHMAC_trampoline_addr uintptr
-
 func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscall_syscall6(_mkcgo_go_updateHMAC_trampoline_addr, uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
+	syscall_syscall6(uintptr(unsafe.Pointer(_mkcgo_go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
 }
 
-var _mkcgo_go_verifyEd25519_trampoline_addr uintptr
-
 func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
-	r0, _, _ := syscall_syscall6(_mkcgo_go_verifyEd25519_trampoline_addr, uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)), 0, 0)
+	r0, _, _ := syscall_syscall6(uintptr(unsafe.Pointer(_mkcgo_go_verifyEd25519)), uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)), 0, 0)
 	return int32(r0)
 }

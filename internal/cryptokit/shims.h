@@ -5,6 +5,8 @@
 // for the CommonCrypto C API. Run "go generate ." to regenerate the bindings.
 // Do not include this file, import "zcryptokit.h" instead.
 
+// mkcgo:static_imports
+
 #ifndef _GO_CRYPTOKIT_SHIMS_H // only include this header once
 #define _GO_CRYPTOKIT_SHIMS_H
 

@@ -881,7 +881,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		}
 		// Use byte + pointer pattern for all functions
 		fmt.Fprintf(w, "var %s byte\n", localName)
-		fmt.Fprintf(w, "var _mkcgo_%s = &%s\n", fn.Name, localName)
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -1043,7 +1042,7 @@ func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
 			if !strings.HasPrefix(localName, "go_") {
 				localName = "go_" + localName
 			}
-			functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(_mkcgo_%s))", fn.Name)
+			functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(&%s))", localName)
 		} else {
 			functionRef = trampolineName(fn)
 		}
@@ -1102,7 +1101,11 @@ func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Wri
 	// Determine function reference (static pointer or trampoline)
 	var functionRef string
 	if useStaticImports || fn.Static {
-		functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(_mkcgo_%s))", fn.Name)
+		localName := fn.Name
+		if !strings.HasPrefix(localName, "go_") {
+			localName = "go_" + localName
+		}
+		functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(&%s))", localName)
 	} else {
 		functionRef = trampolineName(fn)
 	}

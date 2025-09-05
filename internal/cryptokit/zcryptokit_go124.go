@@ -7,31 +7,31 @@
 package cryptokit
 
 /*
-#cgo noescape _mkcgo_MD5
-#cgo nocallback _mkcgo_MD5
-#cgo noescape _mkcgo_SHA1
-#cgo nocallback _mkcgo_SHA1
-#cgo noescape _mkcgo_SHA256
-#cgo nocallback _mkcgo_SHA256
-#cgo noescape _mkcgo_SHA384
-#cgo nocallback _mkcgo_SHA384
-#cgo noescape _mkcgo_SHA512
-#cgo nocallback _mkcgo_SHA512
-#cgo noescape _mkcgo_finalizeHMAC
-#cgo nocallback _mkcgo_finalizeHMAC
-#cgo nocallback _mkcgo_freeHMAC
-#cgo nocallback _mkcgo_hashBlockSize
-#cgo nocallback _mkcgo_hashCopy
-#cgo nocallback _mkcgo_hashFree
-#cgo nocallback _mkcgo_hashNew
-#cgo nocallback _mkcgo_hashReset
-#cgo nocallback _mkcgo_hashSize
-#cgo noescape _mkcgo_hashSum
-#cgo nocallback _mkcgo_hashSum
-#cgo noescape _mkcgo_hashWrite
-#cgo nocallback _mkcgo_hashWrite
-#cgo nocallback _mkcgo_initHMAC
-#cgo noescape _mkcgo_updateHMAC
-#cgo nocallback _mkcgo_updateHMAC
+#cgo noescape _mkcgo_go_MD5
+#cgo nocallback _mkcgo_go_MD5
+#cgo noescape _mkcgo_go_SHA1
+#cgo nocallback _mkcgo_go_SHA1
+#cgo noescape _mkcgo_go_SHA256
+#cgo nocallback _mkcgo_go_SHA256
+#cgo noescape _mkcgo_go_SHA384
+#cgo nocallback _mkcgo_go_SHA384
+#cgo noescape _mkcgo_go_SHA512
+#cgo nocallback _mkcgo_go_SHA512
+#cgo noescape _mkcgo_go_finalizeHMAC
+#cgo nocallback _mkcgo_go_finalizeHMAC
+#cgo nocallback _mkcgo_go_freeHMAC
+#cgo nocallback _mkcgo_go_hashBlockSize
+#cgo nocallback _mkcgo_go_hashCopy
+#cgo nocallback _mkcgo_go_hashFree
+#cgo nocallback _mkcgo_go_hashNew
+#cgo nocallback _mkcgo_go_hashReset
+#cgo nocallback _mkcgo_go_hashSize
+#cgo noescape _mkcgo_go_hashSum
+#cgo nocallback _mkcgo_go_hashSum
+#cgo noescape _mkcgo_go_hashWrite
+#cgo nocallback _mkcgo_go_hashWrite
+#cgo nocallback _mkcgo_go_initHMAC
+#cgo noescape _mkcgo_go_updateHMAC
+#cgo nocallback _mkcgo_go_updateHMAC
 */
 import "C"

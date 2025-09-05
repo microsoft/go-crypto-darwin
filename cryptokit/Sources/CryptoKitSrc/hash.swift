@@ -4,7 +4,7 @@
 import CryptoKit
 import Foundation
 
-@_cdecl("MD5")
+@_cdecl("go_MD5")
 public func MD5(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
@@ -17,7 +17,7 @@ public func MD5(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("SHA1")
+@_cdecl("go_SHA1")
 public func SHA1(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
@@ -30,7 +30,7 @@ public func SHA1(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("SHA256")
+@_cdecl("go_SHA256")
 public func SHA256(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
@@ -43,7 +43,7 @@ public func SHA256(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("SHA384")
+@_cdecl("go_SHA384")
 public func SHA384(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
@@ -56,7 +56,7 @@ public func SHA384(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("SHA512")
+@_cdecl("go_SHA512")
 public func SHA512(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
@@ -69,7 +69,7 @@ public func SHA512(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("hashNew")
+@_cdecl("go_hashNew")
 public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
@@ -97,7 +97,7 @@ public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
     }
 }
 
-@_cdecl("hashWrite")
+@_cdecl("go_hashWrite")
 public func hashWrite(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer,
@@ -129,7 +129,7 @@ public func hashWrite(
         fatalError("Unsupported hash function")
     }
 }
-@_cdecl("hashSum")
+@_cdecl("go_hashSum")
 public func hashSum(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer,
@@ -176,7 +176,7 @@ public func hashSum(
     }
 }
 
-@_cdecl("hashReset")
+@_cdecl("go_hashReset")
 public func hashReset(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer
@@ -202,7 +202,7 @@ public func hashReset(
     }
 }
 
-@_cdecl("hashSize")
+@_cdecl("go_hashSize")
 public func hashSize(_ hashAlgorithm: Int32) -> Int {
     switch hashAlgorithm {
     case 1:
@@ -220,7 +220,7 @@ public func hashSize(_ hashAlgorithm: Int32) -> Int {
     }
 }
 
-@_cdecl("hashBlockSize")
+@_cdecl("go_hashBlockSize")
 public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
     switch hashAlgorithm {
     case 1:
@@ -237,7 +237,7 @@ public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
         fatalError("Unsupported hash function")
     }
 }
-@_cdecl("hashCopy")
+@_cdecl("go_hashCopy")
 public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
@@ -280,7 +280,7 @@ public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> 
     }
 }
 
-@_cdecl("hashFree")
+@_cdecl("go_hashFree")
 public func hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) {
     switch hashAlgorithm {
     case 1:

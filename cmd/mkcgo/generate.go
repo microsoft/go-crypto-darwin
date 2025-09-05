@@ -697,6 +697,10 @@ func goSymName(name string) string {
 	if name == "" {
 		panic("empty name")
 	}
+	// Strip the 'go_' prefix commonly used in shims so Go symbols are nicer.
+	if strings.HasPrefix(name, "go_") {
+		name = name[3:]
+	}
 	ch, _ := utf8.DecodeRuneInString(name)
 	isPrivate := !unicode.IsUpper(ch)
 	if *private == isPrivate {
@@ -721,6 +725,31 @@ func goSymName(name string) string {
 // getFrameworkPath returns the absolute framework path.
 func getFrameworkPath(dylib mkcgo.Framework) string {
 	return fmt.Sprintf("/System/Library/Frameworks/%s.framework/Versions/%s/%s", dylib.Name, dylib.Version, dylib.Name)
+}
+
+// needsAssembly checks if assembly trampolines are needed for nocgo mode.
+// Returns false if all functions use static imports, true otherwise.
+func needsAssembly(src *mkcgo.Source) bool {
+	useStaticImports := false
+	for _, c := range src.Comments {
+		if strings.TrimSpace(c) == "mkcgo:static_imports" {
+			useStaticImports = true
+			break
+		}
+	}
+
+	// If we use static imports, check if all functions are static
+	if useStaticImports {
+		for _, fn := range src.Funcs {
+			if !fn.Static {
+				return true // Need assembly for non-static functions
+			}
+		}
+		return false // All functions are static, no assembly needed
+	}
+
+	// Without static imports directive, we need assembly
+	return true
 }
 
 // generateNocgoGo generates Go source file for nocgo mode from src.
@@ -779,11 +808,39 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	fmt.Fprintf(w, "\n")
 
 	// Generate cgo_import_dynamic directives for extern variables
-	for _, ext := range src.Externs {
-		extName := ext.Name
-		frameworkPath := getFrameworkPath(ext.Framework)
-		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
-		fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
+	useStaticImports := false
+	for _, c := range src.Comments {
+		if strings.TrimSpace(c) == "mkcgo:static_imports" {
+			useStaticImports = true
+			break
+		}
+	}
+	if useStaticImports {
+		for _, ext := range src.Externs {
+			extName := ext.Name
+			localName := extName
+			if !strings.HasPrefix(extName, "go_") {
+				localName = "go_" + extName
+			}
+			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+			fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
+		}
+	} else {
+		for _, ext := range src.Externs {
+			extName := ext.Name
+			if ext.Static {
+				localName := extName
+				if !strings.HasPrefix(extName, "go_") {
+					localName = "go_" + extName
+				}
+				fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+				fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
+				continue
+			}
+			frameworkPath := getFrameworkPath(ext.Framework)
+			fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", extName, extName, frameworkPath)
+			fmt.Fprintf(w, "//go:linkname _mkcgo_%s _mkcgo_%s\n", extName, extName)
+		}
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -794,7 +851,36 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 		}
 		fnName := fn.Name
 		frameworkPath := getFrameworkPath(fn.Framework)
-		fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
+		if useStaticImports || fn.Static {
+			localName := fnName
+			if !strings.HasPrefix(fnName, "go_") {
+				localName = "go_" + fnName
+			}
+			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
+			fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
+		} else {
+			fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)
+		}
+	}
+	fmt.Fprintf(w, "\n")
+
+	// For functions that were statically imported, declare a byte variable
+	// and pointer matching the local import name (e.g., "go_MD5"). This is needed so
+	// the generated nocgo code can reference the symbol address when using
+	// static imports.
+	for _, fn := range src.Funcs {
+		if !fnCalledFromGo(fn) {
+			continue
+		}
+		if !useStaticImports && !fn.Static {
+			continue
+		}
+		localName := fn.Name
+		if !strings.HasPrefix(localName, "go_") {
+			localName = "go_" + localName
+		}
+		// Use byte + pointer pattern for all functions
+		fmt.Fprintf(w, "var %s byte\n", localName)
 	}
 	fmt.Fprintf(w, "\n")
 
@@ -895,8 +981,19 @@ func trampolineName(fn *mkcgo.Func) string {
 func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
 	goFnName := goSymName(fn.Name)
 
-	// Generate trampoline address variable
-	fmt.Fprintf(w, "var %s uintptr\n\n", trampolineName(fn))
+	// Check if we should use static imports
+	useStaticImports := false
+	for _, c := range src.Comments {
+		if strings.TrimSpace(c) == "mkcgo:static_imports" {
+			useStaticImports = true
+			break
+		}
+	}
+
+	// Generate trampoline address variable only for non-static functions
+	if !useStaticImports && !fn.Static {
+		fmt.Fprintf(w, "var %s uintptr\n\n", trampolineName(fn))
+	}
 
 	// Generate Go wrapper function
 	fmt.Fprintf(w, "func %s(", goFnName)
@@ -937,10 +1034,23 @@ func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
 		if fn.Ret != "" && fn.Ret != "void" {
 			fmt.Fprintf(w, "r0, _, _ = ")
 		}
-		fmt.Fprintf(w, "syscallN(%s, %s)\n", trampolineName(fn), tmp.String())
+
+		// Use static function pointer or trampoline address
+		var functionRef string
+		if useStaticImports || fn.Static {
+			localName := fn.Name
+			if !strings.HasPrefix(localName, "go_") {
+				localName = "go_" + localName
+			}
+			functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(&%s))", localName)
+		} else {
+			functionRef = trampolineName(fn)
+		}
+
+		fmt.Fprintf(w, "syscallN(%s, %s)\n", functionRef, tmp.String())
 		fmt.Fprintf(w, "\t} else {\n")
 	}
-	generateNocgoFnBody(fn, !needsSpecalHandling, w)
+	generateNocgoFnBody(src, fn, !needsSpecalHandling, w)
 	if needsSpecalHandling {
 		fmt.Fprintf(w, "\t}\n")
 	}
@@ -960,7 +1070,16 @@ func generateNocgoFn(src *mkcgo.Source, fn *mkcgo.Func, w io.Writer) {
 }
 
 // generateNocgoFnBody generates Go function wrapper body for nocgo mode.
-func generateNocgoFnBody(fn *mkcgo.Func, newR0 bool, w io.Writer) {
+func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Writer) {
+	// Check if we should use static imports
+	useStaticImports := false
+	for _, c := range src.Comments {
+		if strings.TrimSpace(c) == "mkcgo:static_imports" {
+			useStaticImports = true
+			break
+		}
+	}
+
 	// Generate syscall invocation
 	numParams := len(fn.Params)
 	var syscallFunc string
@@ -979,15 +1098,27 @@ func generateNocgoFnBody(fn *mkcgo.Func, newR0 bool, w io.Writer) {
 		maxArgs = numParams
 	}
 
+	// Determine function reference (static pointer or trampoline)
+	var functionRef string
+	if useStaticImports || fn.Static {
+		localName := fn.Name
+		if !strings.HasPrefix(localName, "go_") {
+			localName = "go_" + localName
+		}
+		functionRef = fmt.Sprintf("uintptr(unsafe.Pointer(&%s))", localName)
+	} else {
+		functionRef = trampolineName(fn)
+	}
+
 	// Generate the syscall invocation with proper argument handling for other functions
 	if fn.Ret != "" && fn.Ret != "void" {
 		colon := ":"
 		if !newR0 {
 			colon = ""
 		}
-		fmt.Fprintf(w, "\tr0, _, _ %s= %s(%s", colon, syscallFunc, trampolineName(fn))
+		fmt.Fprintf(w, "\tr0, _, _ %s= %s(%s", colon, syscallFunc, functionRef)
 	} else {
-		fmt.Fprintf(w, "\t%s(%s", syscallFunc, trampolineName(fn))
+		fmt.Fprintf(w, "\t%s(%s", syscallFunc, functionRef)
 	}
 
 	// Add actual parameters
@@ -1019,6 +1150,7 @@ func generateNocgoFnBody(fn *mkcgo.Func, newR0 bool, w io.Writer) {
 }
 
 // generateAssembly generates the assembly trampoline file for nocgo mode.
+// This function is only called when dynamic imports are used.
 func generateAssembly(src *mkcgo.Source, w io.Writer) {
 	printHeader(w)
 	fmt.Fprintf(w, "//go:build !cgo\n\n")

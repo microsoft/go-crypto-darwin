@@ -4,7 +4,7 @@
 import CryptoKit
 import Foundation
 
-@_cdecl("extractHKDF")
+@_cdecl("go_extractHKDF")
 public func extractHKDF(
     hashFunction: Int32,
     secretPointer: UnsafePointer<UInt8>,
@@ -53,7 +53,7 @@ public func extractHKDF(
     return 0
 }
 
-@_cdecl("expandHKDF")
+@_cdecl("go_expandHKDF")
 public func expandHKDF(
     hashFunction: Int32,
     prkPointer: UnsafePointer<UInt8>,

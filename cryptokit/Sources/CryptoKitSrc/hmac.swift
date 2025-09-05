@@ -4,7 +4,7 @@
 import CryptoKit
 import Foundation
 
-@_cdecl("initHMAC")
+@_cdecl("go_initHMAC")
 public func initHMAC(
     _ hashFunction: Int32,
     _ keyPointer: UnsafePointer<UInt8>,
@@ -42,7 +42,7 @@ public func initHMAC(
     }
 }
 
-@_cdecl("freeHMAC")
+@_cdecl("go_freeHMAC")
 public func freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     switch hashFunction {
     case 1:
@@ -65,7 +65,7 @@ public func freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     }
 }
 
-@_cdecl("updateHMAC")
+@_cdecl("go_updateHMAC")
 public func updateHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
@@ -95,7 +95,7 @@ public func updateHMAC(
     }
 }
 
-@_cdecl("copyHMAC")
+@_cdecl("go_copyHMAC")
 public func copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
@@ -138,7 +138,7 @@ public func copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> 
     }
 }
 
-@_cdecl("finalizeHMAC")
+@_cdecl("go_finalizeHMAC")
 public func finalizeHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
@@ -170,7 +170,7 @@ public func finalizeHMAC(
     }
 }
 
-@_cdecl("hmacSize")
+@_cdecl("go_hmacSize")
 public func hmacSize(_ hashFunction: Int32) -> Int {
     switch hashFunction {
     case 1:
@@ -188,7 +188,7 @@ public func hmacSize(_ hashFunction: Int32) -> Int {
     }
 }
 
-@_cdecl("resetHMAC")
+@_cdecl("go_resetHMAC")
 public func resetHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,

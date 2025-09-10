@@ -697,6 +697,10 @@ func goSymName(name string) string {
 	if name == "" {
 		panic("empty name")
 	}
+	// Strip the 'go_' prefix commonly used in shims so Go symbols are nicer.
+	if strings.HasPrefix(name, "go_") {
+		name = name[3:]
+	}
 	ch, _ := utf8.DecodeRuneInString(name)
 	isPrivate := !unicode.IsUpper(ch)
 	if *private == isPrivate {

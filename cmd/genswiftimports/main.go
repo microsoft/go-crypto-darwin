@@ -17,8 +17,6 @@ import (
 )
 
 var (
-	// TODO: remove goCMD once upstream CLs are merged
-	goCmd  = flag.String("go", "go", "path to 'go' binary to use (defaults to $PATH go)")
 	pkg    = flag.String("pkg", "cryptokit", "package name for generated file")
 	xcrDir = flag.String("xcrypto", "./xcrypto", "path to package to build test binary for (relative to repo root)")
 )
@@ -26,7 +24,7 @@ var (
 func main() {
 	flag.Parse()
 	baseName := "z" + *pkg + "_swift"
-	fmt.Fprintf(os.Stderr, "generating bindings for package %s (base %s) using %s\n", *pkg, baseName, *goCmd)
+	fmt.Fprintf(os.Stderr, "generating bindings for package %s (base %s)\n", *pkg, baseName)
 
 	// create a temporary directory to hold the test binary so we don't
 	// accidentally write xcrypto.test into the current working directory.
@@ -79,12 +77,12 @@ func main() {
 		defer os.RemoveAll(archTmp)
 
 		// discover missing symbols for this arch (CGO disabled)
-		missing := detectMissingSymbolsForArch(*goCmd, *xcrDir, archTmp, arch)
+		missing := detectMissingSymbolsForArch(*xcrDir, archTmp, arch)
 		fmt.Fprintf(os.Stderr, "detected %d missing symbols for %s\n", len(missing), arch)
 
 		// build the test binary for this arch with cgo enabled into archTmp
 		outBin := filepath.Join(archTmp, "xcrypto.test")
-		cmd := exec.Command(*goCmd, "test", "-c", "-o", outBin, *xcrDir)
+		cmd := exec.Command("go", "test", "-c", "-o", outBin, *xcrDir)
 		cmd.Env = append(os.Environ(), "CGO_ENABLED=1", "GOARCH="+arch)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -178,9 +176,9 @@ func findRepoRoot() string {
 	return ""
 }
 
-func detectMissingSymbolsForArch(goCmd, xcrDir, tmpdir, arch string) map[string]bool {
+func detectMissingSymbolsForArch(xcrDir, tmpdir, arch string) map[string]bool {
 	outFile := filepath.Join(tmpdir, "xcrypto.test")
-	cmd := exec.Command(goCmd, "test", "-ldflags=-e", "-c", "-o", outFile, xcrDir)
+	cmd := exec.Command("go", "test", "-ldflags=-e", "-c", "-o", outFile, xcrDir)
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOARCH="+arch)
 	out, err := cmd.CombinedOutput()
 	if err == nil {

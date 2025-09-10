@@ -142,12 +142,12 @@ func EncryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce
 }
 
 func ExpandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
-	r0, _, _ := syscall_syscall9(uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), uintptr(unsafe.Pointer(info)), uintptr(infoLength), uintptr(unsafe.Pointer(okm)), uintptr(okmLength), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), uintptr(unsafe.Pointer(info)), uintptr(infoLength), uintptr(unsafe.Pointer(okm)), uintptr(okmLength))
 	return int32(r0)
 }
 
 func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
-	r0, _, _ := syscall_syscall9(uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(secret)), uintptr(secretLength), uintptr(unsafe.Pointer(salt)), uintptr(saltLength), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(secret)), uintptr(secretLength), uintptr(unsafe.Pointer(salt)), uintptr(saltLength), uintptr(unsafe.Pointer(prk)), uintptr(prkLength))
 	return int32(r0)
 }
 

@@ -1090,9 +1090,10 @@ func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Wri
 	} else if numParams <= 6 {
 		syscallFunc = "syscall_syscall6"
 		maxArgs = 6
-	} else if numParams <= 9 {
-		syscallFunc = "syscall_syscall9"
-		maxArgs = 9
+		// TODO: Enable syscall9 support when the 9th parameter is fixed.
+		// } else if numParams <= 9 {
+		// 	syscallFunc = "syscall_syscall9"
+		// 	maxArgs = 9
 	} else {
 		syscallFunc = "syscallN"
 		maxArgs = numParams

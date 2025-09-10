@@ -105,7 +105,7 @@ func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Poin
 var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
 
 func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	r0, _, _ := syscall_syscall9(_mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(unsafe.Pointer(cryptorRef)), 0, 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(unsafe.Pointer(cryptorRef)))
 	return CCCryptorStatus(r0)
 }
 
@@ -145,6 +145,6 @@ func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn unsafe.Pointer, dataInLengt
 var _mkcgo_CCKeyDerivationPBKDF_trampoline_addr uintptr
 
 func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password *byte, passwordLen int, salt *uint8, saltLen int, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey *uint8, derivedKeyLen int) CCCryptorStatus {
-	r0, _, _ := syscall_syscall9(_mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(unsafe.Pointer(password)), uintptr(passwordLen), uintptr(unsafe.Pointer(salt)), uintptr(saltLen), uintptr(prf), uintptr(rounds), uintptr(unsafe.Pointer(derivedKey)), uintptr(derivedKeyLen))
+	r0, _, _ := syscallN(_mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(unsafe.Pointer(password)), uintptr(passwordLen), uintptr(unsafe.Pointer(salt)), uintptr(saltLen), uintptr(prf), uintptr(rounds), uintptr(unsafe.Pointer(derivedKey)), uintptr(derivedKeyLen))
 	return CCCryptorStatus(r0)
 }

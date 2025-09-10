@@ -26,7 +26,6 @@ for arch in arm64 x86_64; do
         -parse-as-library \
         -whole-module-optimization \
         -target ${arch}-apple-macosx13.0 \
-        -O \
         Sources/CryptoKitSrc/cryptokit.swift \
         -o "${dest}"
 done

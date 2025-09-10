@@ -24,7 +24,7 @@ for arch in arm64 x86_64; do
     xcrun swiftc \
         -emit-object \
         -parse-as-library \
-        -no-whole-module-optimization \
+        -whole-module-optimization \
         -target ${arch}-apple-macosx13.0 \
         -O \
         Sources/CryptoKitSrc/cryptokit.swift \

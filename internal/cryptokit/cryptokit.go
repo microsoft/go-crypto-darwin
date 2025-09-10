@@ -9,5 +9,5 @@ package cryptokit
 //go:generate go run ../../cmd/genswiftimports
 
 // #cgo CFLAGS: -Wno-deprecated-declarations
-// #cgo LDFLAGS: -framework Security -framework CoreFoundation -L /Library/Developer/CommandLineTools/usr/lib/swift/macosx
+// #cgo LDFLAGS: -framework Security -framework CoreFoundation
 import "C"

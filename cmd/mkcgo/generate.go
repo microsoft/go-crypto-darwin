@@ -759,22 +759,14 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	fmt.Fprintf(w, "//go:build !cgo && darwin\n\n")
 	fmt.Fprintf(w, "package %s\n\n", *packageName)
 
-	// Check if we need syscallN (functions with more than 9 parameters)
-	needsSyscallN := false
 	needsRuntime := false
 	for _, fn := range src.Funcs {
 		if !fnCalledFromGo(fn) {
 			continue
 		}
-		if len(fn.Params) > 9 {
-			needsSyscallN = true
-		}
 		// Check if we need runtime import for CCCryptorCreateWithMode
 		if fn.Name == "CCCryptorCreateWithMode" && len(fn.Params) > 9 {
 			needsRuntime = true
-		}
-		if needsSyscallN && needsRuntime {
-			break
 		}
 	}
 
@@ -787,25 +779,28 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 	fmt.Fprintf(w, "\t\"unsafe\"\n")
 	fmt.Fprintf(w, ")\n\n")
 
-	// Generate linkname declarations for syscall functions
-	fmt.Fprintf(w, "//go:linkname syscall_syscall syscall.syscall\n")
-	fmt.Fprintf(w, "//go:linkname syscall_syscall6 syscall.syscall6\n")
-	fmt.Fprintf(w, "//go:linkname syscall_syscall9 syscall.syscall9\n")
-	if needsSyscallN {
-		fmt.Fprintf(w, "//go:linkname entersyscall runtime.entersyscall\n")
-		fmt.Fprintf(w, "//go:linkname exitsyscall runtime.exitsyscall\n")
-	}
+	// Generate linkname declaration for the variadic syscall wrapper.
+	// Use syscall.syscallN for all syscall invocations to simplify generated
+	// code and support any number of arguments.
+	fmt.Fprintf(w, "//go:linkname syscall_syscallN syscall.syscallN\n")
+	fmt.Fprintf(w, "//go:linkname entersyscall runtime.entersyscall\n")
+	fmt.Fprintf(w, "//go:linkname exitsyscall runtime.exitsyscall\n")
 	fmt.Fprintf(w, "\n")
 
 	// Generate function signatures for syscall functions
-	fmt.Fprintf(w, "func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
-	fmt.Fprintf(w, "func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
-	fmt.Fprintf(w, "func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)\n")
-	if needsSyscallN {
-		fmt.Fprintf(w, "func entersyscall()\n")
-		fmt.Fprintf(w, "func exitsyscall()\n")
-	}
+	fmt.Fprintf(w, "//go:noescape\n")
+	fmt.Fprintf(w, "func syscall_syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr)\n")
+	fmt.Fprintf(w, "func entersyscall()\n")
+	fmt.Fprintf(w, "func exitsyscall()\n")
 	fmt.Fprintf(w, "\n")
+
+	fmt.Fprintf(w, "//go:nosplit\n")
+	fmt.Fprintf(w, "func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {\n")
+	fmt.Fprintf(w, "\tentersyscall()\n")
+	fmt.Fprintf(w, "\tr1, r2 = syscall_syscallN(fn, args...)\n")
+	fmt.Fprintf(w, "\texitsyscall()\n")
+	fmt.Fprintf(w, "\treturn r1, r2, 0\n")
+	fmt.Fprintf(w, "}\n")
 
 	// Generate cgo_import_dynamic directives for extern variables
 	useStaticImports := false
@@ -1081,23 +1076,7 @@ func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Wri
 	}
 
 	// Generate syscall invocation
-	numParams := len(fn.Params)
-	var syscallFunc string
-	var maxArgs int
-	if numParams <= 3 {
-		syscallFunc = "syscall_syscall"
-		maxArgs = 3
-	} else if numParams <= 6 {
-		syscallFunc = "syscall_syscall6"
-		maxArgs = 6
-		// TODO: Enable syscall9 support when the 9th parameter is fixed.
-		// } else if numParams <= 9 {
-		// 	syscallFunc = "syscall_syscall9"
-		// 	maxArgs = 9
-	} else {
-		syscallFunc = "syscallN"
-		maxArgs = numParams
-	}
+	syscallFunc := "syscallN"
 
 	// Determine function reference (static pointer or trampoline)
 	var functionRef string
@@ -1124,10 +1103,6 @@ func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Wri
 
 	// Add actual parameters
 	for i, param := range fn.Params {
-		if i >= maxArgs {
-			panic("too many parameters")
-		}
-
 		paramName := param.Name
 		if paramName == "" {
 			paramName = fmt.Sprintf("arg%d", i)
@@ -1141,11 +1116,6 @@ func generateNocgoFnBody(src *mkcgo.Source, fn *mkcgo.Func, newR0 bool, w io.Wri
 		} else {
 			fmt.Fprintf(w, ", uintptr(%s)", paramName)
 		}
-	}
-
-	// Pad with zeros to reach the required argument count
-	for i := numParams; i < maxArgs; i++ {
-		fmt.Fprintf(w, ", 0")
 	}
 	fmt.Fprintf(w, ")\n")
 }

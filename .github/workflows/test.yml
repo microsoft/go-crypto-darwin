@@ -13,24 +13,55 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.23.x, 1.24.x]
+        go-version: [1.24.x, 1.25.x]
         macos-version: [macos-13, macos-14, macos-15]
+        cgo: [1]
+        include:
+          - go-version: 1.26.x
+            macos-version: macos-13
+            cgo: 0
+          - go-version: 1.26.x
+            macos-version: macos-14
+            cgo: 0
+          - go-version: 1.26.x
+            macos-version: macos-15
+            cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: ${{ matrix.go-version == '1.26.x' && '1.25' || matrix.go-version }}
+
+      - name: Cache gotip
+        id: gotip
+        if: matrix.go-version == '1.26.x'
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            $HOME/go/bin
+            $HOME/.cache/gotip
+            $HOME/.gotip
+          key: gotip-${{ matrix.macos-version }}-703335
+          restore-keys: |
+            gotip-${{ matrix.macos-version }}-
+
+      - name: Download CL containing patches required for CGO-less
+        if: matrix.go-version == '1.26.x' && steps.gotip.outputs.cache-hit != 'true'
+        run: |
+          go install golang.org/dl/gotip@latest
+          yes y | gotip download 703335
+
+      - name: Add gotip to the PATH
+        if: matrix.go-version == '1.26.x'
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Build CryptoKit.o
         run: bash gen-swift-bindings.sh
 
-      - name: Run CGOless tests
-        run: CGO_ENABLED=0 go test ./...
-
       - name: Run Go Tests
-        run: go test -gcflags=all=-d=checkptr -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit

@@ -129,14 +129,14 @@ func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, paddi
 var _mkcgo_CCCryptorRelease_trampoline_addr uintptr
 
 func CCCryptorRelease(cryptorRef CCCryptorRef) CCCryptorStatus {
-	r0, _, _ := syscallN(_mkcgo_CCCryptorRelease_trampoline_addr, uintptr(cryptorRef), 0, 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorRelease_trampoline_addr, uintptr(cryptorRef))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorReset_trampoline_addr uintptr
 
 func CCCryptorReset(cryptorRef CCCryptorRef, iv unsafe.Pointer) CCCryptorStatus {
-	r0, _, _ := syscallN(_mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(iv), 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(iv))
 	return CCCryptorStatus(r0)
 }
 

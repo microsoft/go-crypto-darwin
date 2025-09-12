@@ -11,17 +11,22 @@ import (
 	"unsafe"
 )
 
-//go:linkname syscall_syscall syscall.syscall
-//go:linkname syscall_syscall6 syscall.syscall6
-//go:linkname syscall_syscall9 syscall.syscall9
+//go:linkname syscall_syscallN syscall.syscallN
 //go:linkname entersyscall runtime.entersyscall
 //go:linkname exitsyscall runtime.exitsyscall
 
-func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
-func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)
-func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
+//go:noescape
+func syscall_syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr)
 func entersyscall()
 func exitsyscall()
+
+//go:nosplit
+func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	entersyscall()
+	r1, r2 = syscall_syscallN(fn, args...)
+	exitsyscall()
+	return r1, r2, 0
+}
 
 //go:cgo_import_static go_MD5
 //go:linkname go_MD5 go_MD5
@@ -107,27 +112,27 @@ var go_updateHMAC byte
 var go_verifyEd25519 byte
 
 func MD5(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func SHA1(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func SHA256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_SHA256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_SHA256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_SHA512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_SHA512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr), 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 	return unsafe.Pointer(r0)
 }
 
@@ -152,78 +157,78 @@ func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint
 }
 
 func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr), 0)
+	syscallN(uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr), 0)
 }
 
 func GenerateKeyEd25519(key *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(key)), 0, 0)
+	syscallN(uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(key)), 0, 0)
 }
 
 func HashBlockSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_hashBlockSize)), uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashBlockSize)), uintptr(hashAlgorithm), 0, 0)
 	return int32(r0)
 }
 
 func HashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr), 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 	return unsafe.Pointer(r0)
 }
 
 func HashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr), 0)
+	syscallN(uintptr(unsafe.Pointer(&go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 }
 
 func HashNew(hashAlgorithm int32) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_hashNew)), uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashNew)), uintptr(hashAlgorithm), 0, 0)
 	return unsafe.Pointer(r0)
 }
 
 func HashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr), 0)
+	syscallN(uintptr(unsafe.Pointer(&go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr), 0)
 }
 
 func HashSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_hashSize)), uintptr(hashAlgorithm), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashSize)), uintptr(hashAlgorithm), 0, 0)
 	return int32(r0)
 }
 
 func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscall_syscall(uintptr(unsafe.Pointer(&go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
+	syscallN(uintptr(unsafe.Pointer(&go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
 }
 
 func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscall_syscall6(uintptr(unsafe.Pointer(&go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
+	syscallN(uintptr(unsafe.Pointer(&go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
 }
 
 func InitHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(key)), uintptr(keyLength))
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(key)), uintptr(keyLength))
 	return unsafe.Pointer(r0)
 }
 
 func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(seed)), 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(seed)), 0)
 	return int32(r0)
 }
 
 func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
-	r0, _, _ := syscall_syscall(uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)), 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)), 0)
 	return int32(r0)
 }
 
 func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
-	r0, _, _ := syscall_syscall6(uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)), 0, 0)
 	return int32(r0)
 }
 
 func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscall_syscall6(uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
+	syscallN(uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length), 0, 0)
 }
 
 func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
-	r0, _, _ := syscall_syscall6(uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)), 0, 0)
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)), 0, 0)
 	return int32(r0)
 }

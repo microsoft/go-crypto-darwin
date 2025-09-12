@@ -162,6 +162,7 @@ func (src *Source) addExtern(line string) error {
 		Name:      name,
 		Type:      typ,
 		Framework: attrs.Framework,
+		Static:    attrs.Static,
 	})
 	return nil
 }

@@ -28,59 +28,32 @@ func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {
 	return r1, r2, 0
 }
 
-//go:cgo_import_static go_MD5
 //go:linkname go_MD5 go_MD5
-//go:cgo_import_static go_SHA1
 //go:linkname go_SHA1 go_SHA1
-//go:cgo_import_static go_SHA256
 //go:linkname go_SHA256 go_SHA256
-//go:cgo_import_static go_SHA384
 //go:linkname go_SHA384 go_SHA384
-//go:cgo_import_static go_SHA512
 //go:linkname go_SHA512 go_SHA512
-//go:cgo_import_static go_copyHMAC
 //go:linkname go_copyHMAC go_copyHMAC
-//go:cgo_import_static go_decryptAESGCM
 //go:linkname go_decryptAESGCM go_decryptAESGCM
-//go:cgo_import_static go_encryptAESGCM
 //go:linkname go_encryptAESGCM go_encryptAESGCM
-//go:cgo_import_static go_expandHKDF
 //go:linkname go_expandHKDF go_expandHKDF
-//go:cgo_import_static go_extractHKDF
 //go:linkname go_extractHKDF go_extractHKDF
-//go:cgo_import_static go_finalizeHMAC
 //go:linkname go_finalizeHMAC go_finalizeHMAC
-//go:cgo_import_static go_freeHMAC
 //go:linkname go_freeHMAC go_freeHMAC
-//go:cgo_import_static go_generateKeyEd25519
 //go:linkname go_generateKeyEd25519 go_generateKeyEd25519
-//go:cgo_import_static go_hashBlockSize
 //go:linkname go_hashBlockSize go_hashBlockSize
-//go:cgo_import_static go_hashCopy
 //go:linkname go_hashCopy go_hashCopy
-//go:cgo_import_static go_hashFree
 //go:linkname go_hashFree go_hashFree
-//go:cgo_import_static go_hashNew
 //go:linkname go_hashNew go_hashNew
-//go:cgo_import_static go_hashReset
 //go:linkname go_hashReset go_hashReset
-//go:cgo_import_static go_hashSize
 //go:linkname go_hashSize go_hashSize
-//go:cgo_import_static go_hashSum
 //go:linkname go_hashSum go_hashSum
-//go:cgo_import_static go_hashWrite
 //go:linkname go_hashWrite go_hashWrite
-//go:cgo_import_static go_initHMAC
 //go:linkname go_initHMAC go_initHMAC
-//go:cgo_import_static go_newPrivateKeyEd25519FromSeed
 //go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
-//go:cgo_import_static go_newPublicKeyEd25519
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
-//go:cgo_import_static go_signEd25519
 //go:linkname go_signEd25519 go_signEd25519
-//go:cgo_import_static go_updateHMAC
 //go:linkname go_updateHMAC go_updateHMAC
-//go:cgo_import_static go_verifyEd25519
 //go:linkname go_verifyEd25519 go_verifyEd25519
 
 var go_MD5 byte

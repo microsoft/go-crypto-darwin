@@ -817,7 +817,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 			if !strings.HasPrefix(extName, "go_") {
 				localName = "go_" + extName
 			}
-			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
 			fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
 		}
 	} else {
@@ -828,7 +827,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 				if !strings.HasPrefix(extName, "go_") {
 					localName = "go_" + extName
 				}
-				fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
 				fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
 				continue
 			}
@@ -851,7 +849,6 @@ func generateNocgoGo(src *mkcgo.Source, w io.Writer) {
 			if !strings.HasPrefix(fnName, "go_") {
 				localName = "go_" + fnName
 			}
-			fmt.Fprintf(w, "//go:cgo_import_static %s\n", localName)
 			fmt.Fprintf(w, "//go:linkname %s %s\n", localName, localName)
 		} else {
 			fmt.Fprintf(w, "//go:cgo_import_dynamic _mkcgo_%s %s \"%s\"\n", fnName, fnName, frameworkPath)

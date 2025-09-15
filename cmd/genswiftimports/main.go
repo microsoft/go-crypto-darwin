@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -92,51 +92,13 @@ func main() {
 		}
 
 		// run objdump on the arch-specific binary
-		outBytes, err := exec.Command("objdump", "--macho", "--bind", "--dylibs-used", outBin).Output()
+		outBytes, err := exec.Command("objdump", "--macho", "--bind", outBin).Output()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error running objdump for %s: %v\n", arch, err)
 			continue
 		}
 
-		parsedAll := parseObjdump(outBytes)
-		parsedMap := map[string]binding{}
-		for _, b := range parsedAll {
-			parsedMap[b.sym] = b
-		}
-
-		// Add any missing symbols not present in objdump
-		for sym := range missing {
-			if _, ok := parsedMap[sym]; !ok {
-				parsedMap[sym] = binding{sym: sym, dylib: guessDylib(sym)}
-			}
-		}
-
-		// Add required Swift runtime symbols if absent
-		requiredSwift := []string{
-			"swift_allocBox",
-			"swift_allocObject",
-			"swift_errorRelease",
-			"swift_getTypeByMangledNameInContext",
-			"swift_getTypeByMangledNameInContextInMetadataState",
-			"swift_getWitnessTable",
-			"swift_release",
-			"swift_retain",
-			"swift_slowAlloc",
-			"swift_slowDealloc",
-			"swift_unexpectedError",
-		}
-		for _, rs := range requiredSwift {
-			if _, ok := parsedMap[rs]; !ok {
-				parsedMap[rs] = binding{sym: rs, dylib: "/usr/lib/swift/libswiftCore.dylib"}
-			}
-		}
-
-		// convert map->slice and sort
-		parsed := make([]binding, 0, len(parsedMap))
-		for _, b := range parsedMap {
-			parsed = append(parsed, b)
-		}
-		sort.Slice(parsed, func(i, j int) bool { return parsed[i].sym < parsed[j].sym })
+		symbols := parseObjdump(outBytes)
 
 		// build per-arch output filename: e.g. zcryptokit_swift_arm64.go
 		archOut := filepath.Join(outDir, baseName+"_"+arch+".go")
@@ -144,12 +106,9 @@ func main() {
 
 		// create final lines
 		finalLines := []string{}
-		for _, b := range parsed {
-			if b.dylib != "" {
-				finalLines = append(finalLines, fmt.Sprintf("//go:cgo_import_dynamic %s %s \"%s\"", b.sym, b.sym, b.dylib))
-			} else {
-				finalLines = append(finalLines, fmt.Sprintf("//go:cgo_import_dynamic %s", b.sym))
-			}
+		for _, name := range missing {
+			dylib := symbols[name]
+			finalLines = append(finalLines, fmt.Sprintf("//go:cgo_import_dynamic %s %s \"%s\"", name, name, dylib))
 		}
 
 		if err := writeLinesWithTag(archOut, *pkg, buildTag, finalLines); err != nil {
@@ -176,128 +135,85 @@ func findRepoRoot() string {
 	return ""
 }
 
-func detectMissingSymbolsForArch(xcrDir, tmpdir, arch string) map[string]bool {
+func detectMissingSymbolsForArch(xcrDir, tmpdir, arch string) []string {
 	outFile := filepath.Join(tmpdir, "xcrypto.test")
 	cmd := exec.Command("go", "test", "-ldflags=-e", "-c", "-o", outFile, xcrDir)
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOARCH="+arch)
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		// build succeeded with CGO disabled; nothing missing
-		return map[string]bool{}
+		return nil
 	}
 
 	text := string(out)
 	// look for patterns like: relocation target swift_getWitnessTable not defined
 	re := regexp.MustCompile(`relocation target\s+([^\s]+)\s+not\s+defined`)
 	m := re.FindAllStringSubmatch(text, -1)
-	needed := map[string]bool{}
-	for _, sm := range m {
-		sym := normalizeSym(sm[1])
-		needed[sym] = true
+	var needed []string
+	for _, sym := range m {
+		needed = append(needed, sym[1])
 	}
 	// also catch patterns like: undefined: symbol
 	re2 := regexp.MustCompile(`undefined:\s*([^\s]+)`)
 	m2 := re2.FindAllStringSubmatch(text, -1)
-	for _, sm := range m2 {
-		sym := normalizeSym(sm[1])
-		needed[sym] = true
+	for _, sym := range m2 {
+		needed = append(needed, sym[1])
 	}
 	// also catch adddynsym missed symbol messages like: missed symbol (Extname=$s9CryptoKit...)
 	re3 := regexp.MustCompile(`missed symbol \(Extname=([^)]*)\)`)
 	m3 := re3.FindAllStringSubmatch(text, -1)
-	for _, sm := range m3 {
-		sym := normalizeSym(sm[1])
-		needed[sym] = true
+	for _, sym := range m3 {
+		needed = append(needed, sym[1])
 	}
+	slices.Sort(needed)
 	return needed
 }
 
-// symbol->dylib mapping
-type binding struct {
-	sym   string
-	dylib string // may be empty
-}
-
-func parseObjdump(data []byte) []binding {
+func parseObjdump(data []byte) map[string]string {
 	s := make(map[string]string)
 
 	// quick heuristic to extract symbol names and dylibs from objdump output
 	scanner := bufio.NewScanner(bytes.NewReader(data))
-	reSym := regexp.MustCompile(`[$@A-Za-z_][A-Za-z0-9_.$@]*`)
-	rePath := regexp.MustCompile(`(/[^ \t\n\r'"]+)`)
-
+	var tableStarted bool
 	for scanner.Scan() {
 		line := scanner.Text()
-		// try to find dylib path on this line
-		dylib := ""
-		if m := rePath.FindStringSubmatch(line); len(m) > 0 {
-			dylib = m[1]
-		}
-
-		for _, token := range reSym.FindAllString(line, -1) {
-			n := normalizeSym(token)
-			// accept tokens that look like Swift/C symbols (contain $ or contain lowercase/underscore key names)
-			if !strings.Contains(n, "$") && !strings.HasPrefix(n, "swift_") && !strings.HasPrefix(n, "__") && n != "memcpy" {
-				continue
+		if !tableStarted {
+			if line == "segment  section            address     type       addend dylib            symbol" {
+				// Table header
+				tableStarted = true
 			}
-			// record mapping, prefer explicit dylib if found
-			if dylib != "" {
-				s[n] = dylib
-			} else if _, ok := s[n]; !ok {
-				// record empty mapping for now
-				s[n] = ""
-			}
+			continue
 		}
-	}
-
-	// also heuristically add some well-known C symbols found in many Swift objects
-	known := []string{"__stack_chk_fail", "__stack_chk_guard", "__chkstk_darwin", "memcpy"}
-	for _, k := range known {
-		if _, ok := s[k]; !ok {
-			s[k] = "" // allow heuristic mapping later
+		columns := strings.Fields(line)
+		if len(columns) < 6 {
+			continue
 		}
+		sym := normalizeSym(columns[len(columns)-1])
+		dylib := dylibPath(columns[len(columns)-2])
+		s[sym] = dylib
 	}
-
-	// convert map to slice and sort
-	out := make([]binding, 0, len(s))
-	for sym, dylib := range s {
-		heur := guessDylib(sym)
-		mapped := ""
-		if dylib == "" {
-			mapped = heur
-		} else if heur != "" && heur != dylib {
-			// prefer heuristic mapping for known Swift modules (CryptoKit/Foundation/Swift core)
-			mapped = heur
-		} else {
-			mapped = dylib
-		}
-		out = append(out, binding{sym: sym, dylib: mapped})
-	}
-	sort.Slice(out, func(i, j int) bool { return out[i].sym < out[j].sym })
-	return out
+	return s
 }
 
 func normalizeSym(sym string) string {
-	// objdump or the Mach-O symbol table sometimes produce names with a leading
-	// single underscore for symbols that actually start with '$'. The handwritten
-	// file uses the '$' prefix without that underscore. Strip a single leading
-	// underscore only when it precedes a '$' to normalize to the canonical form.
-	if strings.HasPrefix(sym, "_$") {
+	// objdump or the Mach-O symbol table produce names with a leading single
+	// underscore. Strip it.
+	if strings.HasPrefix(sym, "_") {
 		return sym[1:]
 	}
 	return sym
 }
 
-func guessDylib(sym string) string {
+func dylibPath(dylib string) string {
 	// common heuristics used in the handwritten file
-	switch {
-	case strings.HasPrefix(sym, "$s9CryptoKit"):
+	switch dylib {
+	case "CryptoKit":
 		return "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit"
-	case strings.HasPrefix(sym, "$s10Foundation") || strings.Contains(sym, "Foundation"):
+	case "Foundation":
 		return "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
-	case strings.HasPrefix(sym, "swift_") || strings.HasPrefix(sym, "$sSW") || strings.HasPrefix(sym, "$sSN") || strings.HasPrefix(sym, "$ss") || strings.HasPrefix(sym, "$sSS") || strings.HasPrefix(sym, "$sS"):
+	case "libswiftCore":
 		return "/usr/lib/swift/libswiftCore.dylib"
-	case sym == "memcpy", strings.HasPrefix(sym, "__"), strings.HasSuffix(sym, "_darwin"):
+	case "libSystem":
 		return "/usr/lib/libSystem.B.dylib"
 	default:
 		return ""
@@ -305,30 +221,6 @@ func guessDylib(sym string) string {
 }
 
 func writeLinesWithTag(path, pkg, buildTag string, lines []string) error {
-	// post-process lines to ensure known Swift/CryptoKit symbols point at the
-	// heuristic dylib rather than an incorrect framework (this helps fix
-	// cases where objdump attributed a symbol to the wrong dylib).
-	processed := make([]string, 0, len(lines))
-	re := regexp.MustCompile(`^//go:cgo_import_dynamic\s+([^\s]+)`) // capture symbol token
-	for _, line := range lines {
-		if m := re.FindStringSubmatch(line); len(m) > 1 {
-			sym := normalizeSym(m[1])
-			heur := guessDylib(sym)
-			if heur != "" && !strings.Contains(line, heur) {
-				reQuoted := regexp.MustCompile(`"([^\\"]+)"`)
-				matches := reQuoted.FindAllStringSubmatchIndex(line, -1)
-				if len(matches) > 0 {
-					last := matches[len(matches)-1]
-					line = line[:last[0]] + `"` + heur + `"` + line[last[1]:]
-				} else {
-					// append heuristic dylib
-					line = line + " \"" + heur + "\""
-				}
-			}
-		}
-		processed = append(processed, line)
-	}
-
 	// ensure output directory exists
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
@@ -350,7 +242,7 @@ func writeLinesWithTag(path, pkg, buildTag string, lines []string) error {
 	fmt.Fprintf(w, "package %s\n", pkg)
 	fmt.Fprintln(w)
 
-	for _, l := range processed {
+	for _, l := range lines {
 		fmt.Fprintln(w, l)
 	}
 	return w.Flush()

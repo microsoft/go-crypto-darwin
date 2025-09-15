@@ -13,24 +13,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.23.x, 1.24.x]
+        go-version: [1.24.x, 1.25.x]
         macos-version: [macos-13, macos-14, macos-15]
+        cgo: [1]
+        include:
+          - go-version: 1.26.x
+            macos-version: macos-13
+            cgo: 0
+          - go-version: 1.26.x
+            macos-version: macos-14
+            cgo: 0
+          - go-version: 1.26.x
+            macos-version: macos-15
+            cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        if: matrix.go-version != '1.26.x'
         with:
           go-version: ${{ matrix.go-version }}
 
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
+      # TODO: Remove this when 1.26 is released
+      - name: Setup gotip
+        if: matrix.go-version == '1.26.x'
+        uses: ./.github/actions/gotip
+        with:
+          macos-version: ${{ matrix.macos-version }}
+
       - name: Build CryptoKit.o
         run: bash gen-swift-bindings.sh
 
-      - name: Run CGOless tests
-        run: CGO_ENABLED=0 go test ./...
-
       - name: Run Go Tests
-        run: go test -gcflags=all=-d=checkptr -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit
@@ -71,13 +87,13 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
-        with:
-          go-version: 1.25
+      # TODO: Remove this when 1.26 is released
+      - name: Setup gotip
+        uses: ./.github/actions/gotip
 
       - name: Run go generate
         run: |
-          go generate ./...
+          gotip generate ./...
 
       - name: Check for any changed files
         run: |

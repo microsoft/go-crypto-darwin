@@ -12,17 +12,22 @@ import (
 	"unsafe"
 )
 
-//go:linkname syscall_syscall syscall.syscall
-//go:linkname syscall_syscall6 syscall.syscall6
-//go:linkname syscall_syscall9 syscall.syscall9
+//go:linkname syscall_syscallN syscall.syscallN
 //go:linkname entersyscall runtime.entersyscall
 //go:linkname exitsyscall runtime.exitsyscall
 
-func syscall_syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
-func syscall_syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err syscall.Errno)
-func syscall_syscall9(fn, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
+//go:noescape
+func syscall_syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr)
 func entersyscall()
 func exitsyscall()
+
+//go:nosplit
+func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	entersyscall()
+	r1, r2 = syscall_syscallN(fn, args...)
+	exitsyscall()
+	return r1, r2, 0
+}
 
 //go:cgo_import_dynamic _mkcgo_CCCrypt CCCrypt "/System/Library/Frameworks/System.framework/Versions/B/System"
 //go:cgo_import_dynamic _mkcgo_CCCryptorCreate CCCryptorCreate "/System/Library/Frameworks/System.framework/Versions/B/System"
@@ -105,7 +110,7 @@ func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Poin
 var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
 
 func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	r0, _, _ := syscall_syscall9(_mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(unsafe.Pointer(cryptorRef)), 0, 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(key), uintptr(keyLength), uintptr(iv), uintptr(unsafe.Pointer(cryptorRef)))
 	return CCCryptorStatus(r0)
 }
 
@@ -124,27 +129,27 @@ func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, paddi
 var _mkcgo_CCCryptorRelease_trampoline_addr uintptr
 
 func CCCryptorRelease(cryptorRef CCCryptorRef) CCCryptorStatus {
-	r0, _, _ := syscall_syscall(_mkcgo_CCCryptorRelease_trampoline_addr, uintptr(cryptorRef), 0, 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorRelease_trampoline_addr, uintptr(cryptorRef))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorReset_trampoline_addr uintptr
 
 func CCCryptorReset(cryptorRef CCCryptorRef, iv unsafe.Pointer) CCCryptorStatus {
-	r0, _, _ := syscall_syscall(_mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(iv), 0)
+	r0, _, _ := syscallN(_mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(iv))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorUpdate_trampoline_addr uintptr
 
 func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn unsafe.Pointer, dataInLength int, dataOut unsafe.Pointer, dataOutAvailable int, dataOutMoved *int) CCCryptorStatus {
-	r0, _, _ := syscall_syscall6(_mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
+	r0, _, _ := syscallN(_mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(dataIn), uintptr(dataInLength), uintptr(dataOut), uintptr(dataOutAvailable), uintptr(unsafe.Pointer(dataOutMoved)))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCKeyDerivationPBKDF_trampoline_addr uintptr
 
 func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password *byte, passwordLen int, salt *uint8, saltLen int, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey *uint8, derivedKeyLen int) CCCryptorStatus {
-	r0, _, _ := syscall_syscall9(_mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(unsafe.Pointer(password)), uintptr(passwordLen), uintptr(unsafe.Pointer(salt)), uintptr(saltLen), uintptr(prf), uintptr(rounds), uintptr(unsafe.Pointer(derivedKey)), uintptr(derivedKeyLen))
+	r0, _, _ := syscallN(_mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(unsafe.Pointer(password)), uintptr(passwordLen), uintptr(unsafe.Pointer(salt)), uintptr(saltLen), uintptr(prf), uintptr(rounds), uintptr(unsafe.Pointer(derivedKey)), uintptr(derivedKeyLen))
 	return CCCryptorStatus(r0)
 }

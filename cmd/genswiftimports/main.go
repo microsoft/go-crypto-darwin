@@ -178,7 +178,7 @@ func parseObjdump(data []byte) map[string]string {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if !tableStarted {
-			if line == "segment  section            address     type       addend dylib            symbol" {
+			if strings.Contains(line, "dylib") && strings.Contains(line, "symbol") {
 				// Table header
 				tableStarted = true
 			}

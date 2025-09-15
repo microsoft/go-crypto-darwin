@@ -102,6 +102,7 @@ package cryptokit
 //go:cgo_import_dynamic $sSWN $sSWN "/usr/lib/swift/libswiftCore.dylib"
 //go:cgo_import_dynamic $sSWSTsWP $sSWSTsWP "/usr/lib/swift/libswiftCore.dylib"
 //go:cgo_import_dynamic $sSp10deallocateyyF $sSp10deallocateyyF "/usr/lib/swift/libswiftCore.dylib"
+//go:cgo_import_dynamic $sSp10initialize2toyx_tF $sSp10initialize2toyx_tF "/usr/lib/swift/libswiftCore.dylib"
 //go:cgo_import_dynamic $sSp8allocate8capacitySpyxGSi_tFZ $sSp8allocate8capacitySpyxGSi_tFZ "/usr/lib/swift/libswiftCore.dylib"
 //go:cgo_import_dynamic $ss17_assertionFailure__4file4line5flagss5NeverOs12StaticStringV_SSAHSus6UInt32VtF $ss17_assertionFailure__4file4line5flagss5NeverOs12StaticStringV_SSAHSus6UInt32VtF "/usr/lib/swift/libswiftCore.dylib"
 //go:cgo_import_dynamic __DATA __DATA "/usr/lib/libSystem.B.dylib"

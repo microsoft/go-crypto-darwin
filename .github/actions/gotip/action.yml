@@ -34,7 +34,7 @@ runs:
       if: steps.gotip.outputs.cache-hit != 'true'
       run: |
         go install golang.org/dl/gotip@latest
-        yes y | gotip download 703335
+        printf 'y\n' | gotip download 703335
 
     - name: Add gotip to the PATH
       shell: bash

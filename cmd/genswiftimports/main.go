@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"strings"
 )
@@ -23,6 +24,10 @@ var (
 
 func main() {
 	flag.Parse()
+	if runtime.GOOS != "darwin" {
+		// This tool only works on macOS
+		return
+	}
 	baseName := "z" + *pkg + "_swift"
 	fmt.Fprintf(os.Stderr, "generating bindings for package %s (base %s)\n", *pkg, baseName)
 

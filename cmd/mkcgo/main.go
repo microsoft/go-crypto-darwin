@@ -18,13 +18,13 @@ import (
 )
 
 var (
-	fileName          = flag.String("out", "", "output file name (standard output if omitted)")
-	includeHeader     = flag.String("include", "", "include header file")
-	packageName       = flag.String("package", "", "package name")
-	mode              = flag.String("mode", "cgo", "mode: cgo (default), nocgo, all")
-	private           = flag.Bool("private", false, "all Go generated symbols are kept unexported")
-	useDynamicLoading = flag.Bool("dynamic-loading", true, "use dynamic loading")
-	errors            = flag.Bool("errors", false, "enable error handling")
+	fileName      = flag.String("out", "", "output file name (standard output if omitted)")
+	includeHeader = flag.String("include", "", "include header file")
+	packageName   = flag.String("package", "", "package name")
+	nocgo         = flag.Bool("nocgo", false, "don't use cgo")
+	mode          = flag.String("mode", "dynamic", "symbol load mode: dynamic, dynload")
+	private       = flag.Bool("private", false, "all Go generated symbols are kept unexported")
+	noerrors      = flag.Bool("noerrors", false, "disable error handling")
 )
 
 func usage() {
@@ -32,6 +32,14 @@ func usage() {
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\n")
 	os.Exit(1)
+}
+
+func dynamic() bool {
+	return *mode == "dynamic"
+}
+
+func dynload() bool {
+	return *mode == "dynload"
 }
 
 func main() {
@@ -63,10 +71,19 @@ func main() {
 		return cmp.Compare(a.Name, b.Name)
 	})
 
-	if *mode == "nocgo" || *mode == "all" {
+	if *nocgo {
+		// Determine if this is a zdl file for special handling
+		baseNameForCheck := *fileName
+		if baseNameForCheck == "" {
+			baseNameForCheck = "mkcgo"
+		} else {
+			baseNameForCheck = strings.TrimSuffix(baseNameForCheck, ".go")
+		}
+		isZdlFile := strings.HasPrefix(baseNameForCheck, "zdl")
+
 		// Generate nocgo mode files
 		var nocgoGoBuffer, assemblyBuffer bytes.Buffer
-		generateNocgoGo(&src, &nocgoGoBuffer)
+		generateNocgoGo(&src, &nocgoGoBuffer, isZdlFile)
 
 		// Only generate assembly if needed (i.e., not all functions are static)
 		needsAsm := needsAssembly(&src)
@@ -77,11 +94,19 @@ func main() {
 		// Format the generated Go source code.
 		nocgoGoData := goformat(nocgoGoBuffer.Bytes())
 
+		// Determine suffix based on the base name
+		suffix := "_nocgo.go"
+
+		// Special case for zdl files - use _nocgo_unix.go suffix
+		if isZdlFile {
+			suffix = "_nocgo_unix.go"
+		}
+
 		files := []struct {
 			suffix string
 			data   []byte
 		}{
-			{"_nocgo.go", nocgoGoData},
+			{suffix, nocgoGoData},
 		}
 
 		// Only add assembly file if needed
@@ -108,9 +133,7 @@ func main() {
 			}
 		}
 
-		if *mode == "nocgo" {
-			return
-		}
+		return
 	}
 
 	var gobuf, go124buf, hbuf, cbuf bytes.Buffer
@@ -177,7 +200,7 @@ func writeTempSourceFile(data []byte) (string, error) {
 }
 
 func goformat(data []byte) []byte {
-	data, err := format.Source(data)
+	fdata, err := format.Source(data)
 	if err != nil {
 		log.Printf("failed to format source: %v", err)
 		f, err := writeTempSourceFile(data)
@@ -186,5 +209,5 @@ func goformat(data []byte) []byte {
 		}
 		log.Fatalf("for diagnosis, wrote unformatted source to %v", f)
 	}
-	return data
+	return fdata
 }

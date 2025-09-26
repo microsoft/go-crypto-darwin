@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/microsoft/go-crypto-darwin/internal/mkcgo"
@@ -51,6 +52,10 @@ func main() {
 		fmt.Fprintln(flag.CommandLine.Output(), "required flag not provided: -shim")
 		flag.Usage()
 		os.Exit(1)
+	}
+	if runtime.GOOS != "darwin" {
+		// This tool only works on macOS
+		return
 	}
 	if *osslInclude != "" {
 		if _, err := os.Stat(*osslInclude); err != nil {

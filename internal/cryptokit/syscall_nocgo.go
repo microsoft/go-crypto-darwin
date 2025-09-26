@@ -5,7 +5,10 @@
 
 package cryptokit
 
-import "syscall"
+import (
+	"syscall"
+	_ "unsafe"
+)
 
 //go:linkname syscall_syscallN syscall.syscallN
 //go:linkname entersyscall runtime.entersyscall

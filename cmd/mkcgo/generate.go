@@ -5,12 +5,11 @@ package main
 
 import (
 	"fmt"
+	"go/token"
 	"io"
 	"slices"
 	"strconv"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/microsoft/go-crypto-darwin/internal/mkcgo"
 )
@@ -660,13 +659,7 @@ func goSymName(name string) string {
 	// Strip the 'go_' prefix commonly used in shims so Go symbols are nicer.
 	name = strings.TrimPrefix(name, "go_")
 
-	// Special case: preserve point_conversion_form_t as lowercase
-	if name == "point_conversion_form_t" {
-		return name
-	}
-
-	ch, _ := utf8.DecodeRuneInString(name)
-	isPrivate := !unicode.IsUpper(ch)
+	isPrivate := !token.IsExported(name)
 	if *private == isPrivate {
 		// Same access level, no need to change.
 		return name
@@ -821,7 +814,7 @@ func generateNocgoAliases(typedefs []*mkcgo.TypeDef, w io.Writer) {
 	for _, typedef := range typedefs {
 		// For basic types, make it an alias to the appropriate Go type
 		goType, _ := cTypeToGo(typedef.Type, false)
-		name := strings.TrimPrefix(typedef.Name, "_")
+		name := goSymName(typedef.Name)
 		if goType != "" && goType != "unsafe.Pointer" {
 			fmt.Fprintf(w, "type %s = %s\n", name, goType)
 			seenTypes[name] = true

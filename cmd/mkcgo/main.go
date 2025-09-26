@@ -25,6 +25,7 @@ var (
 	mode          = flag.String("mode", "dynamic", "symbol load mode: dynamic, dynload")
 	private       = flag.Bool("private", false, "all Go generated symbols are kept unexported")
 	noerrors      = flag.Bool("noerrors", false, "disable error handling")
+	extratags     = flag.String("tags", "", "tags to add to the generated files")
 )
 
 func usage() {
@@ -79,11 +80,10 @@ func main() {
 		} else {
 			baseNameForCheck = strings.TrimSuffix(baseNameForCheck, ".go")
 		}
-		isZdlFile := strings.HasPrefix(baseNameForCheck, "zdl")
 
 		// Generate nocgo mode files
 		var nocgoGoBuffer, assemblyBuffer bytes.Buffer
-		generateNocgoGo(&src, &nocgoGoBuffer, isZdlFile)
+		generateNocgoGo(&src, &nocgoGoBuffer)
 
 		// Only generate assembly if needed (i.e., not all functions are static)
 		needsAsm := needsAssembly(&src)
@@ -96,11 +96,6 @@ func main() {
 
 		// Determine suffix based on the base name
 		suffix := "_nocgo.go"
-
-		// Special case for zdl files - use _nocgo_unix.go suffix
-		if isZdlFile {
-			suffix = "_nocgo_unix.go"
-		}
 
 		files := []struct {
 			suffix string

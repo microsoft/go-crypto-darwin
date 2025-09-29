@@ -108,12 +108,12 @@ func CFDictionarySetValue(theDict CFMutableDictionaryRef, key unsafe.Pointer, va
 	C._mkcgo_CFDictionarySetValue(theDict, key, value)
 }
 
-func CFErrorCopyDescription(error CFErrorRef) CFStringRef {
-	return C._mkcgo_CFErrorCopyDescription(error)
+func CFErrorCopyDescription(__error CFErrorRef) CFStringRef {
+	return C._mkcgo_CFErrorCopyDescription(__error)
 }
 
-func CFErrorGetCode(error CFErrorRef) CFIndex {
-	return C._mkcgo_CFErrorGetCode(error)
+func CFErrorGetCode(__error CFErrorRef) CFIndex {
+	return C._mkcgo_CFErrorGetCode(__error)
 }
 
 func CFNumberCreate(allocator CFAllocatorRef, theType CFNumberType, valuePtr unsafe.Pointer) CFNumberRef {
@@ -132,36 +132,36 @@ func CFStringGetLength(str CFStringRef) CFIndex {
 	return C._mkcgo_CFStringGetLength(str)
 }
 
-func SecKeyCopyExternalRepresentation(key SecKeyRef, error *CFErrorRef) CFDataRef {
-	return C._mkcgo_SecKeyCopyExternalRepresentation(key, error)
+func SecKeyCopyExternalRepresentation(key SecKeyRef, __error *CFErrorRef) CFDataRef {
+	return C._mkcgo_SecKeyCopyExternalRepresentation(key, __error)
 }
 
-func SecKeyCopyKeyExchangeResult(privateKey SecKeyRef, algorithm SecKeyAlgorithm, publicKey SecKeyRef, parameters CFDictionaryRef, error *CFErrorRef) CFDataRef {
-	return C._mkcgo_SecKeyCopyKeyExchangeResult(privateKey, algorithm, publicKey, parameters, error)
+func SecKeyCopyKeyExchangeResult(privateKey SecKeyRef, algorithm SecKeyAlgorithm, publicKey SecKeyRef, parameters CFDictionaryRef, __error *CFErrorRef) CFDataRef {
+	return C._mkcgo_SecKeyCopyKeyExchangeResult(privateKey, algorithm, publicKey, parameters, __error)
 }
 
 func SecKeyCopyPublicKey(key SecKeyRef) SecKeyRef {
 	return C._mkcgo_SecKeyCopyPublicKey(key)
 }
 
-func SecKeyCreateDecryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, ciphertext CFDataRef, error *CFErrorRef) CFDataRef {
-	return C._mkcgo_SecKeyCreateDecryptedData(key, algorithm, ciphertext, error)
+func SecKeyCreateDecryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, ciphertext CFDataRef, __error *CFErrorRef) CFDataRef {
+	return C._mkcgo_SecKeyCreateDecryptedData(key, algorithm, ciphertext, __error)
 }
 
-func SecKeyCreateEncryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, plaintext CFDataRef, error *CFErrorRef) CFDataRef {
-	return C._mkcgo_SecKeyCreateEncryptedData(key, algorithm, plaintext, error)
+func SecKeyCreateEncryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, plaintext CFDataRef, __error *CFErrorRef) CFDataRef {
+	return C._mkcgo_SecKeyCreateEncryptedData(key, algorithm, plaintext, __error)
 }
 
-func SecKeyCreateRandomKey(parameters CFDictionaryRef, error *CFErrorRef) SecKeyRef {
-	return C._mkcgo_SecKeyCreateRandomKey(parameters, error)
+func SecKeyCreateRandomKey(parameters CFDictionaryRef, __error *CFErrorRef) SecKeyRef {
+	return C._mkcgo_SecKeyCreateRandomKey(parameters, __error)
 }
 
-func SecKeyCreateSignature(key SecKeyRef, algorithm SecKeyAlgorithm, data CFDataRef, error *CFErrorRef) CFDataRef {
-	return C._mkcgo_SecKeyCreateSignature(key, algorithm, data, error)
+func SecKeyCreateSignature(key SecKeyRef, algorithm SecKeyAlgorithm, data CFDataRef, __error *CFErrorRef) CFDataRef {
+	return C._mkcgo_SecKeyCreateSignature(key, algorithm, data, __error)
 }
 
-func SecKeyCreateWithData(keyData CFDataRef, attributes CFDictionaryRef, error *CFErrorRef) SecKeyRef {
-	return C._mkcgo_SecKeyCreateWithData(keyData, attributes, error)
+func SecKeyCreateWithData(keyData CFDataRef, attributes CFDictionaryRef, __error *CFErrorRef) SecKeyRef {
+	return C._mkcgo_SecKeyCreateWithData(keyData, attributes, __error)
 }
 
 func SecKeyGetBlockSize(key SecKeyRef) int {
@@ -172,8 +172,8 @@ func SecKeyIsAlgorithmSupported(key SecKeyRef, operation SecKeyOperationType, al
 	return C._mkcgo_SecKeyIsAlgorithmSupported(key, operation, algorithm)
 }
 
-func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData CFDataRef, signature CFDataRef, error *CFErrorRef) Boolean {
-	return C._mkcgo_SecKeyVerifySignature(key, algorithm, signedData, signature, error)
+func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData CFDataRef, signature CFDataRef, __error *CFErrorRef) Boolean {
+	return C._mkcgo_SecKeyVerifySignature(key, algorithm, signedData, signature, __error)
 }
 
 func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes unsafe.Pointer) int32 {

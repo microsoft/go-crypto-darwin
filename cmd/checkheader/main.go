@@ -15,7 +15,7 @@ func main() {
 		// This tool only works on macOS
 		return
 	}
-	args := []string{"go", "run", "github.com/golang-fips/openssl/v2/cmd/checkheader@40b26b14957cadd2f76ccb58a6ea467ea4a45f56"}
+	args := []string{"go", "run", "github.com/golang-fips/openssl/v2/cmd/checkheader@8bbf74f9e05a46abff41b180288784eb0188eb9c"}
 	args = append(args, os.Args[1:]...)
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stderr = os.Stderr

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build darwin
-
 package cryptokit
 
 //go:generate go run ../../cmd/mkcgo -out zcryptokit.go -package cryptokit --noerrors shims.h

@@ -115,6 +115,7 @@ func main() {
 			if name == "syscall.syscallN" {
 				// syscall.syscallN is added in go 1.26, so it can appear as a missing symbol
 				// when running this tool with go 1.25. Ignore it.
+				// TODO: remove this when we stop supporting go 1.25.
 				continue
 			}
 			dylib := symbols[name]

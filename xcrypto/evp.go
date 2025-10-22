@@ -174,6 +174,12 @@ func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
 		return crypto.SHA384, nil
 	case sha512Hash:
 		return crypto.SHA512, nil
+	case sha3_256Hash:
+		return crypto.SHA3_256, nil
+	case sha3_384Hash:
+		return crypto.SHA3_384, nil
+	case sha3_512Hash:
+		return crypto.SHA3_512, nil
 	default:
 		return 0, errors.New("unsupported hash function")
 	}

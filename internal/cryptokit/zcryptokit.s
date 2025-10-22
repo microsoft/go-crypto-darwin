@@ -52,6 +52,21 @@ TEXT _mkcgo_go_SHA384_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_SHA384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_SHA384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA384_trampoline<>(SB)
 
+TEXT _mkcgo_go_SHA3_256_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_SHA3_256(SB)
+GLOBL   ·_mkcgo_go_SHA3_256_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_SHA3_256_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_256_trampoline<>(SB)
+
+TEXT _mkcgo_go_SHA3_384_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_SHA3_384(SB)
+GLOBL   ·_mkcgo_go_SHA3_384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_SHA3_384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_384_trampoline<>(SB)
+
+TEXT _mkcgo_go_SHA3_512_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_SHA3_512(SB)
+GLOBL   ·_mkcgo_go_SHA3_512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_SHA3_512_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_512_trampoline<>(SB)
+
 TEXT _mkcgo_go_SHA512_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_SHA512(SB)
 GLOBL   ·_mkcgo_go_SHA512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -156,6 +171,11 @@ TEXT _mkcgo_go_signEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_signEd25519(SB)
 GLOBL   ·_mkcgo_go_signEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_signEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_signEd25519_trampoline<>(SB)
+
+TEXT _mkcgo_go_supportsSHA3_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_supportsSHA3(SB)
+GLOBL   ·_mkcgo_go_supportsSHA3_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_supportsSHA3_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_supportsSHA3_trampoline<>(SB)
 
 TEXT _mkcgo_go_updateHMAC_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_updateHMAC(SB)

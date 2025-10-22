@@ -16,6 +16,9 @@ import (
 //go:linkname go_SHA1 go_SHA1
 //go:linkname go_SHA256 go_SHA256
 //go:linkname go_SHA384 go_SHA384
+//go:linkname go_SHA3_256 go_SHA3_256
+//go:linkname go_SHA3_384 go_SHA3_384
+//go:linkname go_SHA3_512 go_SHA3_512
 //go:linkname go_SHA512 go_SHA512
 //go:linkname go_copyHMAC go_copyHMAC
 //go:linkname go_decryptAESGCM go_decryptAESGCM
@@ -37,6 +40,7 @@ import (
 //go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
 //go:linkname go_signEd25519 go_signEd25519
+//go:linkname go_supportsSHA3 go_supportsSHA3
 //go:linkname go_updateHMAC go_updateHMAC
 //go:linkname go_verifyEd25519 go_verifyEd25519
 
@@ -44,6 +48,9 @@ var go_MD5 byte
 var go_SHA1 byte
 var go_SHA256 byte
 var go_SHA384 byte
+var go_SHA3_256 byte
+var go_SHA3_384 byte
+var go_SHA3_512 byte
 var go_SHA512 byte
 var go_copyHMAC byte
 var go_decryptAESGCM byte
@@ -65,6 +72,7 @@ var go_initHMAC byte
 var go_newPrivateKeyEd25519FromSeed byte
 var go_newPublicKeyEd25519 byte
 var go_signEd25519 byte
+var go_supportsSHA3 byte
 var go_updateHMAC byte
 var go_verifyEd25519 byte
 
@@ -88,6 +96,24 @@ func SHA256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
 
 func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
 	syscallN(uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
+}
+
+func SHA3_256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	syscallN(uintptr(unsafe.Pointer(&go_SHA3_256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
+}
+
+func SHA3_384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	syscallN(uintptr(unsafe.Pointer(&go_SHA3_384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
+}
+
+func SHA3_512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	syscallN(uintptr(unsafe.Pointer(&go_SHA3_512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
 	runtime.KeepAlive(inputPointer)
 	runtime.KeepAlive(outputPointer)
 }
@@ -219,6 +245,11 @@ func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer
 	runtime.KeepAlive(privateKey)
 	runtime.KeepAlive(message)
 	runtime.KeepAlive(sigBuffer)
+	return int32(r0)
+}
+
+func SupportsSHA3() int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_supportsSHA3)))
 	return int32(r0)
 }
 

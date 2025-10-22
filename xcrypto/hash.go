@@ -17,11 +17,14 @@ import (
 )
 
 const (
-	md5    = 1
-	sha1   = 2
-	sha256 = 3
-	sha384 = 4
-	sha512 = 5
+	md5     = 1
+	sha1    = 2
+	sha256  = 3
+	sha384  = 4
+	sha512  = 5
+	sha3256 = 6
+	sha3384 = 7
+	sha3512 = 8
 )
 
 type hashAlgorithm struct {
@@ -228,6 +231,18 @@ type sha512Hash struct {
 	*evpHash
 }
 
+type sha3_256Hash struct {
+	*evpHash
+}
+
+type sha3_384Hash struct {
+	*evpHash
+}
+
+type sha3_512Hash struct {
+	*evpHash
+}
+
 var _ hash.Hash = (*evpHash)(nil)
 var _ HashCloner = (*evpHash)(nil)
 
@@ -253,6 +268,21 @@ func SHA384(p []byte) (sum [48]byte) {
 
 func SHA512(p []byte) (sum [64]byte) {
 	cryptokit.SHA512(addr(p), len(p), addr(sum[:]))
+	return
+}
+
+func SHA3_256(p []byte) (sum [32]byte) {
+	cryptokit.SHA3_256(addr(p), len(p), addr(sum[:]))
+	return
+}
+
+func SHA3_384(p []byte) (sum [48]byte) {
+	cryptokit.SHA3_384(addr(p), len(p), addr(sum[:]))
+	return
+}
+
+func SHA3_512(p []byte) (sum [64]byte) {
+	cryptokit.SHA3_512(addr(p), len(p), addr(sum[:]))
 	return
 }
 
@@ -288,5 +318,26 @@ func NewSHA384() hash.Hash {
 func NewSHA512() hash.Hash {
 	return sha512Hash{
 		evpHash: newEVPHash(crypto.SHA512),
+	}
+}
+
+// NewSHA3_256 creates a new SHA3-256 hash.
+func NewSHA3_256() hash.Hash {
+	return sha3_256Hash{
+		evpHash: newEVPHash(crypto.SHA3_256),
+	}
+}
+
+// NewSHA3_384 creates a new SHA3-384 hash.
+func NewSHA3_384() hash.Hash {
+	return sha3_384Hash{
+		evpHash: newEVPHash(crypto.SHA3_384),
+	}
+}
+
+// NewSHA3_512 creates a new SHA3-512 hash.
+func NewSHA3_512() hash.Hash {
+	return sha3_512Hash{
+		evpHash: newEVPHash(crypto.SHA3_512),
 	}
 }

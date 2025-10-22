@@ -187,7 +187,103 @@ final class CryptoKitTests: XCTestCase {
         XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
     }
 
-    // MARK: - C-Style Function Tests (Advanced API)
+    // MARK: - SHA-3 Simple API Tests (macOS 26.0+)
+
+    #if canImport(CryptoKit) && (swift(>=6.2) || (swift(>=5.9) && canImport(Keccak)))
+    // Test SHA3-256 hash function (Simple API)
+    @available(macOS 26.0, *)
+    func testSHA3_256_SimpleAPI() {
+        let input = Array(simpleTestString.utf8)
+        var output = [UInt8](repeating: 0, count: 32)  // SHA3-256 is 32 bytes
+
+        SHA3_256(
+            inputPointer: input,
+            inputLength: input.count,
+            outputPointer: &output
+        )
+
+        // Known SHA3-256 hash for "The quick brown fox jumps over the lazy dog"
+        let expectedHex = "69070dda01975c8c120c3aada1b282394e7f032fa9cf32f4cb2259a0897dfc04"
+        XCTAssertEqual(Data(output).hexEncodedString(), expectedHex)
+
+        // Test empty string
+        let emptyInput = Array(emptyString.utf8)
+        var emptyOutput = [UInt8](repeating: 0, count: 32)
+        SHA3_256(
+            inputPointer: emptyInput,
+            inputLength: emptyInput.count,
+            outputPointer: &emptyOutput
+        )
+
+        // Known SHA3-256 hash for empty string
+        let emptyExpectedHex = "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"
+        XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
+    }
+
+    // Test SHA3-384 hash function (Simple API)
+    @available(macOS 26.0, *)
+    func testSHA3_384_SimpleAPI() {
+        let input = Array(simpleTestString.utf8)
+        var output = [UInt8](repeating: 0, count: 48)  // SHA3-384 is 48 bytes
+
+        SHA3_384(
+            inputPointer: input,
+            inputLength: input.count,
+            outputPointer: &output
+        )
+
+        // Known SHA3-384 hash for "The quick brown fox jumps over the lazy dog"
+        let expectedHex =
+            "7063465e08a93bce31cd89d2e3ca8f602498696e253592ed26f07bf7e703cf328581e1471a7ba7ab119b1a9ebdf8be41"
+        XCTAssertEqual(Data(output).hexEncodedString(), expectedHex)
+
+        // Test empty string
+        let emptyInput = Array(emptyString.utf8)
+        var emptyOutput = [UInt8](repeating: 0, count: 48)
+        SHA3_384(
+            inputPointer: emptyInput,
+            inputLength: emptyInput.count,
+            outputPointer: &emptyOutput
+        )
+
+        // Known SHA3-384 hash for empty string
+        let emptyExpectedHex =
+            "0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2ac3713831264adb47fb6bd1e058d5f004"
+        XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
+    }
+
+    // Test SHA3-512 hash function (Simple API)
+    @available(macOS 26.0, *)
+    func testSHA3_512_SimpleAPI() {
+        let input = Array(simpleTestString.utf8)
+        var output = [UInt8](repeating: 0, count: 64)  // SHA3-512 is 64 bytes
+
+        SHA3_512(
+            inputPointer: input,
+            inputLength: input.count,
+            outputPointer: &output
+        )
+
+        // Known SHA3-512 hash for "The quick brown fox jumps over the lazy dog"
+        let expectedHex =
+            "01dedd5de4ef14642445ba5f5b97c15e47b9ad931326e4b0727cd94cefc44fff23f07bf543139939b49128caf436dc1bdee54fcb24023a08d9403f9b4bf0d450"
+        XCTAssertEqual(Data(output).hexEncodedString(), expectedHex)
+
+        // Test empty string
+        let emptyInput = Array(emptyString.utf8)
+        var emptyOutput = [UInt8](repeating: 0, count: 64)
+        SHA3_512(
+            inputPointer: emptyInput,
+            inputLength: emptyInput.count,
+            outputPointer: &emptyOutput
+        )
+
+        // Known SHA3-512 hash for empty string
+        let emptyExpectedHex =
+            "a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26"
+        XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
+    }
+    #endif
 
     func testHashFunctions() {
         let testString = "hello world"
@@ -275,7 +371,68 @@ final class CryptoKitTests: XCTestCase {
             ),
         ]
 
-        for functions in functionsList {
+        // Add SHA-3 functions if available on macOS 26.0+
+        var sha3FunctionsList: [HashingFunctions] = []
+
+        #if canImport(CryptoKit) && (swift(>=6.2) || (swift(>=5.9) && canImport(Keccak)))
+        if #available(macOS 26.0, *) {
+            sha3FunctionsList = [
+                HashingFunctions(
+                    name: "SHA3-256",
+                    new: { hashNew(6) },
+                    write: { ptr, data, length in hashWrite(6, ptr, data, length) },
+                    sum: { ptr, out in hashSum(6, ptr, out) },
+                    reset: { ptr in hashReset(6, ptr) },
+                    copy: { ptr in hashCopy(6, ptr) },
+                    free: { ptr in hashFree(6, ptr) },
+                    size: { hashSize(6) },
+                    blockSize: { hashBlockSize(6) },
+                    expectedSize: 32,  // SHA3-256 output size
+                    expectedBlockSize: 136,  // SHA3-256 block size
+                    knownEmptyHashHex: "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a",
+                    knownTestStringHashHex: "b87f88c72702fff1748e58b87e9141a42c0dbedc29a78cb0d4a5cd81d7a9ea90"  // "hello world"
+                ),
+                HashingFunctions(
+                    name: "SHA3-384",
+                    new: { hashNew(7) },
+                    write: { ptr, data, length in hashWrite(7, ptr, data, length) },
+                    sum: { ptr, out in hashSum(7, ptr, out) },
+                    reset: { ptr in hashReset(7, ptr) },
+                    copy: { ptr in hashCopy(7, ptr) },
+                    free: { ptr in hashFree(7, ptr) },
+                    size: { hashSize(7) },
+                    blockSize: { hashBlockSize(7) },
+                    expectedSize: 48,  // SHA3-384 output size
+                    expectedBlockSize: 104,  // SHA3-384 block size
+                    knownEmptyHashHex:
+                        "0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2ac3713831264adb47fb6bd1e058d5f004",
+                    knownTestStringHashHex:
+                        "83bff28dde1b1bf5810071c6643c08e5b05bdb836effd70b403ea8ea0a634dc4997eb1053aa3593f590f9c63630dd90b"  // "hello world"
+                ),
+                HashingFunctions(
+                    name: "SHA3-512",
+                    new: { hashNew(8) },
+                    write: { ptr, data, length in hashWrite(8, ptr, data, length) },
+                    sum: { ptr, out in hashSum(8, ptr, out) },
+                    reset: { ptr in hashReset(8, ptr) },
+                    copy: { ptr in hashCopy(8, ptr) },
+                    free: { ptr in hashFree(8, ptr) },
+                    size: { hashSize(8) },
+                    blockSize: { hashBlockSize(8) },
+                    expectedSize: 64,  // SHA3-512 output size
+                    expectedBlockSize: 72,  // SHA3-512 block size
+                    knownEmptyHashHex:
+                        "a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26",
+                    knownTestStringHashHex:
+                        "840006653e9ac9e95117a15c915caab81662918e925de9e004f774ff82d7079a40d4d27b1b372657c61d46d470304c88c788b3a4527ad074d1dccbee5dbaa99a"  // "hello world"
+                ),
+            ]
+        }
+        #endif
+
+        let allFunctionsList = functionsList + sha3FunctionsList
+
+        for functions in allFunctionsList {
             let ptr = functions.new()
             defer { functions.free(ptr) }
 

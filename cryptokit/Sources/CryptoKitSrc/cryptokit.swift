@@ -4,6 +4,17 @@
 import CryptoKit
 import Foundation
 
+// Runtime feature detection for SHA3 (available on macOS 26+ only)
+@_cdecl("go_supportsSHA3")
+public func supportsSHA3() -> Int {
+    if #available(macOS 26.0, *) {
+        // SHA3 symbols are lazily bound, so if this returns true,
+        // the runtime can safely call SHA3_* functions.
+        return 1
+    }
+    return 0
+}
+
 @_cdecl("go_encryptAESGCM")
 public func encryptAESGCM(
     keyPointer: UnsafePointer<UInt8>,
@@ -223,7 +234,6 @@ public func verifyEd25519(
     return isValid ? 1 : 0  // Return 1 for valid, 0 for invalid
 }
 
-
 @_cdecl("go_MD5")
 public func MD5(
     inputPointer: UnsafePointer<UInt8>,
@@ -289,6 +299,51 @@ public func SHA512(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
+// SHA3 functions are only available when compiling with macOS 26.0+ SDK
+#if compiler(>=6.2)
+@available(macOS 26.0, *)
+@_cdecl("go_SHA3_256")
+public func SHA3_256(
+    inputPointer: UnsafePointer<UInt8>,
+    inputLength: Int,
+    outputPointer: UnsafeMutablePointer<UInt8>
+) -> Int32 {
+    let inputData = Data(bytes: inputPointer, count: inputLength)
+    let hash = CryptoKit.SHA3_256.hash(data: inputData)
+    let hashData = Data(hash)
+    hashData.copyBytes(to: outputPointer, count: hashData.count)
+    return 0
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_SHA3_384")
+public func SHA3_384(
+    inputPointer: UnsafePointer<UInt8>,
+    inputLength: Int,
+    outputPointer: UnsafeMutablePointer<UInt8>
+) -> Int32 {
+    let inputData = Data(bytes: inputPointer, count: inputLength)
+    let hash = CryptoKit.SHA3_384.hash(data: inputData)
+    let hashData = Data(hash)
+    hashData.copyBytes(to: outputPointer, count: hashData.count)
+    return 0
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_SHA3_512")
+public func SHA3_512(
+    inputPointer: UnsafePointer<UInt8>,
+    inputLength: Int,
+    outputPointer: UnsafeMutablePointer<UInt8>
+) -> Int32 {
+    let inputData = Data(bytes: inputPointer, count: inputLength)
+    let hash = CryptoKit.SHA3_512.hash(data: inputData)
+    let hashData = Data(hash)
+    hashData.copyBytes(to: outputPointer, count: hashData.count)
+    return 0
+}
+#endif
+
 @_cdecl("go_hashNew")
 public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
@@ -312,6 +367,42 @@ public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
         let hasher = UnsafeMutablePointer<CryptoKit.SHA512>.allocate(capacity: 1)
         hasher.initialize(to: CryptoKit.SHA512())
         return UnsafeMutableRawPointer(hasher)
+    case 6:
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = UnsafeMutablePointer<CryptoKit.SHA3_256>.allocate(capacity: 1)
+            hasher.initialize(to: CryptoKit.SHA3_256())
+            return UnsafeMutableRawPointer(hasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
+    case 7:
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = UnsafeMutablePointer<CryptoKit.SHA3_384>.allocate(capacity: 1)
+            hasher.initialize(to: CryptoKit.SHA3_384())
+            return UnsafeMutableRawPointer(hasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
+    case 8:
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = UnsafeMutablePointer<CryptoKit.SHA3_512>.allocate(capacity: 1)
+            hasher.initialize(to: CryptoKit.SHA3_512())
+            return UnsafeMutableRawPointer(hasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -345,6 +436,39 @@ public func hashWrite(
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA512.self)
         let buffer = UnsafeRawBufferPointer(start: data, count: length)
         hasher.pointee.update(data: buffer)
+    case 6:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_256.self)
+            let buffer = UnsafeRawBufferPointer(start: data, count: length)
+            hasher.pointee.update(data: buffer)
+        }
+        #endif
+    case 7:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_384.self)
+            let buffer = UnsafeRawBufferPointer(start: data, count: length)
+            hasher.pointee.update(data: buffer)
+        }
+        #endif
+    case 8:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_512.self)
+            let buffer = UnsafeRawBufferPointer(start: data, count: length)
+            hasher.pointee.update(data: buffer)
+        }
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -391,6 +515,48 @@ public func hashSum(
 
         let hashData = hash.withUnsafeBytes { Data($0) }
         hashData.copyBytes(to: outputPointer, count: hashData.count)
+    case 6:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_256.self)
+            let copiedHasher = hasher.pointee
+            let hash = copiedHasher.finalize();
+
+            let hashData = Data(hash)
+            hashData.copyBytes(to: outputPointer, count: hashData.count)
+        }
+        #endif
+    case 7:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_384.self)
+            let copiedHasher = hasher.pointee
+            let hash = copiedHasher.finalize();
+
+            let hashData = Data(hash)
+            hashData.copyBytes(to: outputPointer, count: hashData.count)
+        }
+        #endif
+    case 8:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_512.self)
+            let copiedHasher = hasher.pointee
+            let hash = copiedHasher.finalize();
+
+            let hashData = Data(hash)
+            hashData.copyBytes(to: outputPointer, count: hashData.count)
+        }
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -417,6 +583,36 @@ public func hashReset(
     case 5:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA512.self)
         hasher.pointee = CryptoKit.SHA512()
+    case 6:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_256.self)
+            hasher.pointee = CryptoKit.SHA3_256()
+        }
+        #endif
+    case 7:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_384.self)
+            hasher.pointee = CryptoKit.SHA3_384()
+        }
+        #endif
+    case 8:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, SHA-3 not supported
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_512.self)
+            hasher.pointee = CryptoKit.SHA3_512()
+        }
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -457,6 +653,7 @@ public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
         fatalError("Unsupported hash function")
     }
 }
+
 @_cdecl("go_hashCopy")
 public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
@@ -495,6 +692,60 @@ public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> 
         newHasher.initialize(to: copyOf)
 
         return UnsafeMutableRawPointer(newHasher)
+    case 6:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_256.self)
+            let copyOf = hasher.pointee
+            let newHasher = UnsafeMutablePointer<CryptoKit.SHA3_256>.allocate(capacity: 1)
+            newHasher.initialize(to: copyOf)
+
+            return UnsafeMutableRawPointer(newHasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
+    case 7:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_384.self)
+            let copyOf = hasher.pointee
+            let newHasher = UnsafeMutablePointer<CryptoKit.SHA3_384>.allocate(capacity: 1)
+            newHasher.initialize(to: copyOf)
+
+            return UnsafeMutableRawPointer(newHasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
+    case 8:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_512.self)
+            let copyOf = hasher.pointee
+            let newHasher = UnsafeMutablePointer<CryptoKit.SHA3_512>.allocate(capacity: 1)
+            newHasher.initialize(to: copyOf)
+
+            return UnsafeMutableRawPointer(newHasher)
+        } else {
+            return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer
+        }
+        #else
+        return UnsafeMutableRawPointer(bitPattern: 1)!  // Return error pointer (SHA3 not available)
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -518,11 +769,40 @@ public func hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) {
     case 5:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA512.self)
         hasher.deallocate()
+    case 6:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, nothing to deallocate
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_256.self)
+            hasher.deallocate()
+        }
+        #endif
+    case 7:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, nothing to deallocate
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_384.self)
+            hasher.deallocate()
+        }
+        #endif
+    case 8:
+        if ptr == UnsafeMutableRawPointer(bitPattern: 1) {
+            return  // Error pointer, nothing to deallocate
+        }
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA3_512.self)
+            hasher.deallocate()
+        }
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
 }
-
 
 @_cdecl("go_extractHKDF")
 public func extractHKDF(
@@ -625,7 +905,6 @@ public func expandHKDF(
 
     return 0
 }
-
 
 @_cdecl("go_initHMAC")
 public func initHMAC(

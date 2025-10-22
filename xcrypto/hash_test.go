@@ -29,14 +29,12 @@ func cryptoToHash(h crypto.Hash) func() hash.Hash {
 		return xcrypto.NewSHA384
 	case crypto.SHA512:
 		return xcrypto.NewSHA512
-		// case crypto.SHA3_224:
-		// 	return xcrypto.NewSHA3_224
-		// case crypto.SHA3_256:
-		// 	return xcrypto.NewSHA3_256
-		// case crypto.SHA3_384:
-		// 	return xcrypto.NewSHA3_384
-		// case crypto.SHA3_512:
-		// 	return xcrypto.NewSHA3_512
+	case crypto.SHA3_256:
+		return xcrypto.NewSHA3_256
+	case crypto.SHA3_384:
+		return xcrypto.NewSHA3_384
+	case crypto.SHA3_512:
+		return xcrypto.NewSHA3_512
 	}
 	return nil
 }
@@ -50,9 +48,9 @@ var hashes = [...]crypto.Hash{
 	crypto.SHA384,
 	crypto.SHA512,
 	// crypto.SHA3_224,
-	// crypto.SHA3_256,
-	// crypto.SHA3_384,
-	// crypto.SHA3_512,
+	crypto.SHA3_256,
+	crypto.SHA3_384,
+	crypto.SHA3_512,
 }
 
 func TestHash(t *testing.T) {

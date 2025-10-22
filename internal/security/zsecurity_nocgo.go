@@ -518,8 +518,9 @@ func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData 
 
 var _mkcgo_SecRandomCopyBytes_trampoline_addr uintptr
 
-func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes unsafe.Pointer) int32 {
-	r0, _, _ := syscallN(_mkcgo_SecRandomCopyBytes_trampoline_addr, uintptr(rnd), uintptr(count), uintptr(bytes))
+func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes *byte) int32 {
+	r0, _, _ := syscallN(_mkcgo_SecRandomCopyBytes_trampoline_addr, uintptr(rnd), uintptr(count), uintptr(unsafe.Pointer(bytes)))
 	runtime.KeepAlive(rnd)
+	runtime.KeepAlive(bytes)
 	return int32(r0)
 }

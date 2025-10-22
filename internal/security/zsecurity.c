@@ -32,7 +32,7 @@ SecKeyRef SecKeyCreateWithData(CFDataRef, CFDictionaryRef, CFErrorRef*);
 size_t SecKeyGetBlockSize(SecKeyRef);
 Boolean SecKeyIsAlgorithmSupported(SecKeyRef, SecKeyOperationType, SecKeyAlgorithm);
 Boolean SecKeyVerifySignature(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFDataRef, CFErrorRef*);
-int SecRandomCopyBytes(SecRandomRef, size_t, void*);
+int SecRandomCopyBytes(SecRandomRef, size_t, unsigned char*);
 
 CFDataRef _mkcgo_CFDataCreate(CFAllocatorRef _arg0, const uint8_t* _arg1, CFIndex _arg2) {
 	return CFDataCreate(_arg0, _arg1, _arg2);
@@ -126,7 +126,7 @@ Boolean _mkcgo_SecKeyVerifySignature(SecKeyRef _arg0, SecKeyAlgorithm _arg1, CFD
 	return SecKeyVerifySignature(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
-int _mkcgo_SecRandomCopyBytes(SecRandomRef _arg0, size_t _arg1, void* _arg2) {
+int _mkcgo_SecRandomCopyBytes(SecRandomRef _arg0, size_t _arg1, unsigned char* _arg2) {
 	return SecRandomCopyBytes(_arg0, _arg1, _arg2);
 }
 

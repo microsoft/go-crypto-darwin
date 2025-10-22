@@ -20,8 +20,7 @@ func (randReader) Read(b []byte) (int, error) {
 	if len(b) == 0 {
 		return 0, nil
 	}
-	// TODO: kSecRandomDefault is nil so this can be replaced
-	if security.SecRandomCopyBytes(security.KSecRandomDefault, len(b), unsafe.Pointer(&b[0])) != 0 {
+	if security.SecRandomCopyBytes(security.KSecRandomDefault, len(b), unsafe.SliceData(b)) != 0 {
 		return 0, errors.New("crypto/rand: unable to read from source")
 	}
 	return len(b), nil

@@ -631,6 +631,27 @@ public func hashSize(_ hashAlgorithm: Int32) -> Int {
         return CryptoKit.SHA384.byteCount
     case 5:
         return CryptoKit.SHA512.byteCount
+    case 6:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_256.byteCount
+        #endif
+    case 7:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_384.byteCount
+        #endif
+    case 8:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_512.byteCount
+        #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -649,6 +670,27 @@ public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
         return CryptoKit.SHA384.blockByteCount
     case 5:
         return CryptoKit.SHA512.blockByteCount
+    case 6:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_256.blockByteCount
+        #endif
+    case 7:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_384.blockByteCount
+        #endif
+    case 8:
+        #if compiler(>=6.2)
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA3 not supported on this OS version")
+        }
+        return CryptoKit.SHA3_512.blockByteCount
+        #endif
     default:
         fatalError("Unsupported hash function")
     }

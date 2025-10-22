@@ -17,24 +17,12 @@ runs:
       with:
         go-version: 1.25.x
 
-    - name: Cache gotip
-      id: gotip
-      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-      with:
-        path: |
-          $HOME/go/bin
-          $HOME/.cache/gotip
-          $HOME/.gotip
-        key: gotip-${{ inputs.macos-version }}-703335
-        restore-keys: |
-          gotip-${{ inputs.macos-version }}-
-
-    - name: Download CL containing patches required for CGO-less
+    - name: Bulild gotip
       shell: bash
       if: steps.gotip.outputs.cache-hit != 'true'
       run: |
         go install golang.org/dl/gotip@latest
-        printf 'y\n' | gotip download 703335
+        printf 'y\n' | gotip download
 
     - name: Add gotip to the PATH
       shell: bash

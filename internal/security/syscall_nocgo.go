@@ -10,7 +10,7 @@ import (
 	_ "unsafe"
 )
 
-//go:linkname syscall_syscallN syscall.syscallN
+//go:linkname syscall_syscallN syscall.syscalln
 //go:linkname entersyscall runtime.entersyscall
 //go:linkname exitsyscall runtime.exitsyscall
 

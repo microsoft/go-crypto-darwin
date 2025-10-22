@@ -99,6 +99,6 @@ SecKeyRef _mkcgo_SecKeyCreateWithData(CFDataRef, CFDictionaryRef, CFErrorRef*);
 size_t _mkcgo_SecKeyGetBlockSize(SecKeyRef);
 Boolean _mkcgo_SecKeyIsAlgorithmSupported(SecKeyRef, SecKeyOperationType, SecKeyAlgorithm);
 Boolean _mkcgo_SecKeyVerifySignature(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFDataRef, CFErrorRef*);
-int _mkcgo_SecRandomCopyBytes(SecRandomRef, size_t, void*);
+int _mkcgo_SecRandomCopyBytes(SecRandomRef, size_t, unsigned char*);
 
 #endif // MKCGO_H

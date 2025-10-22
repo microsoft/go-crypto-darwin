@@ -82,7 +82,7 @@ extern const CFStringRef kSecKeyAlgorithmRSAEncryptionOAEPSHA512 __attribute__((
 // ECDSA
 extern const CFStringRef kSecKeyAlgorithmECDSASignatureDigestX962 __attribute__((framework(Security, A)));
 
-int SecRandomCopyBytes(SecRandomRef rnd, size_t count, void *bytes) __attribute__((framework(Security, A), noescape, nocallback));
+int SecRandomCopyBytes(SecRandomRef rnd, size_t count, unsigned char *bytes) __attribute__((framework(Security, A), noescape, nocallback));
 SecKeyRef SecKeyCopyPublicKey(SecKeyRef key) __attribute__((framework(Security, A)));
 SecKeyRef SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, CFErrorRef *error) __attribute__((framework(Security, A)));
 SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));

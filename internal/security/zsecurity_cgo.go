@@ -161,6 +161,6 @@ func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData 
 	return C._mkcgo_SecKeyVerifySignature(key, algorithm, signedData, signature, __error)
 }
 
-func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes unsafe.Pointer) int32 {
-	return int32(C._mkcgo_SecRandomCopyBytes(rnd, C.size_t(count), bytes))
+func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes *byte) int32 {
+	return int32(C._mkcgo_SecRandomCopyBytes(rnd, C.size_t(count), (*C.uchar)(unsafe.Pointer(bytes))))
 }

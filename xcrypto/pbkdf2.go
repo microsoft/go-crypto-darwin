@@ -30,21 +30,13 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 	derivedKey := make([]byte, keyLen)
 
 	// Call CommonCrypto's PBKDF2 implementation
-	var passwordPtr *uint8
-	if len(password) > 0 {
-		passwordPtr = &password[0]
-	}
-	var saltPtr *uint8
-	if len(salt) > 0 {
-		saltPtr = &salt[0]
-	}
 	status := commoncrypto.CCKeyDerivationPBKDF(
-		commoncrypto.KCCPBKDF2,     // PBKDF2 algorithm
-		passwordPtr, len(password), // Password pointer and its length
-		saltPtr, len(salt), // Salt pointer and its length
+		commoncrypto.KCCPBKDF2, // PBKDF2 algorithm
+		password,               // Password
+		salt,                   // Salt
 		ccDigest,               // Digest algorithm
 		uint32(iter),           // Iteration count
-		&derivedKey[0], keyLen, // Output buffer for derived key and its length
+		derivedKey,             // Output buffer for derived key
 	)
 
 	if status != commoncrypto.KCCSuccess {

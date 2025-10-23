@@ -69,8 +69,8 @@ func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
 	return (*C.mkcgo_err_state)(unsafe.Pointer(x ^ 0))
 }
 
-func CFDataCreate(allocator CFAllocatorRef, bytes *uint8, length CFIndex) CFDataRef {
-	return C._mkcgo_CFDataCreate(allocator, (*C.uint8_t)(unsafe.Pointer(bytes)), length)
+func CFDataCreate(allocator CFAllocatorRef, bytes []uint8) CFDataRef {
+	return C._mkcgo_CFDataCreate(allocator, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(bytes))), CFIndex(len(bytes)))
 }
 
 func CFDataGetBytePtr(data CFDataRef) *uint8 {
@@ -161,6 +161,6 @@ func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData 
 	return C._mkcgo_SecKeyVerifySignature(key, algorithm, signedData, signature, __error)
 }
 
-func SecRandomCopyBytes(rnd SecRandomRef, count int, bytes *byte) int32 {
-	return int32(C._mkcgo_SecRandomCopyBytes(rnd, C.size_t(count), (*C.uchar)(unsafe.Pointer(bytes))))
+func SecRandomCopyBytes(rnd SecRandomRef, bytes []byte) int32 {
+	return int32(C._mkcgo_SecRandomCopyBytes(rnd, C.size_t(len(bytes)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(bytes)))))
 }

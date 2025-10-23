@@ -29,20 +29,22 @@ type hashAlgorithm struct {
 	ch        crypto.Hash
 	size      int
 	blockSize int
-	available bool
 }
 
 var cacheHash sync.Map // map[crypto.Hash]*hashAlgorithm
 
 // loadHash converts a crypto.Hash to a hashAlgorithm.
-func loadHash(ch crypto.Hash) *hashAlgorithm {
+func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 	if v, ok := cacheHash.Load(ch); ok {
+		if v == nil && required {
+			panic("cryptokit: " + ch.String() + " not available")
+		}
 		return v.(*hashAlgorithm)
 	}
 
 	var hash hashAlgorithm
 	hash.ch = ch
-	hash.available = true
+	supported := true
 
 	switch ch {
 	case crypto.MD5:
@@ -66,10 +68,13 @@ func loadHash(ch crypto.Hash) *hashAlgorithm {
 		hash.size = int(cryptokit.HashSize(sha512))
 		hash.blockSize = int(cryptokit.HashBlockSize(sha512))
 	default:
-		hash.available = false
+		supported = false
 	}
 
-	if !hash.available {
+	if !supported {
+		if required {
+			panic("cryptokit: " + ch.String() + " not available")
+		}
 		cacheHash.Store(ch, (*hashAlgorithm)(nil))
 		return nil
 	}
@@ -87,14 +92,11 @@ type evpHash struct {
 
 // SupportsHash returns true if a hash.Hash implementation is supported for h.
 func SupportsHash(h crypto.Hash) bool {
-	return loadHash(h) != nil
+	return loadHash(h, false) != nil
 }
 
 func newEVPHash(ch crypto.Hash) *evpHash {
-	alg := loadHash(ch)
-	if alg == nil {
-		panic("cryptokit: " + ch.String() + " not available")
-	}
+	alg := loadHash(ch, true)
 
 	h := &evpHash{
 		ptr:           cryptokit.HashNew(alg.id),

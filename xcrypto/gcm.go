@@ -99,14 +99,13 @@ func (g *aesGCM) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
 		panic("cipher: invalid buffer overlap")
 	}
 
-	tag := out[len(out)-gcmTagSize:]
 	err := cryptokit.EncryptAESGCM(
-		addr(g.key), len(g.key),
-		addr(plaintext), len(plaintext),
-		addr(nonce), len(nonce),
-		addr(additionalData), len(additionalData),
-		addr(out[:len(out)-gcmTagSize]), len(out[:len(out)-gcmTagSize]),
-		addr(tag),
+		g.key,
+		plaintext,
+		nonce,
+		additionalData,
+		out[:len(out)-gcmTagSize],
+		out[len(out)-gcmTagSize:],
 	)
 	if err != 0 {
 		panic("cipher: encryption failed")
@@ -135,16 +134,15 @@ func (g *aesGCM) SealWithRandomNonce(out, nonce, plaintext, additionalData []byt
 		panic("cipher: TLS 1.2 and 1.3 modes do not support random nonce")
 	}
 
-	tag := out[len(out)-gcmTagSize:]
 	// Generate a random nonce
 	RandReader.Read(nonce)
 	err := cryptokit.EncryptAESGCM(
-		addr(g.key), len(g.key),
-		addr(plaintext), len(plaintext),
-		addr(nonce), len(nonce),
-		addr(additionalData), len(additionalData),
-		addr(out[:len(out)-gcmTagSize]), len(out[:len(out)-gcmTagSize]),
-		addr(tag),
+		g.key,
+		plaintext,
+		nonce,
+		additionalData,
+		out[:len(out)-gcmTagSize],
+		out[len(out)-gcmTagSize:],
 	)
 	if err != 0 {
 		panic("cipher: encryption failed")
@@ -181,12 +179,13 @@ func (g *aesGCM) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, er
 
 	var decSize int
 	err := cryptokit.DecryptAESGCM(
-		addr(g.key), len(g.key),
-		addr(ciphertext), len(ciphertext),
-		addr(nonce), len(nonce),
-		addr(additionalData), len(additionalData),
-		addr(tag), len(tag),
-		addr(out), &decSize,
+		g.key,
+		ciphertext,
+		nonce,
+		additionalData,
+		tag,
+		out,
+		&decSize,
 	)
 	if err != 0 || int(decSize) != len(ciphertext) {
 		// If the decrypted data size does not match, zero out `out` and return `errOpen`

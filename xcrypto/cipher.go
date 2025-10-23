@@ -35,11 +35,9 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 		commoncrypto.KCCModeCBC,        // Mode of operation, here explicitly set to CBC (Cipher Block Chaining).
 		commoncrypto.CCAlgorithm(kind), // The encryption algorithm (e.g., kCCAlgorithmAES128, kCCAlgorithmDES).
 		commoncrypto.CcNoPadding,       // Padding option, set to no padding; padding can be handled at a higher level if necessary.
-		pbase(iv),                      // Initialization Vector (IV) for the cipher, required for CBC mode. Should be nil for ECB mode.
-		pbase(key),                     // Pointer to the encryption key.
-		int(len(key)),                  // Length of the encryption key in bytes.
+		iv,                             // Initialization Vector (IV) for the cipher, required for CBC mode. Should be nil for ECB mode.
+		key,                            // PEncryption key.
 		nil,                            // Tweak key, used only for XTS mode; here set to nil as it’s not required for CBC.
-		0,                              // Length of the tweak key, set to 0 as tweak is nil.
 		0,                              // Number of rounds, mainly for RC2 and Blowfish; not used here, so set to 0.
 		0,                              // Mode options for CTR and F8 modes; not used for CBC, so set to 0.
 		&x.cryptor,                     // Pointer to the CCCryptorRef output, which will hold the state for encryption or decryption.
@@ -78,12 +76,10 @@ func (x *cbcCipher) CryptBlocks(dst, src []byte) {
 	}
 	var outLength int
 	status := commoncrypto.CCCryptorUpdate(
-		x.cryptor,     // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
-		pbase(src),    // Pointer to the input data (source buffer) to be encrypted or decrypted.
-		int(len(src)), // Length of the input data in bytes.
-		pbase(dst),    // Pointer to the output buffer (destination buffer) where the result will be stored.
-		int(len(dst)), // Size of the output buffer in bytes; must be large enough to hold the processed data.
-		&outLength,    // Pointer to a variable that will contain the number of bytes written to the output buffer.
+		x.cryptor,  // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
+		src,        // Input data (source buffer) to be encrypted or decrypted.
+		dst,        // Output buffer (destination buffer) where the result will be stored.
+		&outLength, // Pointer to a variable that will contain the number of bytes written to the output buffer.
 	)
 	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorUpdate failed")
@@ -95,10 +91,7 @@ func (x *cbcCipher) SetIV(iv []byte) {
 	if len(iv) != x.blockSize {
 		panic("crypto/cipher: incorrect IV length")
 	}
-	status := commoncrypto.CCCryptorReset(
-		x.cryptor, // CCCryptorRef created by CCCryptorCreateWithMode; holds the encryption/decryption state.
-		pbase(iv), // Pointer to the new IV to be set.
-	)
+	status := commoncrypto.CCCryptorReset(x.cryptor, iv)
 	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorReset failed")
 	}

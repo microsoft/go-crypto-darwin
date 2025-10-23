@@ -9,23 +9,23 @@
 #include <stdio.h>
 #include "zcommoncrypto.h"
 
-CCCryptorStatus CCCrypt(CCOperation, CCAlgorithm, CCOptions, const void*, size_t, const void*, const void*, size_t, void*, size_t, size_t*);
-CCCryptorStatus CCCryptorCreate(CCOperation, CCAlgorithm, CCOptions, const void*, size_t, const void*, CCCryptorRef*);
-CCCryptorStatus CCCryptorCreateWithMode(CCOperation, CCMode, CCAlgorithm, CCPadding, const void*, const void*, size_t, const void*, size_t, int, CCModeOptions, CCCryptorRef*);
+CCCryptorStatus CCCrypt(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, const unsigned char*, size_t, unsigned char*, size_t, size_t*);
+CCCryptorStatus CCCryptorCreate(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, CCCryptorRef*);
+CCCryptorStatus CCCryptorCreateWithMode(CCOperation, CCMode, CCAlgorithm, CCPadding, const unsigned char*, const unsigned char*, size_t, const unsigned char*, size_t, int, CCModeOptions, CCCryptorRef*);
 CCCryptorStatus CCCryptorRelease(CCCryptorRef);
-CCCryptorStatus CCCryptorReset(CCCryptorRef, const void*);
-CCCryptorStatus CCCryptorUpdate(CCCryptorRef, const void*, size_t, void*, size_t, size_t*);
+CCCryptorStatus CCCryptorReset(CCCryptorRef, const unsigned char*);
+CCCryptorStatus CCCryptorUpdate(CCCryptorRef, const unsigned char*, size_t, unsigned char*, size_t, size_t*);
 CCCryptorStatus CCKeyDerivationPBKDF(CCPBKDFAlgorithm, const char*, size_t, const uint8_t*, size_t, CCPseudoRandomAlgorithm, unsigned, uint8_t*, size_t);
 
-CCCryptorStatus _mkcgo_CCCrypt(CCOperation _arg0, CCAlgorithm _arg1, CCOptions _arg2, const void* _arg3, size_t _arg4, const void* _arg5, const void* _arg6, size_t _arg7, void* _arg8, size_t _arg9, size_t* _arg10) {
+CCCryptorStatus _mkcgo_CCCrypt(CCOperation _arg0, CCAlgorithm _arg1, CCOptions _arg2, const unsigned char* _arg3, size_t _arg4, const unsigned char* _arg5, const unsigned char* _arg6, size_t _arg7, unsigned char* _arg8, size_t _arg9, size_t* _arg10) {
 	return CCCrypt(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10);
 }
 
-CCCryptorStatus _mkcgo_CCCryptorCreate(CCOperation _arg0, CCAlgorithm _arg1, CCOptions _arg2, const void* _arg3, size_t _arg4, const void* _arg5, CCCryptorRef* _arg6) {
+CCCryptorStatus _mkcgo_CCCryptorCreate(CCOperation _arg0, CCAlgorithm _arg1, CCOptions _arg2, const unsigned char* _arg3, size_t _arg4, const unsigned char* _arg5, CCCryptorRef* _arg6) {
 	return CCCryptorCreate(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
 }
 
-CCCryptorStatus _mkcgo_CCCryptorCreateWithMode(CCOperation _arg0, CCMode _arg1, CCAlgorithm _arg2, CCPadding _arg3, const void* _arg4, const void* _arg5, size_t _arg6, const void* _arg7, size_t _arg8, int _arg9, CCModeOptions _arg10, CCCryptorRef* _arg11) {
+CCCryptorStatus _mkcgo_CCCryptorCreateWithMode(CCOperation _arg0, CCMode _arg1, CCAlgorithm _arg2, CCPadding _arg3, const unsigned char* _arg4, const unsigned char* _arg5, size_t _arg6, const unsigned char* _arg7, size_t _arg8, int _arg9, CCModeOptions _arg10, CCCryptorRef* _arg11) {
 	return CCCryptorCreateWithMode(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10, _arg11);
 }
 
@@ -33,11 +33,11 @@ CCCryptorStatus _mkcgo_CCCryptorRelease(CCCryptorRef _arg0) {
 	return CCCryptorRelease(_arg0);
 }
 
-CCCryptorStatus _mkcgo_CCCryptorReset(CCCryptorRef _arg0, const void* _arg1) {
+CCCryptorStatus _mkcgo_CCCryptorReset(CCCryptorRef _arg0, const unsigned char* _arg1) {
 	return CCCryptorReset(_arg0, _arg1);
 }
 
-CCCryptorStatus _mkcgo_CCCryptorUpdate(CCCryptorRef _arg0, const void* _arg1, size_t _arg2, void* _arg3, size_t _arg4, size_t* _arg5) {
+CCCryptorStatus _mkcgo_CCCryptorUpdate(CCCryptorRef _arg0, const unsigned char* _arg1, size_t _arg2, unsigned char* _arg3, size_t _arg4, size_t* _arg5) {
 	return CCCryptorUpdate(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
 }
 

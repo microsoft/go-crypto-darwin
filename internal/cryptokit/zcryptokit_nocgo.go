@@ -12,6 +12,8 @@ import (
 	"unsafe"
 )
 
+var _ = runtime.GOOS
+
 //go:linkname go_MD5 go_MD5
 //go:linkname go_SHA1 go_SHA1
 //go:linkname go_SHA256 go_SHA256
@@ -76,192 +78,141 @@ var go_supportsSHA3 byte
 var go_updateHMAC byte
 var go_verifyEd25519 byte
 
-func MD5(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func MD5(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA1(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA1(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA256(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA256)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA384(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA3_256)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA3_256(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_256)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA3_384)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA3_384(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_384)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA3_512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA3_512(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_512)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_SHA512)), uintptr(unsafe.Pointer(inputPointer)), uintptr(inputLength), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(inputPointer)
-	runtime.KeepAlive(outputPointer)
+func SHA512(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA512)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr))
 	return unsafe.Pointer(r0)
 }
 
-func DecryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, tag *uint8, tagLength int, out *uint8, outLength *int) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(tag)), uintptr(tagLength), uintptr(unsafe.Pointer(out)), uintptr(unsafe.Pointer(outLength)))
-	runtime.KeepAlive(key)
-	runtime.KeepAlive(data)
-	runtime.KeepAlive(nonce)
-	runtime.KeepAlive(aad)
-	runtime.KeepAlive(tag)
-	runtime.KeepAlive(out)
-	runtime.KeepAlive(outLength)
+func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
 	return int32(r0)
 }
 
-func EncryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, cipherText *uint8, cipherTextLength int, tag *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(unsafe.Pointer(key)), uintptr(keyLength), uintptr(unsafe.Pointer(data)), uintptr(dataLength), uintptr(unsafe.Pointer(nonce)), uintptr(nonceLength), uintptr(unsafe.Pointer(aad)), uintptr(aadLength), uintptr(unsafe.Pointer(cipherText)), uintptr(cipherTextLength), uintptr(unsafe.Pointer(tag)))
-	runtime.KeepAlive(key)
-	runtime.KeepAlive(data)
-	runtime.KeepAlive(nonce)
-	runtime.KeepAlive(aad)
-	runtime.KeepAlive(cipherText)
-	runtime.KeepAlive(tag)
+func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
 	return int32(r0)
 }
 
-func ExpandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(prk)), uintptr(prkLength), uintptr(unsafe.Pointer(info)), uintptr(infoLength), uintptr(unsafe.Pointer(okm)), uintptr(okmLength))
-	runtime.KeepAlive(prk)
-	runtime.KeepAlive(info)
-	runtime.KeepAlive(okm)
+func ExpandHKDF(hashFunction int32, prk []uint8, info []uint8, okm []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)), uintptr(unsafe.Pointer(unsafe.SliceData(info))), uintptr(len(info)), uintptr(unsafe.Pointer(unsafe.SliceData(okm))), uintptr(len(okm)))
 	return int32(r0)
 }
 
-func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(secret)), uintptr(secretLength), uintptr(unsafe.Pointer(salt)), uintptr(saltLength), uintptr(unsafe.Pointer(prk)), uintptr(prkLength))
-	runtime.KeepAlive(secret)
-	runtime.KeepAlive(salt)
-	runtime.KeepAlive(prk)
+func ExtractHKDF(hashFunction int32, secret []uint8, salt []uint8, prk []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(secret))), uintptr(len(secret)), uintptr(unsafe.Pointer(unsafe.SliceData(salt))), uintptr(len(salt)), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)))
 	return int32(r0)
 }
 
-func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(outputPointer)
+func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
-	syscallN(uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr))
+	syscallN(0, uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr))
 }
 
-func GenerateKeyEd25519(key *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(key)))
-	runtime.KeepAlive(key)
+func GenerateKeyEd25519(key []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))))
 }
 
 func HashBlockSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashBlockSize)), uintptr(hashAlgorithm))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashBlockSize)), uintptr(hashAlgorithm))
 	return int32(r0)
 }
 
 func HashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr))
 	return unsafe.Pointer(r0)
 }
 
 func HashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscallN(uintptr(unsafe.Pointer(&go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr))
+	syscallN(0, uintptr(unsafe.Pointer(&go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr))
 }
 
 func HashNew(hashAlgorithm int32) unsafe.Pointer {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashNew)), uintptr(hashAlgorithm))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashNew)), uintptr(hashAlgorithm))
 	return unsafe.Pointer(r0)
 }
 
 func HashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
-	syscallN(uintptr(unsafe.Pointer(&go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr))
+	syscallN(0, uintptr(unsafe.Pointer(&go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr))
 }
 
 func HashSize(hashAlgorithm int32) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_hashSize)), uintptr(hashAlgorithm))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashSize)), uintptr(hashAlgorithm))
 	return int32(r0)
 }
 
-func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	syscallN(uintptr(unsafe.Pointer(&go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(outputPointer)))
-	runtime.KeepAlive(outputPointer)
+func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscallN(uintptr(unsafe.Pointer(&go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length))
-	runtime.KeepAlive(data)
+func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)))
 }
 
-func InitHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(key)), uintptr(keyLength))
-	runtime.KeepAlive(key)
+func InitHMAC(hashFunction int32, key []uint8) unsafe.Pointer {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)))
 	return unsafe.Pointer(r0)
 }
 
-func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(seed)))
-	runtime.KeepAlive(key)
-	runtime.KeepAlive(seed)
+func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(seed))))
 	return int32(r0)
 }
 
-func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(pub)))
-	runtime.KeepAlive(key)
-	runtime.KeepAlive(pub)
+func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(pub))))
 	return int32(r0)
 }
 
-func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(privateKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sigBuffer)))
-	runtime.KeepAlive(privateKey)
-	runtime.KeepAlive(message)
-	runtime.KeepAlive(sigBuffer)
+func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sigBuffer))))
 	return int32(r0)
 }
 
 func SupportsSHA3() int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_supportsSHA3)))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_supportsSHA3)))
 	return int32(r0)
 }
 
-func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	syscallN(uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(data)), uintptr(length))
-	runtime.KeepAlive(data)
+func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)))
 }
 
-func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(publicKey)), uintptr(unsafe.Pointer(message)), uintptr(messageLength), uintptr(unsafe.Pointer(sig)))
-	runtime.KeepAlive(publicKey)
-	runtime.KeepAlive(message)
-	runtime.KeepAlive(sig)
+func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))))
 	return int32(r0)
 }

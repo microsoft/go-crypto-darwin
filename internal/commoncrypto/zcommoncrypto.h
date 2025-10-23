@@ -60,12 +60,12 @@ typedef void* mkcgo_err_state;
 mkcgo_err_state mkcgo_err_retrieve();
 void mkcgo_err_free(mkcgo_err_state);
 
-CCCryptorStatus _mkcgo_CCCrypt(CCOperation, CCAlgorithm, CCOptions, const void*, size_t, const void*, const void*, size_t, void*, size_t, size_t*);
-CCCryptorStatus _mkcgo_CCCryptorCreate(CCOperation, CCAlgorithm, CCOptions, const void*, size_t, const void*, CCCryptorRef*);
-CCCryptorStatus _mkcgo_CCCryptorCreateWithMode(CCOperation, CCMode, CCAlgorithm, CCPadding, const void*, const void*, size_t, const void*, size_t, int, CCModeOptions, CCCryptorRef*);
+CCCryptorStatus _mkcgo_CCCrypt(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, const unsigned char*, size_t, unsigned char*, size_t, size_t*);
+CCCryptorStatus _mkcgo_CCCryptorCreate(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, CCCryptorRef*);
+CCCryptorStatus _mkcgo_CCCryptorCreateWithMode(CCOperation, CCMode, CCAlgorithm, CCPadding, const unsigned char*, const unsigned char*, size_t, const unsigned char*, size_t, int, CCModeOptions, CCCryptorRef*);
 CCCryptorStatus _mkcgo_CCCryptorRelease(CCCryptorRef);
-CCCryptorStatus _mkcgo_CCCryptorReset(CCCryptorRef, const void*);
-CCCryptorStatus _mkcgo_CCCryptorUpdate(CCCryptorRef, const void*, size_t, void*, size_t, size_t*);
+CCCryptorStatus _mkcgo_CCCryptorReset(CCCryptorRef, const unsigned char*);
+CCCryptorStatus _mkcgo_CCCryptorUpdate(CCCryptorRef, const unsigned char*, size_t, unsigned char*, size_t, size_t*);
 CCCryptorStatus _mkcgo_CCKeyDerivationPBKDF(CCPBKDFAlgorithm, const char*, size_t, const uint8_t*, size_t, CCPseudoRandomAlgorithm, unsigned, uint8_t*, size_t);
 
 #endif // MKCGO_H

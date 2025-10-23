@@ -6,7 +6,6 @@
 package security
 
 import (
-	"syscall"
 	_ "unsafe"
 )
 
@@ -16,7 +15,6 @@ import (
 func syscall_syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr)
 
 //go:nosplit
-func syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	r1, r2 = syscall_syscallN(fn, args...)
-	return r1, r2, 0
+func syscallN(_ uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
+	return syscall_syscallN(fn, args...)
 }

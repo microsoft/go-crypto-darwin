@@ -63,13 +63,10 @@ func (c *desCipher) Encrypt(dst, src []byte) {
 		commoncrypto.KCCEncrypt,
 		commoncrypto.CCAlgorithm(c.kind),
 		commoncrypto.KCCOptionECBMode,
-		pbase(c.key),
-		int(len(c.key)),
+		c.key,
 		nil,
-		pbase(src[:blockSize]),
-		int(blockSize),
-		pbase(dst[:blockSize]),
-		int(blockSize),
+		src[:blockSize],
+		dst[:blockSize],
 		&outLength,
 	)
 	if status != commoncrypto.KCCSuccess {
@@ -92,13 +89,10 @@ func (c *desCipher) Decrypt(dst, src []byte) {
 		commoncrypto.KCCDecrypt,
 		commoncrypto.CCAlgorithm(c.kind),
 		commoncrypto.KCCOptionECBMode,
-		pbase(c.key),
-		int(len(c.key)),
+		c.key,
 		nil,
-		pbase(src[:blockSize]),
-		int(blockSize),
-		pbase(dst[:blockSize]),
-		int(blockSize),
+		src[:blockSize],
+		dst[:blockSize],
 		&outLength,
 	)
 	if status != commoncrypto.KCCSuccess {

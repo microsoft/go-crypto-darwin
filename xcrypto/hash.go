@@ -166,7 +166,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
-	cryptokit.HashWrite(h.alg.id, h.ptr, addrNeverEmpty(p), int32(len(p)))
+	cryptokit.HashWrite(h.alg.id, h.ptr, p)
 
 	runtime.KeepAlive(h)
 
@@ -177,7 +177,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 	if len(s) == 0 {
 		return 0, nil
 	}
-	cryptokit.HashWrite(h.alg.id, h.ptr, addrNeverEmpty([]byte(s)), int32(len(s)))
+	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(unsafe.StringData(s), len(s)))
 
 	runtime.KeepAlive(h)
 
@@ -185,7 +185,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 }
 
 func (h *evpHash) WriteByte(c byte) error {
-	cryptokit.HashWrite(h.alg.id, h.ptr, addr([]byte{c}), 1)
+	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(&c, 1))
 
 	runtime.KeepAlive(h)
 
@@ -194,7 +194,7 @@ func (h *evpHash) WriteByte(c byte) error {
 
 func (h *evpHash) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.alg.size, 64) // explicit cap to allow stack allocation
-	cryptokit.HashSum(h.alg.id, h.ptr, addr(hashSlice))
+	cryptokit.HashSum(h.alg.id, h.ptr, hashSlice)
 	runtime.KeepAlive(h)
 	b = append(b, hashSlice...)
 	return b
@@ -244,42 +244,42 @@ var _ hash.Hash = (*DigestSHA3)(nil)
 var _ HashCloner = (*DigestSHA3)(nil)
 
 func MD5(p []byte) (sum [16]byte) {
-	cryptokit.MD5(addr(p), len(p), addr(sum[:]))
+	cryptokit.MD5(p, sum[:])
 	return
 }
 
 func SHA1(p []byte) (sum [20]byte) {
-	cryptokit.SHA1(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA1(p, sum[:])
 	return
 }
 
 func SHA256(p []byte) (sum [32]byte) {
-	cryptokit.SHA256(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA256(p, sum[:])
 	return
 }
 
 func SHA384(p []byte) (sum [48]byte) {
-	cryptokit.SHA384(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA384(p, sum[:])
 	return
 }
 
 func SHA512(p []byte) (sum [64]byte) {
-	cryptokit.SHA512(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA512(p, sum[:])
 	return
 }
 
 func SumSHA3_256(p []byte) (sum [32]byte) {
-	cryptokit.SHA3_256(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA3_256(p, sum[:])
 	return
 }
 
 func SumSHA3_384(p []byte) (sum [48]byte) {
-	cryptokit.SHA3_384(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA3_384(p, sum[:])
 	return
 }
 
 func SumSHA3_512(p []byte) (sum [64]byte) {
-	cryptokit.SHA3_512(addr(p), len(p), addr(sum[:]))
+	cryptokit.SHA3_512(p, sum[:])
 	return
 }
 

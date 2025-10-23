@@ -13,23 +13,23 @@ import (
 )
 
 const (
-	// SharedKeySize is the size of a shared key produced by ML-KEM.
-	SharedKeySize = 32
+	// sharedKeySizeMLKEM is the size of a shared key produced by ML-KEM.
+	sharedKeySizeMLKEM = 32
 
-	// SeedSize is the size of a seed used to generate a decapsulation key.
-	SeedSize = 64
+	// seedSizeMLKEM is the size of a seed used to generate a decapsulation key.
+	seedSizeMLKEM = 64
 
-	// CiphertextSize768 is the size of a ciphertext produced by ML-KEM-768.
-	CiphertextSize768 = 1088
+	// ciphertextSizeMLKEM768 is the size of a ciphertext produced by ML-KEM-768.
+	ciphertextSizeMLKEM768 = 1088
 
-	// EncapsulationKeySize768 is the size of an ML-KEM-768 encapsulation key.
-	EncapsulationKeySize768 = 1184
+	// encapsulationKeySizeMLKEM768 is the size of an ML-KEM-768 encapsulation key.
+	encapsulationKeySizeMLKEM768 = 1184
 
-	// CiphertextSize1024 is the size of a ciphertext produced by ML-KEM-1024.
-	CiphertextSize1024 = 1568
+	// ciphertextSizeMLKEM1024 is the size of a ciphertext produced by ML-KEM-1024.
+	ciphertextSizeMLKEM1024 = 1568
 
-	// EncapsulationKeySize1024 is the size of an ML-KEM-1024 encapsulation key.
-	EncapsulationKeySize1024 = 1568
+	// encapsulationKeySizeMLKEM1024 is the size of an ML-KEM-1024 encapsulation key.
+	encapsulationKeySizeMLKEM1024 = 1568
 )
 
 // SupportsMLKEM returns true if ML-KEM is supported on this platform.
@@ -37,16 +37,16 @@ func SupportsMLKEM() bool {
 	return cryptokit.SupportsMLKEM() == 1
 }
 
-// DecapsulationKey768 is the secret key used to decapsulate a shared key
+// DecapsulationKeyMLKEM768 is the secret key used to decapsulate a shared key
 // from a ciphertext. It includes various precomputed values.
-type DecapsulationKey768 struct {
-	seed [SeedSize]byte
+type DecapsulationKeyMLKEM768 struct {
+	seed [seedSizeMLKEM]byte
 }
 
 // GenerateKeyMLKEM768 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
-func GenerateKeyMLKEM768() (*DecapsulationKey768, error) {
-	dk := &DecapsulationKey768{}
+func GenerateKeyMLKEM768() (*DecapsulationKeyMLKEM768, error) {
+	dk := &DecapsulationKeyMLKEM768{}
 	ret := cryptokit.GenerateKeyMLKEM768(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
 		return nil, errors.New("mlkem: key generation failed")
@@ -57,12 +57,12 @@ func GenerateKeyMLKEM768() (*DecapsulationKey768, error) {
 
 // NewDecapsulationKeyMLKEM768 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
-func NewDecapsulationKeyMLKEM768(seed []byte) (*DecapsulationKey768, error) {
-	if len(seed) != SeedSize {
+func NewDecapsulationKeyMLKEM768(seed []byte) (*DecapsulationKeyMLKEM768, error) {
+	if len(seed) != seedSizeMLKEM {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
 
-	dk := &DecapsulationKey768{}
+	dk := &DecapsulationKeyMLKEM768{}
 	copy(dk.seed[:], seed)
 	return dk, nil
 }
@@ -70,7 +70,7 @@ func NewDecapsulationKeyMLKEM768(seed []byte) (*DecapsulationKey768, error) {
 // Bytes returns the decapsulation key as a 64-byte seed in the "d || z" form.
 //
 // The decapsulation key must be kept secret.
-func (dk *DecapsulationKey768) Bytes() []byte {
+func (dk *DecapsulationKeyMLKEM768) Bytes() []byte {
 	return dk.seed[:]
 }
 
@@ -78,12 +78,12 @@ func (dk *DecapsulationKey768) Bytes() []byte {
 // key. If the ciphertext is not valid, Decapsulate returns an error.
 //
 // The shared key must be kept secret.
-func (dk *DecapsulationKey768) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
-	if len(ciphertext) != CiphertextSize768 {
+func (dk *DecapsulationKeyMLKEM768) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
+	if len(ciphertext) != ciphertextSizeMLKEM768 {
 		return nil, errors.New("mlkem: invalid ciphertext size")
 	}
 
-	sharedKey = make([]byte, SharedKeySize)
+	sharedKey = make([]byte, sharedKeySizeMLKEM)
 	ret := cryptokit.DecapsulateMLKEM768(
 		addrNeverEmpty(dk.seed[:]),
 		addrNeverEmpty(ciphertext),
@@ -101,8 +101,8 @@ func (dk *DecapsulationKey768) Decapsulate(ciphertext []byte) (sharedKey []byte,
 
 // EncapsulationKey returns the public encapsulation key necessary to produce
 // ciphertexts.
-func (dk *DecapsulationKey768) EncapsulationKey() *EncapsulationKey768 {
-	ek := &EncapsulationKey768{}
+func (dk *DecapsulationKeyMLKEM768) EncapsulationKey() *EncapsulationKeyMLKEM768 {
+	ek := &EncapsulationKeyMLKEM768{}
 	ret := cryptokit.DeriveEncapsulationKeyMLKEM768(
 		addrNeverEmpty(dk.seed[:]),
 		addrNeverEmpty(ek.bytes[:]),
@@ -116,26 +116,26 @@ func (dk *DecapsulationKey768) EncapsulationKey() *EncapsulationKey768 {
 	return ek
 }
 
-// An EncapsulationKey768 is the public key used to produce ciphertexts to be
-// decapsulated by the corresponding DecapsulationKey768.
-type EncapsulationKey768 struct {
-	bytes [EncapsulationKeySize768]byte
+// An EncapsulationKeyMLKEM768 is the public key used to produce ciphertexts to be
+// decapsulated by the corresponding DecapsulationKeyMLKEM768.
+type EncapsulationKeyMLKEM768 struct {
+	bytes [encapsulationKeySizeMLKEM768]byte
 }
 
 // NewEncapsulationKeyMLKEM768 parses an encapsulation key from its encoded form. If
 // the encapsulation key is not valid, NewEncapsulationKeyMLKEM768 returns an error.
-func NewEncapsulationKeyMLKEM768(encapsulationKey []byte) (*EncapsulationKey768, error) {
-	if len(encapsulationKey) != EncapsulationKeySize768 {
+func NewEncapsulationKeyMLKEM768(encapsulationKey []byte) (*EncapsulationKeyMLKEM768, error) {
+	if len(encapsulationKey) != encapsulationKeySizeMLKEM768 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}
 
-	ek := &EncapsulationKey768{}
+	ek := &EncapsulationKeyMLKEM768{}
 	copy(ek.bytes[:], encapsulationKey)
 	return ek, nil
 }
 
 // Bytes returns the encapsulation key as a byte slice.
-func (ek *EncapsulationKey768) Bytes() []byte {
+func (ek *EncapsulationKeyMLKEM768) Bytes() []byte {
 	return ek.bytes[:]
 }
 
@@ -143,9 +143,9 @@ func (ek *EncapsulationKey768) Bytes() []byte {
 // encapsulation key, drawing random bytes from the default crypto/rand source.
 //
 // The shared key must be kept secret.
-func (ek *EncapsulationKey768) Encapsulate() (sharedKey, ciphertext []byte) {
-	sharedKey = make([]byte, SharedKeySize)
-	ciphertext = make([]byte, CiphertextSize768)
+func (ek *EncapsulationKeyMLKEM768) Encapsulate() (sharedKey, ciphertext []byte) {
+	sharedKey = make([]byte, sharedKeySizeMLKEM)
+	ciphertext = make([]byte, ciphertextSizeMLKEM768)
 
 	ret := cryptokit.EncapsulateMLKEM768(
 		addrNeverEmpty(ek.bytes[:]),
@@ -162,16 +162,16 @@ func (ek *EncapsulationKey768) Encapsulate() (sharedKey, ciphertext []byte) {
 	return sharedKey, ciphertext
 }
 
-// DecapsulationKey1024 is the secret key used to decapsulate a shared key
+// DecapsulationKeyMLKEM1024 is the secret key used to decapsulate a shared key
 // from a ciphertext. It includes various precomputed values.
-type DecapsulationKey1024 struct {
-	seed [SeedSize]byte
+type DecapsulationKeyMLKEM1024 struct {
+	seed [seedSizeMLKEM]byte
 }
 
 // GenerateKeyMLKEM1024 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
-func GenerateKeyMLKEM1024() (*DecapsulationKey1024, error) {
-	dk := &DecapsulationKey1024{}
+func GenerateKeyMLKEM1024() (*DecapsulationKeyMLKEM1024, error) {
+	dk := &DecapsulationKeyMLKEM1024{}
 	ret := cryptokit.GenerateKeyMLKEM1024(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
 		return nil, errors.New("mlkem: key generation failed")
@@ -182,12 +182,12 @@ func GenerateKeyMLKEM1024() (*DecapsulationKey1024, error) {
 
 // NewDecapsulationKeyMLKEM1024 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
-func NewDecapsulationKeyMLKEM1024(seed []byte) (*DecapsulationKey1024, error) {
-	if len(seed) != SeedSize {
+func NewDecapsulationKeyMLKEM1024(seed []byte) (*DecapsulationKeyMLKEM1024, error) {
+	if len(seed) != seedSizeMLKEM {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
 
-	dk := &DecapsulationKey1024{}
+	dk := &DecapsulationKeyMLKEM1024{}
 	copy(dk.seed[:], seed)
 	return dk, nil
 }
@@ -195,7 +195,7 @@ func NewDecapsulationKeyMLKEM1024(seed []byte) (*DecapsulationKey1024, error) {
 // Bytes returns the decapsulation key as a 64-byte seed in the "d || z" form.
 //
 // The decapsulation key must be kept secret.
-func (dk *DecapsulationKey1024) Bytes() []byte {
+func (dk *DecapsulationKeyMLKEM1024) Bytes() []byte {
 	return dk.seed[:]
 }
 
@@ -203,12 +203,12 @@ func (dk *DecapsulationKey1024) Bytes() []byte {
 // key. If the ciphertext is not valid, Decapsulate returns an error.
 //
 // The shared key must be kept secret.
-func (dk *DecapsulationKey1024) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
-	if len(ciphertext) != CiphertextSize1024 {
+func (dk *DecapsulationKeyMLKEM1024) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
+	if len(ciphertext) != ciphertextSizeMLKEM1024 {
 		return nil, errors.New("mlkem: invalid ciphertext size")
 	}
 
-	sharedKey = make([]byte, SharedKeySize)
+	sharedKey = make([]byte, sharedKeySizeMLKEM)
 	ret := cryptokit.DecapsulateMLKEM1024(
 		addrNeverEmpty(dk.seed[:]),
 		addrNeverEmpty(ciphertext),
@@ -226,8 +226,8 @@ func (dk *DecapsulationKey1024) Decapsulate(ciphertext []byte) (sharedKey []byte
 
 // EncapsulationKey returns the public encapsulation key necessary to produce
 // ciphertexts.
-func (dk *DecapsulationKey1024) EncapsulationKey() *EncapsulationKey1024 {
-	ek := &EncapsulationKey1024{}
+func (dk *DecapsulationKeyMLKEM1024) EncapsulationKey() *EncapsulationKeyMLKEM1024 {
+	ek := &EncapsulationKeyMLKEM1024{}
 	ret := cryptokit.DeriveEncapsulationKeyMLKEM1024(
 		addrNeverEmpty(dk.seed[:]),
 		addrNeverEmpty(ek.bytes[:]),
@@ -241,26 +241,26 @@ func (dk *DecapsulationKey1024) EncapsulationKey() *EncapsulationKey1024 {
 	return ek
 }
 
-// An EncapsulationKey1024 is the public key used to produce ciphertexts to be
-// decapsulated by the corresponding DecapsulationKey1024.
-type EncapsulationKey1024 struct {
-	bytes [EncapsulationKeySize1024]byte
+// An EncapsulationKeyMLKEM1024 is the public key used to produce ciphertexts to be
+// decapsulated by the corresponding DecapsulationKeyMLKEM1024.
+type EncapsulationKeyMLKEM1024 struct {
+	bytes [encapsulationKeySizeMLKEM1024]byte
 }
 
 // NewEncapsulationKeyMLKEM1024 parses an encapsulation key from its encoded form. If
 // the encapsulation key is not valid, NewEncapsulationKeyMLKEM1024 returns an error.
-func NewEncapsulationKeyMLKEM1024(encapsulationKey []byte) (*EncapsulationKey1024, error) {
-	if len(encapsulationKey) != EncapsulationKeySize1024 {
+func NewEncapsulationKeyMLKEM1024(encapsulationKey []byte) (*EncapsulationKeyMLKEM1024, error) {
+	if len(encapsulationKey) != encapsulationKeySizeMLKEM1024 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}
 
-	ek := &EncapsulationKey1024{}
+	ek := &EncapsulationKeyMLKEM1024{}
 	copy(ek.bytes[:], encapsulationKey)
 	return ek, nil
 }
 
 // Bytes returns the encapsulation key as a byte slice.
-func (ek *EncapsulationKey1024) Bytes() []byte {
+func (ek *EncapsulationKeyMLKEM1024) Bytes() []byte {
 	return ek.bytes[:]
 }
 
@@ -268,9 +268,9 @@ func (ek *EncapsulationKey1024) Bytes() []byte {
 // encapsulation key, drawing random bytes from the default crypto/rand source.
 //
 // The shared key must be kept secret.
-func (ek *EncapsulationKey1024) Encapsulate() (sharedKey, ciphertext []byte) {
-	sharedKey = make([]byte, SharedKeySize)
-	ciphertext = make([]byte, CiphertextSize1024)
+func (ek *EncapsulationKeyMLKEM1024) Encapsulate() (sharedKey, ciphertext []byte) {
+	sharedKey = make([]byte, sharedKeySizeMLKEM)
+	ciphertext = make([]byte, ciphertextSizeMLKEM1024)
 
 	ret := cryptokit.EncapsulateMLKEM1024(
 		addrNeverEmpty(ek.bytes[:]),

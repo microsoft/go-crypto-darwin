@@ -5,6 +5,7 @@ package xcrypto_test
 
 import (
 	"bytes"
+	"crypto/mlkem"
 	"crypto/rand"
 	"testing"
 
@@ -160,14 +161,6 @@ func testBadLengths[E encapsulationKey, D decapsulationKey[E]](
 	}
 }
 
-// TestAccumulated accumulates 10k (or 100, or 1M) random vectors and checks the
-// hash of the result, to avoid checking in 150MB of test vectors.
-// NOTE: This test is skipped for CryptoKit implementation because it relies on
-// internal deterministic APIs (EncapsulateInternal) that are not available.
-func TestMLKEMAccumulated(t *testing.T) {
-	t.Skip("TestMLKEMAccumulated requires deterministic encapsulation (EncapsulateInternal) which is not available in CryptoKit implementation")
-}
-
 func BenchmarkMLKEMKeyGen(b *testing.B) {
 	if !xcrypto.SupportsMLKEM() {
 		b.Skip("ML-KEM not supported on this platform")
@@ -189,7 +182,7 @@ func BenchmarkMLKEMEncaps(b *testing.B) {
 	if !xcrypto.SupportsMLKEM() {
 		b.Skip("ML-KEM not supported on this platform")
 	}
-	seed := make([]byte, xcrypto.SeedSize)
+	seed := make([]byte, xcrypto.SeedSizeMLKEM)
 	rand.Read(seed)
 	var m [32]byte
 	rand.Read(m[:])
@@ -273,27 +266,27 @@ func BenchmarkMLKEMRoundTrip(b *testing.B) {
 
 // Test that the constants match the ML-KEM specification (NIST FIPS 203).
 func TestMLKEMConstantSizes(t *testing.T) {
-	if xcrypto.SharedKeySize != 32 {
-		t.Errorf("SharedKeySize mismatch: got %d, want %d", xcrypto.SharedKeySize, 32)
+	if xcrypto.SharedKeySizeMLKEM != mlkem.SharedKeySize {
+		t.Errorf("SharedKeySize mismatch: got %d, want %d", xcrypto.SharedKeySizeMLKEM, mlkem.SharedKeySize)
 	}
 
-	if xcrypto.SeedSize != 64 {
-		t.Errorf("SeedSize mismatch: got %d, want %d", xcrypto.SeedSize, 64)
+	if xcrypto.SeedSizeMLKEM != mlkem.SeedSize {
+		t.Errorf("SeedSize mismatch: got %d, want %d", xcrypto.SeedSizeMLKEM, mlkem.SeedSize)
 	}
 
-	if xcrypto.CiphertextSize768 != 1088 {
-		t.Errorf("CiphertextSize768 mismatch: got %d, want %d", xcrypto.CiphertextSize768, 1088)
+	if xcrypto.CiphertextSizeMLKEM768 != mlkem.CiphertextSize768 {
+		t.Errorf("CiphertextSize768 mismatch: got %d, want %d", xcrypto.CiphertextSizeMLKEM768, mlkem.CiphertextSize768)
 	}
 
-	if xcrypto.EncapsulationKeySize768 != 1184 {
-		t.Errorf("EncapsulationKeySize768 mismatch: got %d, want %d", xcrypto.EncapsulationKeySize768, 1184)
+	if xcrypto.EncapsulationKeySizeMLKEM768 != mlkem.EncapsulationKeySize768 {
+		t.Errorf("EncapsulationKeySize768 mismatch: got %d, want %d", xcrypto.EncapsulationKeySizeMLKEM768, mlkem.EncapsulationKeySize768)
 	}
 
-	if xcrypto.CiphertextSize1024 != 1568 {
-		t.Errorf("CiphertextSize1024 mismatch: got %d, want %d", xcrypto.CiphertextSize1024, 1568)
+	if xcrypto.CiphertextSizeMLKEM1024 != mlkem.CiphertextSize1024 {
+		t.Errorf("CiphertextSize1024 mismatch: got %d, want %d", xcrypto.CiphertextSizeMLKEM1024, mlkem.CiphertextSize1024)
 	}
 
-	if xcrypto.EncapsulationKeySize1024 != 1568 {
-		t.Errorf("EncapsulationKeySize1024 mismatch: got %d, want %d", xcrypto.EncapsulationKeySize1024, 1568)
+	if xcrypto.EncapsulationKeySizeMLKEM1024 != mlkem.EncapsulationKeySize1024 {
+		t.Errorf("EncapsulationKeySize1024 mismatch: got %d, want %d", xcrypto.EncapsulationKeySizeMLKEM1024, mlkem.EncapsulationKeySize1024)
 	}
 }

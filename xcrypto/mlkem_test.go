@@ -22,7 +22,10 @@ type decapsulationKey[E encapsulationKey] interface {
 	EncapsulationKey() E
 }
 
-func TestRoundTrip(t *testing.T) {
+func TestMLKEMRoundTrip(t *testing.T) {
+	if !xcrypto.SupportsMLKEM() {
+		t.Skip("ML-KEM not supported on this platform")
+	}
 	t.Run("768", func(t *testing.T) {
 		testRoundTrip(t, xcrypto.GenerateKey768, xcrypto.NewEncapsulationKey768, xcrypto.NewDecapsulationKey768)
 	})
@@ -92,7 +95,10 @@ func testRoundTrip[E encapsulationKey, D decapsulationKey[E]](
 	}
 }
 
-func TestBadLengths(t *testing.T) {
+func TestMLKEMBadLengths(t *testing.T) {
+	if !xcrypto.SupportsMLKEM() {
+		t.Skip("ML-KEM not supported on this platform")
+	}
 	t.Run("768", func(t *testing.T) {
 		testBadLengths(t, xcrypto.GenerateKey768, xcrypto.NewEncapsulationKey768, xcrypto.NewDecapsulationKey768)
 	})
@@ -158,13 +164,14 @@ func testBadLengths[E encapsulationKey, D decapsulationKey[E]](
 // hash of the result, to avoid checking in 150MB of test vectors.
 // NOTE: This test is skipped for CryptoKit implementation because it relies on
 // internal deterministic APIs (EncapsulateInternal) that are not available.
-func TestAccumulated(t *testing.T) {
-	t.Skip("TestAccumulated requires deterministic encapsulation (EncapsulateInternal) which is not available in CryptoKit implementation")
+func TestMLKEMAccumulated(t *testing.T) {
+	t.Skip("TestMLKEMAccumulated requires deterministic encapsulation (EncapsulateInternal) which is not available in CryptoKit implementation")
 }
 
-// var sink byte
-
-func BenchmarkKeyGen(b *testing.B) {
+func BenchmarkMLKEMKeyGen(b *testing.B) {
+	if !xcrypto.SupportsMLKEM() {
+		b.Skip("ML-KEM not supported on this platform")
+	}
 	var d, z [32]byte
 	rand.Read(d[:])
 	rand.Read(z[:])
@@ -178,7 +185,10 @@ func BenchmarkKeyGen(b *testing.B) {
 	}
 }
 
-func BenchmarkEncaps(b *testing.B) {
+func BenchmarkMLKEMEncaps(b *testing.B) {
+	if !xcrypto.SupportsMLKEM() {
+		b.Skip("ML-KEM not supported on this platform")
+	}
 	seed := make([]byte, xcrypto.SeedSize)
 	rand.Read(seed)
 	var m [32]byte
@@ -199,7 +209,10 @@ func BenchmarkEncaps(b *testing.B) {
 	}
 }
 
-func BenchmarkDecaps(b *testing.B) {
+func BenchmarkMLKEMDecaps(b *testing.B) {
+	if !xcrypto.SupportsMLKEM() {
+		b.Skip("ML-KEM not supported on this platform")
+	}
 	dk, err := xcrypto.GenerateKey768()
 	if err != nil {
 		b.Fatal(err)
@@ -213,7 +226,10 @@ func BenchmarkDecaps(b *testing.B) {
 	}
 }
 
-func BenchmarkRoundTrip(b *testing.B) {
+func BenchmarkMLKEMRoundTrip(b *testing.B) {
+	if !xcrypto.SupportsMLKEM() {
+		b.Skip("ML-KEM not supported on this platform")
+	}
 	dk, err := xcrypto.GenerateKey768()
 	if err != nil {
 		b.Fatal(err)
@@ -256,7 +272,7 @@ func BenchmarkRoundTrip(b *testing.B) {
 }
 
 // Test that the constants match the ML-KEM specification (NIST FIPS 203).
-func TestConstantSizes(t *testing.T) {
+func TestMLKEMConstantSizes(t *testing.T) {
 	if xcrypto.SharedKeySize != 32 {
 		t.Errorf("SharedKeySize mismatch: got %d, want %d", xcrypto.SharedKeySize, 32)
 	}

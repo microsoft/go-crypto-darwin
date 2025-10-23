@@ -32,8 +32,8 @@ const (
 	EncapsulationKeySize1024 = 1568
 )
 
-// supportsMLKEM returns true if ML-KEM is available on this macOS version.
-func supportsMLKEM() bool {
+// SupportsMLKEM returns true if ML-KEM is supported on this platform.
+func SupportsMLKEM() bool {
 	return cryptokit.SupportsMLKEM() == 1
 }
 
@@ -46,10 +46,6 @@ type DecapsulationKey768 struct {
 // GenerateKey768 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
 func GenerateKey768() (*DecapsulationKey768, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
-
 	dk := &DecapsulationKey768{}
 	ret := cryptokit.GenerateKeyMLKEM768(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
@@ -62,9 +58,6 @@ func GenerateKey768() (*DecapsulationKey768, error) {
 // NewDecapsulationKey768 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
 func NewDecapsulationKey768(seed []byte) (*DecapsulationKey768, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(seed) != SeedSize {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
@@ -86,9 +79,6 @@ func (dk *DecapsulationKey768) Bytes() []byte {
 //
 // The shared key must be kept secret.
 func (dk *DecapsulationKey768) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(ciphertext) != CiphertextSize768 {
 		return nil, errors.New("mlkem: invalid ciphertext size")
 	}
@@ -135,9 +125,6 @@ type EncapsulationKey768 struct {
 // NewEncapsulationKey768 parses an encapsulation key from its encoded form. If
 // the encapsulation key is not valid, NewEncapsulationKey768 returns an error.
 func NewEncapsulationKey768(encapsulationKey []byte) (*EncapsulationKey768, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(encapsulationKey) != EncapsulationKeySize768 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}
@@ -157,10 +144,6 @@ func (ek *EncapsulationKey768) Bytes() []byte {
 //
 // The shared key must be kept secret.
 func (ek *EncapsulationKey768) Encapsulate() (sharedKey, ciphertext []byte) {
-	if !supportsMLKEM() {
-		return nil, nil
-	}
-
 	sharedKey = make([]byte, SharedKeySize)
 	ciphertext = make([]byte, CiphertextSize768)
 
@@ -188,10 +171,6 @@ type DecapsulationKey1024 struct {
 // GenerateKey1024 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
 func GenerateKey1024() (*DecapsulationKey1024, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
-
 	dk := &DecapsulationKey1024{}
 	ret := cryptokit.GenerateKeyMLKEM1024(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
@@ -204,9 +183,6 @@ func GenerateKey1024() (*DecapsulationKey1024, error) {
 // NewDecapsulationKey1024 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
 func NewDecapsulationKey1024(seed []byte) (*DecapsulationKey1024, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(seed) != SeedSize {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
@@ -228,9 +204,6 @@ func (dk *DecapsulationKey1024) Bytes() []byte {
 //
 // The shared key must be kept secret.
 func (dk *DecapsulationKey1024) Decapsulate(ciphertext []byte) (sharedKey []byte, err error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(ciphertext) != CiphertextSize1024 {
 		return nil, errors.New("mlkem: invalid ciphertext size")
 	}
@@ -277,9 +250,6 @@ type EncapsulationKey1024 struct {
 // NewEncapsulationKey1024 parses an encapsulation key from its encoded form. If
 // the encapsulation key is not valid, NewEncapsulationKey1024 returns an error.
 func NewEncapsulationKey1024(encapsulationKey []byte) (*EncapsulationKey1024, error) {
-	if !supportsMLKEM() {
-		return nil, errors.New("mlkem: ML-KEM is not supported on this macOS version")
-	}
 	if len(encapsulationKey) != EncapsulationKeySize1024 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}
@@ -299,10 +269,6 @@ func (ek *EncapsulationKey1024) Bytes() []byte {
 //
 // The shared key must be kept secret.
 func (ek *EncapsulationKey1024) Encapsulate() (sharedKey, ciphertext []byte) {
-	if !supportsMLKEM() {
-		return nil, nil
-	}
-
 	sharedKey = make([]byte, SharedKeySize)
 	ciphertext = make([]byte, CiphertextSize1024)
 

@@ -307,12 +307,11 @@ public func SHA3_256(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
     outputPointer: UnsafeMutablePointer<UInt8>
-) -> Int32 {
+) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_256.hash(data: inputData)
     let hashData = Data(hash)
     hashData.copyBytes(to: outputPointer, count: hashData.count)
-    return 0
 }
 
 @available(macOS 26.0, *)
@@ -321,12 +320,11 @@ public func SHA3_384(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
     outputPointer: UnsafeMutablePointer<UInt8>
-) -> Int32 {
+) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_384.hash(data: inputData)
     let hashData = Data(hash)
     hashData.copyBytes(to: outputPointer, count: hashData.count)
-    return 0
 }
 
 @available(macOS 26.0, *)
@@ -335,12 +333,11 @@ public func SHA3_512(
     inputPointer: UnsafePointer<UInt8>,
     inputLength: Int,
     outputPointer: UnsafeMutablePointer<UInt8>
-) -> Int32 {
+) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_512.hash(data: inputData)
     let hashData = Data(hash)
     hashData.copyBytes(to: outputPointer, count: hashData.count)
-    return 0
 }
 #endif
 

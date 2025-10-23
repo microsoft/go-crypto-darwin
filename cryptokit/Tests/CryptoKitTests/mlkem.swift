@@ -26,7 +26,7 @@ final class MLKEMTests: XCTestCase {
     func testMLKEM768KeyGeneration() throws {
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
-        let result = generateKeyMLKEM768(seedPointer: &seed)
+        let result = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
 
         XCTAssertEqual(result, 0, "Key generation should succeed")
 
@@ -40,14 +40,16 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM768(seedPointer: &seed)
+        let genResult = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         // Derive the encapsulation key
         var encapKey = [UInt8](repeating: 0, count: 1184)  // EncapsulationKeySize768 = 1184
         let deriveResult = deriveEncapsulationKeyMLKEM768(
             seedPointer: seed,
-            encapKeyPointer: &encapKey
+            seedLen: 64,
+            encapKeyPointer: &encapKey,
+            encapKeyLen: 1184
         )
 
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
@@ -62,13 +64,15 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM768(seedPointer: &seed)
+        let genResult = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         var encapKey = [UInt8](repeating: 0, count: 1184)
         let deriveResult = deriveEncapsulationKeyMLKEM768(
             seedPointer: seed,
-            encapKeyPointer: &encapKey
+            seedLen: 64,
+            encapKeyPointer: &encapKey,
+            encapKeyLen: 1184
         )
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
 
@@ -77,8 +81,11 @@ final class MLKEMTests: XCTestCase {
         var ciphertext = [UInt8](repeating: 0, count: 1088)  // CiphertextSize768 = 1088
         let encapResult = encapsulateMLKEM768(
             encapKeyPointer: encapKey,
+            encapKeyLen: 1184,
             sharedKeyPointer: &sharedKey1,
-            ciphertextPointer: &ciphertext
+            sharedKeyLen: 32,
+            ciphertextPointer: &ciphertext,
+            ciphertextLen: 1088
         )
         XCTAssertEqual(encapResult, 0, "Encapsulation should succeed")
 
@@ -86,8 +93,11 @@ final class MLKEMTests: XCTestCase {
         var sharedKey2 = [UInt8](repeating: 0, count: 32)
         let decapResult = decapsulateMLKEM768(
             seedPointer: seed,
+            seedLen: 64,
             ciphertextPointer: ciphertext,
-            sharedKeyPointer: &sharedKey2
+            ciphertextLen: 1088,
+            sharedKeyPointer: &sharedKey2,
+            sharedKeyLen: 32
         )
         XCTAssertEqual(decapResult, 0, "Decapsulation should succeed")
 
@@ -105,7 +115,7 @@ final class MLKEMTests: XCTestCase {
     func testMLKEM1024KeyGeneration() throws {
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
-        let result = generateKeyMLKEM1024(seedPointer: &seed)
+        let result = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
 
         XCTAssertEqual(result, 0, "Key generation should succeed")
 
@@ -119,14 +129,16 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM1024(seedPointer: &seed)
+        let genResult = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         // Derive the encapsulation key
         var encapKey = [UInt8](repeating: 0, count: 1568)  // EncapsulationKeySize1024 = 1568
         let deriveResult = deriveEncapsulationKeyMLKEM1024(
             seedPointer: seed,
-            encapKeyPointer: &encapKey
+            seedLen: 64,
+            encapKeyPointer: &encapKey,
+            encapKeyLen: 1568
         )
 
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
@@ -141,13 +153,15 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM1024(seedPointer: &seed)
+        let genResult = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         var encapKey = [UInt8](repeating: 0, count: 1568)
         let deriveResult = deriveEncapsulationKeyMLKEM1024(
             seedPointer: seed,
-            encapKeyPointer: &encapKey
+            seedLen: 64,
+            encapKeyPointer: &encapKey,
+            encapKeyLen: 1568
         )
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
 
@@ -156,8 +170,11 @@ final class MLKEMTests: XCTestCase {
         var ciphertext = [UInt8](repeating: 0, count: 1568)  // CiphertextSize1024 = 1568
         let encapResult = encapsulateMLKEM1024(
             encapKeyPointer: encapKey,
+            encapKeyLen: 1568,
             sharedKeyPointer: &sharedKey1,
-            ciphertextPointer: &ciphertext
+            sharedKeyLen: 32,
+            ciphertextPointer: &ciphertext,
+            ciphertextLen: 1568
         )
         XCTAssertEqual(encapResult, 0, "Encapsulation should succeed")
 
@@ -165,8 +182,11 @@ final class MLKEMTests: XCTestCase {
         var sharedKey2 = [UInt8](repeating: 0, count: 32)
         let decapResult = decapsulateMLKEM1024(
             seedPointer: seed,
+            seedLen: 64,
             ciphertextPointer: ciphertext,
-            sharedKeyPointer: &sharedKey2
+            ciphertextLen: 1568,
+            sharedKeyPointer: &sharedKey2,
+            sharedKeyLen: 32
         )
         XCTAssertEqual(decapResult, 0, "Decapsulation should succeed")
 
@@ -190,8 +210,11 @@ final class MLKEMTests: XCTestCase {
 
         let result = decapsulateMLKEM768(
             seedPointer: seed,
+            seedLen: 64,
             ciphertextPointer: invalidCiphertext,
-            sharedKeyPointer: &sharedKey
+            ciphertextLen: 1088,
+            sharedKeyPointer: &sharedKey,
+            sharedKeyLen: 32
         )
 
         // Note: This might succeed depending on CryptoKit implementation

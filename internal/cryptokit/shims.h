@@ -56,13 +56,13 @@ void go_hashFree(int32_t hashAlgorithm, void *ptr) __attribute__((nocallback, st
 
 // ML-KEM (Post-quantum key encapsulation mechanism)
 int go_supportsMLKEM() __attribute__((nocallback, static));
-int go_generateKeyMLKEM768(uint8_t *seed) __attribute__((noescape, nocallback, static));
-int go_generateKeyMLKEM1024(uint8_t *seed) __attribute__((noescape, nocallback, static));
-int go_deriveEncapsulationKeyMLKEM768(const uint8_t *seed, uint8_t *encapKey) __attribute__((noescape, nocallback, static));
-int go_deriveEncapsulationKeyMLKEM1024(const uint8_t *seed, uint8_t *encapKey) __attribute__((noescape, nocallback, static));
-int go_encapsulateMLKEM768(const uint8_t *encapKey, uint8_t *sharedKey, uint8_t *ciphertext) __attribute__((noescape, nocallback, static));
-int go_encapsulateMLKEM1024(const uint8_t *encapKey, uint8_t *sharedKey, uint8_t *ciphertext) __attribute__((noescape, nocallback, static));
-int go_decapsulateMLKEM768(const uint8_t *seed, const uint8_t *ciphertext, uint8_t *sharedKey) __attribute__((noescape, nocallback, static));
-int go_decapsulateMLKEM1024(const uint8_t *seed, const uint8_t *ciphertext, uint8_t *sharedKey) __attribute__((noescape, nocallback, static));
+int go_generateKeyMLKEM768(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static));
+int go_generateKeyMLKEM1024(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static));
+int go_deriveEncapsulationKeyMLKEM768(const uint8_t *seed, int seedLen, uint8_t *encapKey, int encapKeyLen) __attribute__((noescape, nocallback, static));
+int go_deriveEncapsulationKeyMLKEM1024(const uint8_t *seed, int seedLen, uint8_t *encapKey, int encapKeyLen) __attribute__((noescape, nocallback, static));
+int go_encapsulateMLKEM768(const uint8_t *encapKey, int encapKeyLen, uint8_t *sharedKey, int sharedKeyLen, uint8_t *ciphertext, int ciphertextLen) __attribute__((noescape, nocallback, static));
+int go_encapsulateMLKEM1024(const uint8_t *encapKey, int encapKeyLen, uint8_t *sharedKey, int sharedKeyLen, uint8_t *ciphertext, int ciphertextLen) __attribute__((noescape, nocallback, static));
+int go_decapsulateMLKEM768(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static));
+int go_decapsulateMLKEM1024(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static));
 
 #endif // _GO_CRYPTOKIT_SHIMS_H

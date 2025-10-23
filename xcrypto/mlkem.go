@@ -47,7 +47,7 @@ type DecapsulationKeyMLKEM768 struct {
 // the default crypto/rand source. The decapsulation key must be kept secret.
 func GenerateKeyMLKEM768() (*DecapsulationKeyMLKEM768, error) {
 	dk := &DecapsulationKeyMLKEM768{}
-	ret := cryptokit.GenerateKeyMLKEM768(addrNeverEmpty(dk.seed[:]))
+	ret := cryptokit.GenerateKeyMLKEM768(addrNeverEmpty(dk.seed[:]), seedSizeMLKEM)
 	if ret != 0 {
 		return nil, errors.New("mlkem: key generation failed")
 	}
@@ -85,9 +85,9 @@ func (dk *DecapsulationKeyMLKEM768) Decapsulate(ciphertext []byte) (sharedKey []
 
 	sharedKey = make([]byte, sharedKeySizeMLKEM)
 	ret := cryptokit.DecapsulateMLKEM768(
-		addrNeverEmpty(dk.seed[:]),
-		addrNeverEmpty(ciphertext),
-		addrNeverEmpty(sharedKey),
+		addrNeverEmpty(dk.seed[:]), seedSizeMLKEM,
+		addrNeverEmpty(ciphertext), int32(len(ciphertext)),
+		addrNeverEmpty(sharedKey), sharedKeySizeMLKEM,
 	)
 	runtime.KeepAlive(dk.seed)
 	runtime.KeepAlive(ciphertext)
@@ -104,8 +104,8 @@ func (dk *DecapsulationKeyMLKEM768) Decapsulate(ciphertext []byte) (sharedKey []
 func (dk *DecapsulationKeyMLKEM768) EncapsulationKey() *EncapsulationKeyMLKEM768 {
 	ek := &EncapsulationKeyMLKEM768{}
 	ret := cryptokit.DeriveEncapsulationKeyMLKEM768(
-		addrNeverEmpty(dk.seed[:]),
-		addrNeverEmpty(ek.bytes[:]),
+		addrNeverEmpty(dk.seed[:]), seedSizeMLKEM,
+		addrNeverEmpty(ek.bytes[:]), encapsulationKeySizeMLKEM768,
 	)
 	runtime.KeepAlive(dk.seed)
 	runtime.KeepAlive(ek.bytes)
@@ -148,9 +148,9 @@ func (ek *EncapsulationKeyMLKEM768) Encapsulate() (sharedKey, ciphertext []byte)
 	ciphertext = make([]byte, ciphertextSizeMLKEM768)
 
 	ret := cryptokit.EncapsulateMLKEM768(
-		addrNeverEmpty(ek.bytes[:]),
-		addrNeverEmpty(sharedKey),
-		addrNeverEmpty(ciphertext),
+		addrNeverEmpty(ek.bytes[:]), encapsulationKeySizeMLKEM768,
+		addrNeverEmpty(sharedKey), sharedKeySizeMLKEM,
+		addrNeverEmpty(ciphertext), ciphertextSizeMLKEM768,
 	)
 	runtime.KeepAlive(ek.bytes)
 	runtime.KeepAlive(sharedKey)
@@ -172,7 +172,7 @@ type DecapsulationKeyMLKEM1024 struct {
 // the default crypto/rand source. The decapsulation key must be kept secret.
 func GenerateKeyMLKEM1024() (*DecapsulationKeyMLKEM1024, error) {
 	dk := &DecapsulationKeyMLKEM1024{}
-	ret := cryptokit.GenerateKeyMLKEM1024(addrNeverEmpty(dk.seed[:]))
+	ret := cryptokit.GenerateKeyMLKEM1024(addrNeverEmpty(dk.seed[:]), seedSizeMLKEM)
 	if ret != 0 {
 		return nil, errors.New("mlkem: key generation failed")
 	}
@@ -210,9 +210,9 @@ func (dk *DecapsulationKeyMLKEM1024) Decapsulate(ciphertext []byte) (sharedKey [
 
 	sharedKey = make([]byte, sharedKeySizeMLKEM)
 	ret := cryptokit.DecapsulateMLKEM1024(
-		addrNeverEmpty(dk.seed[:]),
-		addrNeverEmpty(ciphertext),
-		addrNeverEmpty(sharedKey),
+		addrNeverEmpty(dk.seed[:]), seedSizeMLKEM,
+		addrNeverEmpty(ciphertext), int32(len(ciphertext)),
+		addrNeverEmpty(sharedKey), sharedKeySizeMLKEM,
 	)
 	runtime.KeepAlive(dk.seed)
 	runtime.KeepAlive(ciphertext)
@@ -229,8 +229,8 @@ func (dk *DecapsulationKeyMLKEM1024) Decapsulate(ciphertext []byte) (sharedKey [
 func (dk *DecapsulationKeyMLKEM1024) EncapsulationKey() *EncapsulationKeyMLKEM1024 {
 	ek := &EncapsulationKeyMLKEM1024{}
 	ret := cryptokit.DeriveEncapsulationKeyMLKEM1024(
-		addrNeverEmpty(dk.seed[:]),
-		addrNeverEmpty(ek.bytes[:]),
+		addrNeverEmpty(dk.seed[:]), seedSizeMLKEM,
+		addrNeverEmpty(ek.bytes[:]), encapsulationKeySizeMLKEM1024,
 	)
 	runtime.KeepAlive(dk.seed)
 	runtime.KeepAlive(ek.bytes)
@@ -273,9 +273,9 @@ func (ek *EncapsulationKeyMLKEM1024) Encapsulate() (sharedKey, ciphertext []byte
 	ciphertext = make([]byte, ciphertextSizeMLKEM1024)
 
 	ret := cryptokit.EncapsulateMLKEM1024(
-		addrNeverEmpty(ek.bytes[:]),
-		addrNeverEmpty(sharedKey),
-		addrNeverEmpty(ciphertext),
+		addrNeverEmpty(ek.bytes[:]), encapsulationKeySizeMLKEM1024,
+		addrNeverEmpty(sharedKey), sharedKeySizeMLKEM,
+		addrNeverEmpty(ciphertext), ciphertextSizeMLKEM1024,
 	)
 	runtime.KeepAlive(ek.bytes)
 	runtime.KeepAlive(sharedKey)

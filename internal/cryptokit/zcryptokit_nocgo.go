@@ -147,16 +147,16 @@ func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	return unsafe.Pointer(r0)
 }
 
-func DecapsulateMLKEM1024(seed *uint8, ciphertext *uint8, sharedKey *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_decapsulateMLKEM1024)), uintptr(unsafe.Pointer(seed)), uintptr(unsafe.Pointer(ciphertext)), uintptr(unsafe.Pointer(sharedKey)))
+func DecapsulateMLKEM1024(seed *uint8, seedLen int32, ciphertext *uint8, ciphertextLen int32, sharedKey *uint8, sharedKeyLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_decapsulateMLKEM1024)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen), uintptr(unsafe.Pointer(ciphertext)), uintptr(ciphertextLen), uintptr(unsafe.Pointer(sharedKey)), uintptr(sharedKeyLen))
 	runtime.KeepAlive(seed)
 	runtime.KeepAlive(ciphertext)
 	runtime.KeepAlive(sharedKey)
 	return int32(r0)
 }
 
-func DecapsulateMLKEM768(seed *uint8, ciphertext *uint8, sharedKey *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_decapsulateMLKEM768)), uintptr(unsafe.Pointer(seed)), uintptr(unsafe.Pointer(ciphertext)), uintptr(unsafe.Pointer(sharedKey)))
+func DecapsulateMLKEM768(seed *uint8, seedLen int32, ciphertext *uint8, ciphertextLen int32, sharedKey *uint8, sharedKeyLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_decapsulateMLKEM768)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen), uintptr(unsafe.Pointer(ciphertext)), uintptr(ciphertextLen), uintptr(unsafe.Pointer(sharedKey)), uintptr(sharedKeyLen))
 	runtime.KeepAlive(seed)
 	runtime.KeepAlive(ciphertext)
 	runtime.KeepAlive(sharedKey)
@@ -175,30 +175,30 @@ func DecryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce
 	return int32(r0)
 }
 
-func DeriveEncapsulationKeyMLKEM1024(seed *uint8, encapKey *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM1024)), uintptr(unsafe.Pointer(seed)), uintptr(unsafe.Pointer(encapKey)))
+func DeriveEncapsulationKeyMLKEM1024(seed *uint8, seedLen int32, encapKey *uint8, encapKeyLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM1024)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen), uintptr(unsafe.Pointer(encapKey)), uintptr(encapKeyLen))
 	runtime.KeepAlive(seed)
 	runtime.KeepAlive(encapKey)
 	return int32(r0)
 }
 
-func DeriveEncapsulationKeyMLKEM768(seed *uint8, encapKey *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM768)), uintptr(unsafe.Pointer(seed)), uintptr(unsafe.Pointer(encapKey)))
+func DeriveEncapsulationKeyMLKEM768(seed *uint8, seedLen int32, encapKey *uint8, encapKeyLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM768)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen), uintptr(unsafe.Pointer(encapKey)), uintptr(encapKeyLen))
 	runtime.KeepAlive(seed)
 	runtime.KeepAlive(encapKey)
 	return int32(r0)
 }
 
-func EncapsulateMLKEM1024(encapKey *uint8, sharedKey *uint8, ciphertext *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_encapsulateMLKEM1024)), uintptr(unsafe.Pointer(encapKey)), uintptr(unsafe.Pointer(sharedKey)), uintptr(unsafe.Pointer(ciphertext)))
+func EncapsulateMLKEM1024(encapKey *uint8, encapKeyLen int32, sharedKey *uint8, sharedKeyLen int32, ciphertext *uint8, ciphertextLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_encapsulateMLKEM1024)), uintptr(unsafe.Pointer(encapKey)), uintptr(encapKeyLen), uintptr(unsafe.Pointer(sharedKey)), uintptr(sharedKeyLen), uintptr(unsafe.Pointer(ciphertext)), uintptr(ciphertextLen))
 	runtime.KeepAlive(encapKey)
 	runtime.KeepAlive(sharedKey)
 	runtime.KeepAlive(ciphertext)
 	return int32(r0)
 }
 
-func EncapsulateMLKEM768(encapKey *uint8, sharedKey *uint8, ciphertext *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_encapsulateMLKEM768)), uintptr(unsafe.Pointer(encapKey)), uintptr(unsafe.Pointer(sharedKey)), uintptr(unsafe.Pointer(ciphertext)))
+func EncapsulateMLKEM768(encapKey *uint8, encapKeyLen int32, sharedKey *uint8, sharedKeyLen int32, ciphertext *uint8, ciphertextLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_encapsulateMLKEM768)), uintptr(unsafe.Pointer(encapKey)), uintptr(encapKeyLen), uintptr(unsafe.Pointer(sharedKey)), uintptr(sharedKeyLen), uintptr(unsafe.Pointer(ciphertext)), uintptr(ciphertextLen))
 	runtime.KeepAlive(encapKey)
 	runtime.KeepAlive(sharedKey)
 	runtime.KeepAlive(ciphertext)
@@ -246,14 +246,14 @@ func GenerateKeyEd25519(key *uint8) {
 	runtime.KeepAlive(key)
 }
 
-func GenerateKeyMLKEM1024(seed *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_generateKeyMLKEM1024)), uintptr(unsafe.Pointer(seed)))
+func GenerateKeyMLKEM1024(seed *uint8, seedLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_generateKeyMLKEM1024)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen))
 	runtime.KeepAlive(seed)
 	return int32(r0)
 }
 
-func GenerateKeyMLKEM768(seed *uint8) int32 {
-	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_generateKeyMLKEM768)), uintptr(unsafe.Pointer(seed)))
+func GenerateKeyMLKEM768(seed *uint8, seedLen int32) int32 {
+	r0, _, _ := syscallN(uintptr(unsafe.Pointer(&go_generateKeyMLKEM768)), uintptr(unsafe.Pointer(seed)), uintptr(seedLen))
 	runtime.KeepAlive(seed)
 	return int32(r0)
 }

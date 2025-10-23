@@ -54,4 +54,15 @@ int go_hashBlockSize(int32_t hashAlgorithm) __attribute__((nocallback, static));
 void *go_hashCopy(int32_t hashAlgorithm, void *ptr) __attribute__((nocallback, static));
 void go_hashFree(int32_t hashAlgorithm, void *ptr) __attribute__((nocallback, static));
 
+// ML-KEM (Post-quantum key encapsulation mechanism)
+int go_supportsMLKEM() __attribute__((nocallback, static));
+int go_generateKeyMLKEM768(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+int go_generateKeyMLKEM1024(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+int go_deriveEncapsulationKeyMLKEM768(const uint8_t *seed, int seedLen, uint8_t *encapKey, int encapKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(encapKey, encapKeyLen)));
+int go_deriveEncapsulationKeyMLKEM1024(const uint8_t *seed, int seedLen, uint8_t *encapKey, int encapKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(encapKey, encapKeyLen)));
+int go_encapsulateMLKEM768(const uint8_t *encapKey, int encapKeyLen, uint8_t *sharedKey, int sharedKeyLen, uint8_t *ciphertext, int ciphertextLen) __attribute__((noescape, nocallback, static, slice(encapKey, encapKeyLen), slice(sharedKey, sharedKeyLen), slice(ciphertext, ciphertextLen)));
+int go_encapsulateMLKEM1024(const uint8_t *encapKey, int encapKeyLen, uint8_t *sharedKey, int sharedKeyLen, uint8_t *ciphertext, int ciphertextLen) __attribute__((noescape, nocallback, static, slice(encapKey, encapKeyLen), slice(sharedKey, sharedKeyLen), slice(ciphertext, ciphertextLen)));
+int go_decapsulateMLKEM768(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
+int go_decapsulateMLKEM1024(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
+
 #endif // _GO_CRYPTOKIT_SHIMS_H

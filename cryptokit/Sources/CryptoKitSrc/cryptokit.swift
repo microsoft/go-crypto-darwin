@@ -1169,3 +1169,211 @@ public func resetHMAC(
         fatalError("Unsupported hash function")
     }
 }
+
+// ML-KEM (Post-quantum key encapsulation mechanism)
+// Runtime feature detection for ML-KEM (available on macOS 26+ only)
+@_cdecl("go_supportsMLKEM")
+public func supportsMLKEM() -> Int {
+    if #available(macOS 26.0, *) {
+        // ML-KEM symbols are lazily bound, so if this returns true,
+        // the runtime can safely call ML-KEM functions.
+        return 1
+    }
+    return 0
+}
+
+// ML-KEM-768 functions
+#if compiler(>=6.2)
+@available(macOS 26.0, *)
+@_cdecl("go_generateKeyMLKEM768")
+public func generateKeyMLKEM768(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
+    do {
+        let privateKey = try MLKEM768.PrivateKey()
+        let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
+        seedData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_deriveEncapsulationKeyMLKEM768")
+public func deriveEncapsulationKeyMLKEM768(
+    seedPointer: UnsafePointer<UInt8>,
+    seedLen: Int,
+    encapKeyPointer: UnsafeMutablePointer<UInt8>,
+    encapKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLKEM768.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
+        let publicKey = privateKey.publicKey
+        let publicKeyData = publicKey.rawRepresentation
+        guard encapKeyLen == publicKeyData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: encapKeyPointer, count: encapKeyLen)
+        publicKeyData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_encapsulateMLKEM768")
+public func encapsulateMLKEM768(
+    encapKeyPointer: UnsafePointer<UInt8>,
+    encapKeyLen: Int,
+    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    sharedKeyLen: Int,
+    ciphertextPointer: UnsafeMutablePointer<UInt8>,
+    ciphertextLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
+        let publicKey = try MLKEM768.PublicKey(rawRepresentation: publicKeyData)
+        let encapResult = try publicKey.encapsulate()
+
+        guard sharedKeyLen >= encapResult.sharedSecret.withUnsafeBytes({ $0.count }),
+            ciphertextLen >= encapResult.encapsulated.count
+        else { return 1 }
+
+        let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
+        let ciphertextBuffer = UnsafeMutableRawBufferPointer(start: ciphertextPointer, count: ciphertextLen)
+        encapResult.sharedSecret.withUnsafeBytes { bytes in
+            sharedKeyBuffer.copyBytes(from: bytes)
+        }
+        encapResult.encapsulated.copyBytes(to: ciphertextBuffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_decapsulateMLKEM768")
+public func decapsulateMLKEM768(
+    seedPointer: UnsafePointer<UInt8>,
+    seedLen: Int,
+    ciphertextPointer: UnsafePointer<UInt8>,
+    ciphertextLen: Int,
+    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    sharedKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLKEM768.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
+        let ciphertextData = Data(bytes: ciphertextPointer, count: ciphertextLen)
+        let sharedKey = try privateKey.decapsulate(ciphertextData)
+        guard sharedKeyLen >= sharedKey.withUnsafeBytes({ $0.count }) else { return 1 }
+        sharedKey.withUnsafeBytes { sharedKeyBytes in
+            let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
+            sharedKeyBuffer.copyBytes(from: sharedKeyBytes)
+        }
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+// ML-KEM-1024 functions
+@available(macOS 26.0, *)
+@_cdecl("go_generateKeyMLKEM1024")
+public func generateKeyMLKEM1024(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
+    do {
+        let privateKey = try MLKEM1024.PrivateKey()
+        let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
+        seedData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_deriveEncapsulationKeyMLKEM1024")
+public func deriveEncapsulationKeyMLKEM1024(
+    seedPointer: UnsafePointer<UInt8>,
+    seedLen: Int,
+    encapKeyPointer: UnsafeMutablePointer<UInt8>,
+    encapKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLKEM1024.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
+        let publicKey = privateKey.publicKey
+        let publicKeyData = publicKey.rawRepresentation
+        guard encapKeyLen == publicKeyData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: encapKeyPointer, count: encapKeyLen)
+        publicKeyData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_encapsulateMLKEM1024")
+public func encapsulateMLKEM1024(
+    encapKeyPointer: UnsafePointer<UInt8>,
+    encapKeyLen: Int,
+    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    sharedKeyLen: Int,
+    ciphertextPointer: UnsafeMutablePointer<UInt8>,
+    ciphertextLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
+        let publicKey = try MLKEM1024.PublicKey(rawRepresentation: publicKeyData)
+        let encapResult = try publicKey.encapsulate()
+
+        guard sharedKeyLen >= encapResult.sharedSecret.withUnsafeBytes({ $0.count }),
+            ciphertextLen >= encapResult.encapsulated.count
+        else { return 1 }
+
+        let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
+        let ciphertextBuffer = UnsafeMutableRawBufferPointer(start: ciphertextPointer, count: ciphertextLen)
+        encapResult.sharedSecret.withUnsafeBytes { bytes in
+            sharedKeyBuffer.copyBytes(from: bytes)
+        }
+        encapResult.encapsulated.copyBytes(to: ciphertextBuffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@_cdecl("go_decapsulateMLKEM1024")
+public func decapsulateMLKEM1024(
+    seedPointer: UnsafePointer<UInt8>,
+    seedLen: Int,
+    ciphertextPointer: UnsafePointer<UInt8>,
+    ciphertextLen: Int,
+    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    sharedKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLKEM1024.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
+        let ciphertextData = Data(bytes: ciphertextPointer, count: ciphertextLen)
+        let sharedKey = try privateKey.decapsulate(ciphertextData)
+        guard sharedKeyLen >= sharedKey.withUnsafeBytes({ $0.count }) else { return 1 }
+        sharedKey.withUnsafeBytes { sharedKeyBytes in
+            let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
+            sharedKeyBuffer.copyBytes(from: sharedKeyBytes)
+        }
+        return 0
+    } catch {
+        return 1
+    }
+}
+#endif

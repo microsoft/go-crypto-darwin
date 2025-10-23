@@ -18,13 +18,21 @@ void go_SHA3_384(const uint8_t*, size_t, const uint8_t*);
 void go_SHA3_512(const uint8_t*, size_t, const uint8_t*);
 void go_SHA512(const uint8_t*, size_t, const uint8_t*);
 void* go_copyHMAC(int32_t, void*);
+int go_decapsulateMLKEM1024(const uint8_t*, int, const uint8_t*, int, uint8_t*, int);
+int go_decapsulateMLKEM768(const uint8_t*, int, const uint8_t*, int, uint8_t*, int);
 int go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
+int go_deriveEncapsulationKeyMLKEM1024(const uint8_t*, int, uint8_t*, int);
+int go_deriveEncapsulationKeyMLKEM768(const uint8_t*, int, uint8_t*, int);
+int go_encapsulateMLKEM1024(const uint8_t*, int, uint8_t*, int, uint8_t*, int);
+int go_encapsulateMLKEM768(const uint8_t*, int, uint8_t*, int, uint8_t*, int);
 int go_encryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
 int go_expandHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 int go_extractHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 void go_finalizeHMAC(int32_t, void*, uint8_t*);
 void go_freeHMAC(int32_t, void*);
 void go_generateKeyEd25519(uint8_t*);
+int go_generateKeyMLKEM1024(uint8_t*, int);
+int go_generateKeyMLKEM768(uint8_t*, int);
 int go_hashBlockSize(int32_t);
 void* go_hashCopy(int32_t, void*);
 void go_hashFree(int32_t, void*);
@@ -37,6 +45,7 @@ void* go_initHMAC(int32_t, const uint8_t*, int);
 int go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 int go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
 int go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
+int go_supportsMLKEM(void);
 int go_supportsSHA3(void);
 void go_updateHMAC(int32_t, void*, const uint8_t*, int);
 int go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
@@ -77,8 +86,32 @@ void* _mkcgo_go_copyHMAC(int32_t _arg0, void* _arg1) {
 	return go_copyHMAC(_arg0, _arg1);
 }
 
+int _mkcgo_go_decapsulateMLKEM1024(const uint8_t* _arg0, int _arg1, const uint8_t* _arg2, int _arg3, uint8_t* _arg4, int _arg5) {
+	return go_decapsulateMLKEM1024(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
+}
+
+int _mkcgo_go_decapsulateMLKEM768(const uint8_t* _arg0, int _arg1, const uint8_t* _arg2, int _arg3, uint8_t* _arg4, int _arg5) {
+	return go_decapsulateMLKEM768(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
+}
+
 int _mkcgo_go_decryptAESGCM(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2, size_t _arg3, const uint8_t* _arg4, size_t _arg5, const uint8_t* _arg6, size_t _arg7, const uint8_t* _arg8, size_t _arg9, uint8_t* _arg10, size_t* _arg11) {
 	return go_decryptAESGCM(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10, _arg11);
+}
+
+int _mkcgo_go_deriveEncapsulationKeyMLKEM1024(const uint8_t* _arg0, int _arg1, uint8_t* _arg2, int _arg3) {
+	return go_deriveEncapsulationKeyMLKEM1024(_arg0, _arg1, _arg2, _arg3);
+}
+
+int _mkcgo_go_deriveEncapsulationKeyMLKEM768(const uint8_t* _arg0, int _arg1, uint8_t* _arg2, int _arg3) {
+	return go_deriveEncapsulationKeyMLKEM768(_arg0, _arg1, _arg2, _arg3);
+}
+
+int _mkcgo_go_encapsulateMLKEM1024(const uint8_t* _arg0, int _arg1, uint8_t* _arg2, int _arg3, uint8_t* _arg4, int _arg5) {
+	return go_encapsulateMLKEM1024(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
+}
+
+int _mkcgo_go_encapsulateMLKEM768(const uint8_t* _arg0, int _arg1, uint8_t* _arg2, int _arg3, uint8_t* _arg4, int _arg5) {
+	return go_encapsulateMLKEM768(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
 }
 
 int _mkcgo_go_encryptAESGCM(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2, size_t _arg3, const uint8_t* _arg4, size_t _arg5, const uint8_t* _arg6, size_t _arg7, uint8_t* _arg8, size_t _arg9, uint8_t* _arg10) {
@@ -103,6 +136,14 @@ void _mkcgo_go_freeHMAC(int32_t _arg0, void* _arg1) {
 
 void _mkcgo_go_generateKeyEd25519(uint8_t* _arg0) {
 	go_generateKeyEd25519(_arg0);
+}
+
+int _mkcgo_go_generateKeyMLKEM1024(uint8_t* _arg0, int _arg1) {
+	return go_generateKeyMLKEM1024(_arg0, _arg1);
+}
+
+int _mkcgo_go_generateKeyMLKEM768(uint8_t* _arg0, int _arg1) {
+	return go_generateKeyMLKEM768(_arg0, _arg1);
 }
 
 int _mkcgo_go_hashBlockSize(int32_t _arg0) {
@@ -151,6 +192,10 @@ int _mkcgo_go_newPublicKeyEd25519(uint8_t* _arg0, const uint8_t* _arg1) {
 
 int _mkcgo_go_signEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, uint8_t* _arg3) {
 	return go_signEd25519(_arg0, _arg1, _arg2, _arg3);
+}
+
+int _mkcgo_go_supportsMLKEM(void) {
+	return go_supportsMLKEM();
 }
 
 int _mkcgo_go_supportsSHA3(void) {

@@ -23,13 +23,21 @@ var _ = runtime.GOOS
 //go:linkname go_SHA3_512 go_SHA3_512
 //go:linkname go_SHA512 go_SHA512
 //go:linkname go_copyHMAC go_copyHMAC
+//go:linkname go_decapsulateMLKEM1024 go_decapsulateMLKEM1024
+//go:linkname go_decapsulateMLKEM768 go_decapsulateMLKEM768
 //go:linkname go_decryptAESGCM go_decryptAESGCM
+//go:linkname go_deriveEncapsulationKeyMLKEM1024 go_deriveEncapsulationKeyMLKEM1024
+//go:linkname go_deriveEncapsulationKeyMLKEM768 go_deriveEncapsulationKeyMLKEM768
+//go:linkname go_encapsulateMLKEM1024 go_encapsulateMLKEM1024
+//go:linkname go_encapsulateMLKEM768 go_encapsulateMLKEM768
 //go:linkname go_encryptAESGCM go_encryptAESGCM
 //go:linkname go_expandHKDF go_expandHKDF
 //go:linkname go_extractHKDF go_extractHKDF
 //go:linkname go_finalizeHMAC go_finalizeHMAC
 //go:linkname go_freeHMAC go_freeHMAC
 //go:linkname go_generateKeyEd25519 go_generateKeyEd25519
+//go:linkname go_generateKeyMLKEM1024 go_generateKeyMLKEM1024
+//go:linkname go_generateKeyMLKEM768 go_generateKeyMLKEM768
 //go:linkname go_hashBlockSize go_hashBlockSize
 //go:linkname go_hashCopy go_hashCopy
 //go:linkname go_hashFree go_hashFree
@@ -42,6 +50,7 @@ var _ = runtime.GOOS
 //go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
 //go:linkname go_signEd25519 go_signEd25519
+//go:linkname go_supportsMLKEM go_supportsMLKEM
 //go:linkname go_supportsSHA3 go_supportsSHA3
 //go:linkname go_updateHMAC go_updateHMAC
 //go:linkname go_verifyEd25519 go_verifyEd25519
@@ -55,13 +64,21 @@ var go_SHA3_384 byte
 var go_SHA3_512 byte
 var go_SHA512 byte
 var go_copyHMAC byte
+var go_decapsulateMLKEM1024 byte
+var go_decapsulateMLKEM768 byte
 var go_decryptAESGCM byte
+var go_deriveEncapsulationKeyMLKEM1024 byte
+var go_deriveEncapsulationKeyMLKEM768 byte
+var go_encapsulateMLKEM1024 byte
+var go_encapsulateMLKEM768 byte
 var go_encryptAESGCM byte
 var go_expandHKDF byte
 var go_extractHKDF byte
 var go_finalizeHMAC byte
 var go_freeHMAC byte
 var go_generateKeyEd25519 byte
+var go_generateKeyMLKEM1024 byte
+var go_generateKeyMLKEM768 byte
 var go_hashBlockSize byte
 var go_hashCopy byte
 var go_hashFree byte
@@ -74,6 +91,7 @@ var go_initHMAC byte
 var go_newPrivateKeyEd25519FromSeed byte
 var go_newPublicKeyEd25519 byte
 var go_signEd25519 byte
+var go_supportsMLKEM byte
 var go_supportsSHA3 byte
 var go_updateHMAC byte
 var go_verifyEd25519 byte
@@ -115,8 +133,38 @@ func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	return unsafe.Pointer(r0)
 }
 
+func DecapsulateMLKEM1024(seed []uint8, ciphertext []uint8, sharedKey []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decapsulateMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)))
+	return int32(r0)
+}
+
+func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decapsulateMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)))
+	return int32(r0)
+}
+
 func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
+	return int32(r0)
+}
+
+func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)))
+	return int32(r0)
+}
+
+func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)))
+	return int32(r0)
+}
+
+func EncapsulateMLKEM1024(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encapsulateMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)))
+	return int32(r0)
+}
+
+func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encapsulateMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)))
 	return int32(r0)
 }
 
@@ -145,6 +193,16 @@ func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 
 func GenerateKeyEd25519(key []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))))
+}
+
+func GenerateKeyMLKEM1024(seed []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	return int32(r0)
+}
+
+func GenerateKeyMLKEM768(seed []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	return int32(r0)
 }
 
 func HashBlockSize(hashAlgorithm int32) int32 {
@@ -200,6 +258,11 @@ func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sigBuffer))))
+	return int32(r0)
+}
+
+func SupportsMLKEM() int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_supportsMLKEM)))
 	return int32(r0)
 }
 

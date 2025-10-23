@@ -38,7 +38,7 @@ func (k PrivateKeyEd25519) Public() PublicKeyEd25519 {
 // GenerateKeyEd25519 generates a new Ed25519 private key.
 func GenerateKeyEd25519() PrivateKeyEd25519 {
 	pkeyPriv := make([]byte, privateKeySizeEd25519)
-	cryptokit.GenerateKeyEd25519(addr(pkeyPriv))
+	cryptokit.GenerateKeyEd25519(pkeyPriv)
 	return pkeyPriv
 }
 
@@ -58,7 +58,7 @@ func NewPublicKeyEd25519(pub []byte) (PublicKeyEd25519, error) {
 		panic("ed25519: bad public key length: " + strconv.Itoa(len(pub)))
 	}
 	pkey := make([]byte, publicKeySizeEd25519)
-	result := cryptokit.NewPublicKeyEd25519(addr(pkey), addr(pub))
+	result := cryptokit.NewPublicKeyEd25519(pkey, pub)
 	if result != 0 {
 		return nil, errors.New("failed to create Ed25519 public key")
 	}
@@ -78,7 +78,7 @@ func NewPrivateKeyEd25519FromSeed(seed []byte) (PrivateKeyEd25519, error) {
 		panic("ed25519: bad seed length: " + strconv.Itoa(len(seed)))
 	}
 	pkey := make([]byte, privateKeySizeEd25519)
-	result := cryptokit.NewPrivateKeyEd25519FromSeed(addr(pkey), addr(seed))
+	result := cryptokit.NewPrivateKeyEd25519FromSeed(pkey, seed)
 	if result != 0 {
 		return nil, errors.New("failed to generate Ed25519 key from seed")
 	}
@@ -88,7 +88,7 @@ func NewPrivateKeyEd25519FromSeed(seed []byte) (PrivateKeyEd25519, error) {
 // SignEd25519 signs the message with priv and returns a signature.
 func SignEd25519(priv PrivateKeyEd25519, message []byte) ([]byte, error) {
 	sig := make([]byte, signatureSizeEd25519)
-	result := cryptokit.SignEd25519(addr(priv), addr(message), len(message), addr(sig))
+	result := cryptokit.SignEd25519(priv, message, sig)
 	if result < 0 {
 		switch result {
 		case -1:
@@ -108,7 +108,7 @@ func SignEd25519(priv PrivateKeyEd25519, message []byte) ([]byte, error) {
 
 // VerifyEd25519 reports whether sig is a valid signature of message by pub.
 func VerifyEd25519(pub PublicKeyEd25519, message, sig []byte) error {
-	result := cryptokit.VerifyEd25519(addr(pub), addr(message), len(message), addr(sig))
+	result := cryptokit.VerifyEd25519(pub, message, sig)
 	switch result {
 	case 1:
 		return nil // Valid signature

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"runtime"
 	"slices"
-	"unsafe"
 
 	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
@@ -28,8 +27,7 @@ func NewRC4Cipher(key []byte) (*RC4Cipher, error) {
 		commoncrypto.KCCEncrypt,      // Operation (RC4 stream)
 		commoncrypto.KCCAlgorithmRC4, // Algorithm
 		0,                            // No padding or other options
-		pbase(key),                   // Key
-		int(len(key)),                // Key length
+		key,                          // Key
 		nil,                          // No IV needed for RC4
 		&ctx,                         // Output: CCCryptorRef
 	)
@@ -69,8 +67,8 @@ func (c *RC4Cipher) XORKeyStream(dst, src []byte) {
 	var outLen int
 	status := commoncrypto.CCCryptorUpdate(
 		c.ctx,
-		unsafe.Pointer(&*addrNeverEmpty(src)), int(len(src)), // Input
-		unsafe.Pointer(&*addrNeverEmpty(dst)), int(len(dst)), // Output
+		src, // Input
+		dst, // Output
 		&outLen,
 	)
 	if status != commoncrypto.KCCSuccess {

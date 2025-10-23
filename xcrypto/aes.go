@@ -77,13 +77,10 @@ func (c *aesCipher) Encrypt(dst, src []byte) {
 		commoncrypto.KCCEncrypt,          // Operation
 		commoncrypto.CCAlgorithm(c.kind), // Algorithm
 		0,                                // Options
-		pbase(c.key),                     // Key
-		int(len(c.key)),                  // Key length
+		c.key,                            // Key
 		nil,                              // IV
-		pbase(src),                       // Input
-		int(blockSize),                   // Input length
-		pbase(dst),                       // Output
-		int(blockSize),                   // Output length
+		src,                              // Input
+		dst,                              // Output
 		nil,                              // Output length
 	)
 	if status != commoncrypto.KCCSuccess {
@@ -107,13 +104,10 @@ func (c *aesCipher) Decrypt(dst, src []byte) {
 		commoncrypto.KCCDecrypt,          // Operation
 		commoncrypto.CCAlgorithm(c.kind), // Algorithm
 		0,                                // Options
-		pbase(c.key),                     // Key
-		int(len(c.key)),                  // Key length
+		c.key,                            // Key
 		nil,                              // IV
-		pbase(src),                       // Input
-		int(blockSize),                   // Input length
-		pbase(dst),                       // Output
-		int(blockSize),                   // Output length
+		src,                              // Input
+		dst,                              // Output
 		nil,                              // Output length
 	)
 	if status != commoncrypto.KCCSuccess {

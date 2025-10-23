@@ -38,12 +38,7 @@ func ExtractHKDF(h func() hash.Hash, secret, salt []byte) ([]byte, error) {
 	// Allocate buffer for derived key
 	prk := make([]byte, hash.Size())
 
-	result := cryptokit.ExtractHKDF(
-		swiftHash,
-		addr(secret), len(secret),
-		addr(salt), len(salt),
-		addr(prk), len(prk),
-	)
+	result := cryptokit.ExtractHKDF(swiftHash, secret, salt, prk)
 	if result != 0 {
 		return nil, errors.New("HKDF derivation failed")
 	}
@@ -79,12 +74,7 @@ func ExpandHKDF(h func() hash.Hash, pseudorandomKey, info []byte, keyLength int)
 	// Allocate buffer for derived key
 	expandedKey := make([]byte, keyLength)
 
-	result := cryptokit.ExpandHKDF(
-		swiftHash,
-		addr(pseudorandomKey), len(pseudorandomKey),
-		addr(info), len(info),
-		addr(expandedKey), len(expandedKey),
-	)
+	result := cryptokit.ExpandHKDF(swiftHash, pseudorandomKey, info, expandedKey)
 	if result != 0 {
 		return nil, errors.New("HKDF derivation failed")
 	}

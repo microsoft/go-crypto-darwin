@@ -20,7 +20,7 @@ var _ HashCloner = (*cryptoKitHMAC)(nil)
 type cryptoKitHMAC struct {
 	ptr unsafe.Pointer
 
-	kind int
+	kind int32
 	key  []byte
 
 	blockSize int
@@ -47,10 +47,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	hmac := &cryptoKitHMAC{
-		ptr: cryptokit.InitHMAC(
-			int32(kind),
-			addr(key), int32(len(key)),
-		),
+		ptr:       cryptokit.InitHMAC(kind, key),
 		kind:      kind,
 		key:       key,
 		blockSize: h.BlockSize(),
@@ -58,20 +55,14 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 	}
 
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(
-			int32(h.kind),
-			h.ptr,
-		)
+		cryptokit.FreeHMAC(h.kind, h.ptr)
 	})
 
 	return hmac
 }
 
 func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
-	cryptokit.UpdateHMAC(int32(h.kind),
-		h.ptr,
-		addrNeverEmpty(p), int32(len(p)),
-	)
+	cryptokit.UpdateHMAC(h.kind, h.ptr, p)
 	runtime.KeepAlive(h)
 
 	return len(p), nil
@@ -79,11 +70,7 @@ func (h *cryptoKitHMAC) Write(p []byte) (n int, err error) {
 
 func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.size, 64) // explicit cap to allow stack allocation
-	cryptokit.FinalizeHMAC(
-		int32(h.kind),
-		h.ptr,
-		addr(hashSlice),
-	)
+	cryptokit.FinalizeHMAC(h.kind, h.ptr, hashSlice)
 	runtime.KeepAlive(h)
 
 	b = append(b, hashSlice...)
@@ -96,30 +83,21 @@ func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
 		panic("cryptokit: hash already finalized")
 	}
 
-	hmac := &cryptoKitHMAC{ptr: cryptokit.CopyHMAC(int32(h.kind), h.ptr), kind: h.kind, key: slices.Clone(h.key), blockSize: h.blockSize, size: h.size}
+	hmac := &cryptoKitHMAC{ptr: cryptokit.CopyHMAC(h.kind, h.ptr), kind: h.kind, key: slices.Clone(h.key), blockSize: h.blockSize, size: h.size}
 
 	runtime.KeepAlive(h)
 
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(
-			int32(h.kind),
-			h.ptr,
-		)
+		cryptokit.FreeHMAC(h.kind, h.ptr)
 	})
 
 	return hmac, nil
 }
 
 func (h *cryptoKitHMAC) Reset() {
-	cryptokit.FreeHMAC(
-		int32(h.kind),
-		h.ptr,
-	)
+	cryptokit.FreeHMAC(h.kind, h.ptr)
 
-	h.ptr = cryptokit.InitHMAC(
-		int32(h.kind),
-		addrNeverEmpty(h.key), int32(len(h.key)),
-	)
+	h.ptr = cryptokit.InitHMAC(h.kind, h.key)
 	runtime.KeepAlive(h)
 }
 
@@ -131,12 +109,12 @@ func (h *cryptoKitHMAC) BlockSize() int {
 	return h.blockSize
 }
 
-func hashToHMACEnum(h hash.Hash) int {
+func hashToHMACEnum(h hash.Hash) int32 {
 	switch h := h.(type) {
 	case *evpHash:
-		return int(h.alg.id)
+		return h.alg.id
 	case *DigestSHA3:
-		return int(h.alg.id)
+		return h.alg.id
 	default:
 		return 0
 	}

@@ -18,100 +18,100 @@ func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
 	return (*C.mkcgo_err_state)(unsafe.Pointer(x ^ 0))
 }
 
-func MD5(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_MD5((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func MD5(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_MD5((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA1(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA1((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA1(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA1((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA256((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA256(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA256((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA384((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA384(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA384((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA3_256((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA3_256(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA3_256((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA3_384((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA3_384(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA3_384((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA3_512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA3_512((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA3_512(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA3_512((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
-	C._mkcgo_go_SHA512((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func SHA512(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA512((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	return C._mkcgo_go_copyHMAC(C.int32_t(hashAlgorithm), ptr)
 }
 
-func DecapsulateMLKEM1024(seed *uint8, seedLen int32, ciphertext *uint8, ciphertextLen int32, sharedKey *uint8, sharedKeyLen int32) int32 {
-	return int32(C._mkcgo_go_decapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen), (*C.uint8_t)(unsafe.Pointer(ciphertext)), C.int(ciphertextLen), (*C.uint8_t)(unsafe.Pointer(sharedKey)), C.int(sharedKeyLen)))
+func DecapsulateMLKEM1024(seed []uint8, ciphertext []uint8, sharedKey []uint8) int32 {
+	return int32(C._mkcgo_go_decapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int(len(sharedKey))))
 }
 
-func DecapsulateMLKEM768(seed *uint8, seedLen int32, ciphertext *uint8, ciphertextLen int32, sharedKey *uint8, sharedKeyLen int32) int32 {
-	return int32(C._mkcgo_go_decapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen), (*C.uint8_t)(unsafe.Pointer(ciphertext)), C.int(ciphertextLen), (*C.uint8_t)(unsafe.Pointer(sharedKey)), C.int(sharedKeyLen)))
+func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) int32 {
+	return int32(C._mkcgo_go_decapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int(len(sharedKey))))
 }
 
-func DecryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, tag *uint8, tagLength int, out *uint8, outLength *int) int32 {
-	return int32(C._mkcgo_go_decryptAESGCM((*C.uint8_t)(unsafe.Pointer(key)), C.size_t(keyLength), (*C.uint8_t)(unsafe.Pointer(data)), C.size_t(dataLength), (*C.uint8_t)(unsafe.Pointer(nonce)), C.size_t(nonceLength), (*C.uint8_t)(unsafe.Pointer(aad)), C.size_t(aadLength), (*C.uint8_t)(unsafe.Pointer(tag)), C.size_t(tagLength), (*C.uint8_t)(unsafe.Pointer(out)), (*C.size_t)(unsafe.Pointer(outLength))))
+func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int32 {
+	return int32(C._mkcgo_go_decryptAESGCM((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag))), C.size_t(len(tag)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(out))), (*C.size_t)(unsafe.Pointer(outLength))))
 }
 
-func DeriveEncapsulationKeyMLKEM1024(seed *uint8, seedLen int32, encapKey *uint8, encapKeyLen int32) int32 {
-	return int32(C._mkcgo_go_deriveEncapsulationKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen), (*C.uint8_t)(unsafe.Pointer(encapKey)), C.int(encapKeyLen)))
+func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int32 {
+	return int32(C._mkcgo_go_deriveEncapsulationKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int(len(encapKey))))
 }
 
-func DeriveEncapsulationKeyMLKEM768(seed *uint8, seedLen int32, encapKey *uint8, encapKeyLen int32) int32 {
-	return int32(C._mkcgo_go_deriveEncapsulationKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen), (*C.uint8_t)(unsafe.Pointer(encapKey)), C.int(encapKeyLen)))
+func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int32 {
+	return int32(C._mkcgo_go_deriveEncapsulationKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int(len(encapKey))))
 }
 
-func EncapsulateMLKEM1024(encapKey *uint8, encapKeyLen int32, sharedKey *uint8, sharedKeyLen int32, ciphertext *uint8, ciphertextLen int32) int32 {
-	return int32(C._mkcgo_go_encapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(encapKey)), C.int(encapKeyLen), (*C.uint8_t)(unsafe.Pointer(sharedKey)), C.int(sharedKeyLen), (*C.uint8_t)(unsafe.Pointer(ciphertext)), C.int(ciphertextLen)))
+func EncapsulateMLKEM1024(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int32 {
+	return int32(C._mkcgo_go_encapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int(len(ciphertext))))
 }
 
-func EncapsulateMLKEM768(encapKey *uint8, encapKeyLen int32, sharedKey *uint8, sharedKeyLen int32, ciphertext *uint8, ciphertextLen int32) int32 {
-	return int32(C._mkcgo_go_encapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(encapKey)), C.int(encapKeyLen), (*C.uint8_t)(unsafe.Pointer(sharedKey)), C.int(sharedKeyLen), (*C.uint8_t)(unsafe.Pointer(ciphertext)), C.int(ciphertextLen)))
+func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int32 {
+	return int32(C._mkcgo_go_encapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int(len(ciphertext))))
 }
 
-func EncryptAESGCM(key *uint8, keyLength int, data *uint8, dataLength int, nonce *uint8, nonceLength int, aad *uint8, aadLength int, cipherText *uint8, cipherTextLength int, tag *uint8) int32 {
-	return int32(C._mkcgo_go_encryptAESGCM((*C.uint8_t)(unsafe.Pointer(key)), C.size_t(keyLength), (*C.uint8_t)(unsafe.Pointer(data)), C.size_t(dataLength), (*C.uint8_t)(unsafe.Pointer(nonce)), C.size_t(nonceLength), (*C.uint8_t)(unsafe.Pointer(aad)), C.size_t(aadLength), (*C.uint8_t)(unsafe.Pointer(cipherText)), C.size_t(cipherTextLength), (*C.uint8_t)(unsafe.Pointer(tag))))
+func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int32 {
+	return int32(C._mkcgo_go_encryptAESGCM((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(cipherText))), C.size_t(len(cipherText)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag)))))
 }
 
-func ExpandHKDF(hashFunction int32, prk *uint8, prkLength int, info *uint8, infoLength int, okm *uint8, okmLength int) int32 {
-	return int32(C._mkcgo_go_expandHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(prk)), C.size_t(prkLength), (*C.uint8_t)(unsafe.Pointer(info)), C.size_t(infoLength), (*C.uint8_t)(unsafe.Pointer(okm)), C.size_t(okmLength)))
+func ExpandHKDF(hashFunction int32, prk []uint8, info []uint8, okm []uint8) int32 {
+	return int32(C._mkcgo_go_expandHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(prk))), C.size_t(len(prk)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(info))), C.size_t(len(info)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(okm))), C.size_t(len(okm))))
 }
 
-func ExtractHKDF(hashFunction int32, secret *uint8, secretLength int, salt *uint8, saltLength int, prk *uint8, prkLength int) int32 {
-	return int32(C._mkcgo_go_extractHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(secret)), C.size_t(secretLength), (*C.uint8_t)(unsafe.Pointer(salt)), C.size_t(saltLength), (*C.uint8_t)(unsafe.Pointer(prk)), C.size_t(prkLength)))
+func ExtractHKDF(hashFunction int32, secret []uint8, salt []uint8, prk []uint8) int32 {
+	return int32(C._mkcgo_go_extractHKDF(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(secret))), C.size_t(len(secret)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(salt))), C.size_t(len(salt)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(prk))), C.size_t(len(prk))))
 }
 
-func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	C._mkcgo_go_finalizeHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer []uint8) {
+	C._mkcgo_go_finalizeHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 	C._mkcgo_go_freeHMAC(C.int32_t(hashFunction), ptr)
 }
 
-func GenerateKeyEd25519(key *uint8) {
-	C._mkcgo_go_generateKeyEd25519((*C.uint8_t)(unsafe.Pointer(key)))
+func GenerateKeyEd25519(key []uint8) {
+	C._mkcgo_go_generateKeyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))))
 }
 
-func GenerateKeyMLKEM1024(seed *uint8, seedLen int32) int32 {
-	return int32(C._mkcgo_go_generateKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen)))
+func GenerateKeyMLKEM1024(seed []uint8) int32 {
+	return int32(C._mkcgo_go_generateKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed))))
 }
 
-func GenerateKeyMLKEM768(seed *uint8, seedLen int32) int32 {
-	return int32(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(seed)), C.int(seedLen)))
+func GenerateKeyMLKEM768(seed []uint8) int32 {
+	return int32(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed))))
 }
 
 func HashBlockSize(hashAlgorithm int32) int32 {
@@ -138,28 +138,28 @@ func HashSize(hashAlgorithm int32) int32 {
 	return int32(C._mkcgo_go_hashSize(C.int32_t(hashAlgorithm)))
 }
 
-func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer *uint8) {
-	C._mkcgo_go_hashSum(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer []uint8) {
+	C._mkcgo_go_hashSum(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
-func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	C._mkcgo_go_hashWrite(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(data)), C.int(length))
+func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data []uint8) {
+	C._mkcgo_go_hashWrite(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.int(len(data)))
 }
 
-func InitHMAC(hashFunction int32, key *uint8, keyLength int32) unsafe.Pointer {
-	return C._mkcgo_go_initHMAC(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(key)), C.int(keyLength))
+func InitHMAC(hashFunction int32, key []uint8) unsafe.Pointer {
+	return C._mkcgo_go_initHMAC(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.int(len(key)))
 }
 
-func NewPrivateKeyEd25519FromSeed(key *uint8, seed *uint8) int32 {
-	return int32(C._mkcgo_go_newPrivateKeyEd25519FromSeed((*C.uint8_t)(unsafe.Pointer(key)), (*C.uint8_t)(unsafe.Pointer(seed))))
+func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int32 {
+	return int32(C._mkcgo_go_newPrivateKeyEd25519FromSeed((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed)))))
 }
 
-func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
-	return int32(C._mkcgo_go_newPublicKeyEd25519((*C.uint8_t)(unsafe.Pointer(key)), (*C.uint8_t)(unsafe.Pointer(pub))))
+func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
+	return int32(C._mkcgo_go_newPublicKeyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(pub)))))
 }
 
-func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
-	return int32(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(privateKey)), (*C.uint8_t)(unsafe.Pointer(message)), C.size_t(messageLength), (*C.uint8_t)(unsafe.Pointer(sigBuffer))))
+func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
+	return int32(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sigBuffer)))))
 }
 
 func SupportsMLKEM() int32 {
@@ -170,10 +170,10 @@ func SupportsSHA3() int32 {
 	return int32(C._mkcgo_go_supportsSHA3())
 }
 
-func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {
-	C._mkcgo_go_updateHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(data)), C.int(length))
+func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
+	C._mkcgo_go_updateHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.int(len(data)))
 }
 
-func VerifyEd25519(publicKey *uint8, message *uint8, messageLength int, sig *uint8) int32 {
-	return int32(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(publicKey)), (*C.uint8_t)(unsafe.Pointer(message)), C.size_t(messageLength), (*C.uint8_t)(unsafe.Pointer(sig))))
+func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int32 {
+	return int32(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sig)))))
 }

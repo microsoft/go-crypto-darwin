@@ -241,7 +241,7 @@ func selectAlgorithm(hash crypto.Hash, algorithmType algorithmType) (security.CF
 // bytesToCFData turns a byte slice into a CFDataRef. Caller then "owns" the
 // CFDataRef and must CFRelease the CFDataRef when done.
 func bytesToCFData(buf []byte) security.CFDataRef {
-	return security.CFDataCreate(security.KCFAllocatorDefault, addr(buf), security.CFIndex(len(buf)))
+	return security.CFDataCreate(security.KCFAllocatorDefault, buf)
 }
 
 // cfDataToBytes turns a CFDataRef into a byte slice.
@@ -257,7 +257,7 @@ func cfRelease(ref unsafe.Pointer) {
 
 // createSecKeyWithData creates a SecKey from the provided encoded key and attributes dictionary.
 func createSecKeyWithData(encodedKey []byte, keyType, keyClass security.CFStringRef) (security.SecKeyRef, error) {
-	encodedKeyCF := security.CFDataCreate(security.KCFAllocatorDefault, addr(encodedKey), security.CFIndex(len(encodedKey)))
+	encodedKeyCF := security.CFDataCreate(security.KCFAllocatorDefault, encodedKey)
 	if encodedKeyCF == nil {
 		return nil, errors.New("xcrypto: failed to create CFData for private key")
 	}

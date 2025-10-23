@@ -29,30 +29,30 @@ func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
 	return (*C.mkcgo_err_state)(unsafe.Pointer(x ^ 0))
 }
 
-func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, dataIn unsafe.Pointer, dataInLength int, dataOut unsafe.Pointer, dataOutAvailable int, dataOutMoved *int) CCCryptorStatus {
-	return C._mkcgo_CCCrypt(op, alg, options, key, C.size_t(keyLength), iv, dataIn, C.size_t(dataInLength), dataOut, C.size_t(dataOutAvailable), (*C.size_t)(unsafe.Pointer(dataOutMoved)))
+func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
+	return C._mkcgo_CCCrypt(op, alg, options, (*C.uchar)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(iv))), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(dataIn))), C.size_t(len(dataIn)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(dataOut))), C.size_t(len(dataOut)), (*C.size_t)(unsafe.Pointer(dataOutMoved)))
 }
 
-func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key unsafe.Pointer, keyLength int, iv unsafe.Pointer, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	return C._mkcgo_CCCryptorCreate(op, alg, options, key, C.size_t(keyLength), iv, cryptorRef)
+func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, cryptorRef *CCCryptorRef) CCCryptorStatus {
+	return C._mkcgo_CCCryptorCreate(op, alg, options, (*C.uchar)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(iv))), cryptorRef)
 }
 
-func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv unsafe.Pointer, key unsafe.Pointer, keyLength int, tweak unsafe.Pointer, tweakLength int, numRounds int32, options CCModeOptions, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	return C._mkcgo_CCCryptorCreateWithMode(op, mode, alg, padding, iv, key, C.size_t(keyLength), tweak, C.size_t(tweakLength), C.int(numRounds), options, cryptorRef)
+func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, padding CCPadding, iv []byte, key []byte, tweak []byte, numRounds int32, options CCModeOptions, cryptorRef *CCCryptorRef) CCCryptorStatus {
+	return C._mkcgo_CCCryptorCreateWithMode(op, mode, alg, padding, (*C.uchar)(unsafe.Pointer(unsafe.SliceData(iv))), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(tweak))), C.size_t(len(tweak)), C.int(numRounds), options, cryptorRef)
 }
 
 func CCCryptorRelease(cryptorRef CCCryptorRef) CCCryptorStatus {
 	return C._mkcgo_CCCryptorRelease(cryptorRef)
 }
 
-func CCCryptorReset(cryptorRef CCCryptorRef, iv unsafe.Pointer) CCCryptorStatus {
-	return C._mkcgo_CCCryptorReset(cryptorRef, iv)
+func CCCryptorReset(cryptorRef CCCryptorRef, iv []byte) CCCryptorStatus {
+	return C._mkcgo_CCCryptorReset(cryptorRef, (*C.uchar)(unsafe.Pointer(unsafe.SliceData(iv))))
 }
 
-func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn unsafe.Pointer, dataInLength int, dataOut unsafe.Pointer, dataOutAvailable int, dataOutMoved *int) CCCryptorStatus {
-	return C._mkcgo_CCCryptorUpdate(cryptorRef, dataIn, C.size_t(dataInLength), dataOut, C.size_t(dataOutAvailable), (*C.size_t)(unsafe.Pointer(dataOutMoved)))
+func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
+	return C._mkcgo_CCCryptorUpdate(cryptorRef, (*C.uchar)(unsafe.Pointer(unsafe.SliceData(dataIn))), C.size_t(len(dataIn)), (*C.uchar)(unsafe.Pointer(unsafe.SliceData(dataOut))), C.size_t(len(dataOut)), (*C.size_t)(unsafe.Pointer(dataOutMoved)))
 }
 
-func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password *byte, passwordLen int, salt *uint8, saltLen int, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey *uint8, derivedKeyLen int) CCCryptorStatus {
-	return C._mkcgo_CCKeyDerivationPBKDF(algorithm, (*C.char)(unsafe.Pointer(password)), C.size_t(passwordLen), (*C.uint8_t)(unsafe.Pointer(salt)), C.size_t(saltLen), prf, C.uint(rounds), (*C.uint8_t)(unsafe.Pointer(derivedKey)), C.size_t(derivedKeyLen))
+func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password []byte, salt []uint8, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey []uint8) CCCryptorStatus {
+	return C._mkcgo_CCKeyDerivationPBKDF(algorithm, (*C.char)(unsafe.Pointer(unsafe.SliceData(password))), C.size_t(len(password)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(salt))), C.size_t(len(salt)), prf, C.uint(rounds), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(derivedKey))), C.size_t(len(derivedKey)))
 }

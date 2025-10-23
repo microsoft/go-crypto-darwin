@@ -10,6 +10,7 @@ import (
 	"errors"
 	"hash"
 	"runtime"
+	"sync"
 	"unsafe"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
@@ -23,18 +24,59 @@ const (
 	sha512 = 5
 )
 
-var (
-	md5BlockSize    = int(cryptokit.HashBlockSize(md5))
-	md5Size         = int(cryptokit.HashSize(md5))
-	sha1BlockSize   = int(cryptokit.HashBlockSize(sha1))
-	sha1Size        = int(cryptokit.HashSize(sha1))
-	sha256BlockSize = int(cryptokit.HashBlockSize(sha256))
-	sha256Size      = int(cryptokit.HashSize(sha256))
-	sha384BlockSize = int(cryptokit.HashBlockSize(sha384))
-	sha384Size      = int(cryptokit.HashSize(sha384))
-	sha512BlockSize = int(cryptokit.HashBlockSize(sha512))
-	sha512Size      = int(cryptokit.HashSize(sha512))
-)
+type hashAlgorithm struct {
+	id        int32
+	ch        crypto.Hash
+	size      int
+	blockSize int
+	available bool
+}
+
+var cacheHash sync.Map // map[crypto.Hash]*hashAlgorithm
+
+// loadHash converts a crypto.Hash to a hashAlgorithm.
+func loadHash(ch crypto.Hash) *hashAlgorithm {
+	if v, ok := cacheHash.Load(ch); ok {
+		return v.(*hashAlgorithm)
+	}
+
+	var hash hashAlgorithm
+	hash.ch = ch
+	hash.available = true
+
+	switch ch {
+	case crypto.MD5:
+		hash.id = md5
+		hash.size = int(cryptokit.HashSize(md5))
+		hash.blockSize = int(cryptokit.HashBlockSize(md5))
+	case crypto.SHA1:
+		hash.id = sha1
+		hash.size = int(cryptokit.HashSize(sha1))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha1))
+	case crypto.SHA256:
+		hash.id = sha256
+		hash.size = int(cryptokit.HashSize(sha256))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha256))
+	case crypto.SHA384:
+		hash.id = sha384
+		hash.size = int(cryptokit.HashSize(sha384))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha384))
+	case crypto.SHA512:
+		hash.id = sha512
+		hash.size = int(cryptokit.HashSize(sha512))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha512))
+	default:
+		hash.available = false
+	}
+
+	if !hash.available {
+		cacheHash.Store(ch, (*hashAlgorithm)(nil))
+		return nil
+	}
+
+	cacheHash.Store(ch, &hash)
+	return &hash
+}
 
 type evpHash struct {
 	ptr           unsafe.Pointer
@@ -45,20 +87,20 @@ type evpHash struct {
 
 // SupportsHash returns true if a hash.Hash implementation is supported for h.
 func SupportsHash(h crypto.Hash) bool {
-	switch h {
-	case crypto.MD5, crypto.SHA1, crypto.SHA256, crypto.SHA384, crypto.SHA512:
-		return true
-	default:
-		return false
-	}
+	return loadHash(h) != nil
 }
 
-func newEVPHash(hashAlgorithm int32, blockSize, size int) *evpHash {
+func newEVPHash(ch crypto.Hash) *evpHash {
+	alg := loadHash(ch)
+	if alg == nil {
+		panic("cryptokit: " + ch.String() + " not available")
+	}
+
 	h := &evpHash{
-		ptr:           cryptokit.HashNew(hashAlgorithm),
-		hashAlgorithm: hashAlgorithm,
-		blockSize:     blockSize,
-		size:          size,
+		ptr:           cryptokit.HashNew(alg.id),
+		hashAlgorithm: alg.id,
+		blockSize:     alg.blockSize,
+		size:          alg.size,
 	}
 
 	runtime.SetFinalizer(h, (*evpHash).finalize)
@@ -215,54 +257,34 @@ func SHA512(p []byte) (sum [64]byte) {
 // NewMD5 initializes a new MD5 hasher.
 func NewMD5() hash.Hash {
 	return md5Hash{
-		evpHash: newEVPHash(
-			int32(md5),
-			md5BlockSize,
-			md5Size,
-		),
+		evpHash: newEVPHash(crypto.MD5),
 	}
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
 	return sha1Hash{
-		evpHash: newEVPHash(
-			int32(sha1),
-			sha1BlockSize,
-			sha1Size,
-		),
+		evpHash: newEVPHash(crypto.SHA1),
 	}
 }
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
 	return sha256Hash{
-		evpHash: newEVPHash(
-			int32(sha256),
-			sha256BlockSize,
-			sha256Size,
-		),
+		evpHash: newEVPHash(crypto.SHA256),
 	}
 }
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
 	return sha384Hash{
-		evpHash: newEVPHash(
-			int32(sha384),
-			sha384BlockSize,
-			sha384Size,
-		),
+		evpHash: newEVPHash(crypto.SHA384),
 	}
 }
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
 	return sha512Hash{
-		evpHash: newEVPHash(
-			int32(sha512),
-			sha512BlockSize,
-			sha512Size,
-		),
+		evpHash: newEVPHash(crypto.SHA512),
 	}
 }

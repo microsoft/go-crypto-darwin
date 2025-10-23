@@ -34,6 +34,18 @@ func SHA384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
 	C._mkcgo_go_SHA384((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
 }
 
+func SHA3_256(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	C._mkcgo_go_SHA3_256((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+}
+
+func SHA3_384(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	C._mkcgo_go_SHA3_384((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+}
+
+func SHA3_512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
+	C._mkcgo_go_SHA3_512((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
+}
+
 func SHA512(inputPointer *uint8, inputLength int, outputPointer *uint8) {
 	C._mkcgo_go_SHA512((*C.uint8_t)(unsafe.Pointer(inputPointer)), C.size_t(inputLength), (*C.uint8_t)(unsafe.Pointer(outputPointer)))
 }
@@ -116,6 +128,10 @@ func NewPublicKeyEd25519(key *uint8, pub *uint8) int32 {
 
 func SignEd25519(privateKey *uint8, message *uint8, messageLength int, sigBuffer *uint8) int32 {
 	return int32(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(privateKey)), (*C.uint8_t)(unsafe.Pointer(message)), C.size_t(messageLength), (*C.uint8_t)(unsafe.Pointer(sigBuffer))))
+}
+
+func SupportsSHA3() int32 {
+	return int32(C._mkcgo_go_supportsSHA3())
 }
 
 func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data *uint8, length int32) {

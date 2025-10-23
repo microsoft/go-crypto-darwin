@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         go-version: [1.24.x, 1.25.x]
-        macos-version: [macos-13, macos-14, macos-15]
+        macos-version: [macos-13, macos-14, macos-15, macos-26]
         cgo: [1]
         include:
           - go-version: 1.26.x
@@ -25,6 +25,9 @@ jobs:
             cgo: 0
           - go-version: 1.26.x
             macos-version: macos-15
+            cgo: 0
+          - go-version: 1.26.x
+            macos-version: macos-26
             cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:
@@ -42,28 +45,40 @@ jobs:
         with:
           macos-version: ${{ matrix.macos-version }}
 
-      - name: Build CryptoKit.o
-        run: bash gen-swift-bindings.sh
-
       - name: Run Go Tests
         run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit
         run: swift test
-  santise:
-    runs-on: ubuntu-latest
+  verify-reproducible-build:
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
 
-      - name: Ensure PR does not contain CryptoKit.syso object files
+      - name: Backup existing object files
         run: |
-          if git diff --name-only HEAD^ | grep -E -q 'internal/cryptokit/(CryptoKit\.syso|Cryptokit_arm64\.syso|Cryptokit_amd64\.syso|CryptoKit_arm64\.syso)'; then
-            echo "CryptoKit/Cryptokit.syso files have been checked in. Please remove this from your PR."
+          mkdir -p backup
+          cp -f internal/cryptokit/CryptoKit_*.syso backup/ 2>/dev/null || true
+
+      - name: Rebuild object files
+        run: ./gen-swift-bindings.sh
+
+      - name: Verify object files are reproducible
+        run: |
+          if ! diff -q backup/CryptoKit_amd64.syso internal/cryptokit/CryptoKit_amd64.syso >/dev/null 2>&1; then
+            echo "ERROR: CryptoKit_amd64.syso is not reproducible - the checked-in version differs from the rebuilt version"
+            echo "This indicates the object file in the repository is out of sync with the source code"
+            echo "Please rebuild using: ./gen-swift-bindings.sh"
             exit 1
           fi
+          if ! diff -q backup/CryptoKit_arm64.syso internal/cryptokit/CryptoKit_arm64.syso >/dev/null 2>&1; then
+            echo "ERROR: CryptoKit_arm64.syso is not reproducible - the checked-in version differs from the rebuilt version"
+            echo "This indicates the object file in the repository is out of sync with the source code"
+            echo "Please rebuild using: ./gen-swift-bindings.sh"
+            exit 1
+          fi
+          echo "✅ Object files are reproducible and match the source code"
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -82,7 +97,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        macos-version: [macos-13, macos-14, macos-15]
+        macos-version: [macos-13, macos-14, macos-15, macos-26]
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0

@@ -16,6 +16,12 @@ package cryptokit
 #cgo nocallback _mkcgo_go_SHA256
 #cgo noescape _mkcgo_go_SHA384
 #cgo nocallback _mkcgo_go_SHA384
+#cgo noescape _mkcgo_go_SHA3_256
+#cgo nocallback _mkcgo_go_SHA3_256
+#cgo noescape _mkcgo_go_SHA3_384
+#cgo nocallback _mkcgo_go_SHA3_384
+#cgo noescape _mkcgo_go_SHA3_512
+#cgo nocallback _mkcgo_go_SHA3_512
 #cgo noescape _mkcgo_go_SHA512
 #cgo nocallback _mkcgo_go_SHA512
 #cgo noescape _mkcgo_go_finalizeHMAC
@@ -32,6 +38,7 @@ package cryptokit
 #cgo noescape _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_initHMAC
+#cgo nocallback _mkcgo_go_supportsSHA3
 #cgo noescape _mkcgo_go_updateHMAC
 #cgo nocallback _mkcgo_go_updateHMAC
 */

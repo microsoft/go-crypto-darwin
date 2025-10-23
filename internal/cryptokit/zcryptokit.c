@@ -13,6 +13,9 @@ void go_MD5(const uint8_t*, size_t, const uint8_t*);
 void go_SHA1(const uint8_t*, size_t, const uint8_t*);
 void go_SHA256(const uint8_t*, size_t, const uint8_t*);
 void go_SHA384(const uint8_t*, size_t, const uint8_t*);
+void go_SHA3_256(const uint8_t*, size_t, const uint8_t*);
+void go_SHA3_384(const uint8_t*, size_t, const uint8_t*);
+void go_SHA3_512(const uint8_t*, size_t, const uint8_t*);
 void go_SHA512(const uint8_t*, size_t, const uint8_t*);
 void* go_copyHMAC(int32_t, void*);
 int go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
@@ -34,6 +37,7 @@ void* go_initHMAC(int32_t, const uint8_t*, int);
 int go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 int go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
 int go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
+int go_supportsSHA3(void);
 void go_updateHMAC(int32_t, void*, const uint8_t*, int);
 int go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
 
@@ -51,6 +55,18 @@ void _mkcgo_go_SHA256(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) 
 
 void _mkcgo_go_SHA384(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
 	go_SHA384(_arg0, _arg1, _arg2);
+}
+
+void _mkcgo_go_SHA3_256(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
+	go_SHA3_256(_arg0, _arg1, _arg2);
+}
+
+void _mkcgo_go_SHA3_384(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
+	go_SHA3_384(_arg0, _arg1, _arg2);
+}
+
+void _mkcgo_go_SHA3_512(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
+	go_SHA3_512(_arg0, _arg1, _arg2);
 }
 
 void _mkcgo_go_SHA512(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
@@ -135,6 +151,10 @@ int _mkcgo_go_newPublicKeyEd25519(uint8_t* _arg0, const uint8_t* _arg1) {
 
 int _mkcgo_go_signEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, uint8_t* _arg3) {
 	return go_signEd25519(_arg0, _arg1, _arg2, _arg3);
+}
+
+int _mkcgo_go_supportsSHA3(void) {
+	return go_supportsSHA3();
 }
 
 void _mkcgo_go_updateHMAC(int32_t _arg0, void* _arg1, const uint8_t* _arg2, int _arg3) {

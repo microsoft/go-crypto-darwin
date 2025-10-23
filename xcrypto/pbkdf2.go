@@ -6,6 +6,7 @@
 package xcrypto
 
 import (
+	"crypto"
 	"errors"
 	"hash"
 
@@ -55,15 +56,20 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 
 // Mapping Go hash functions to CommonCrypto hash constants
 func hashToCCDigestPBKDF2(hash hash.Hash) (commoncrypto.CCPseudoRandomAlgorithm, error) {
-	switch hash.(type) {
-	case sha1Hash:
-		return commoncrypto.KCCPRFHmacAlgSHA1, nil
-	case sha256Hash:
-		return commoncrypto.KCCPRFHmacAlgSHA256, nil
-	case sha384Hash:
-		return commoncrypto.KCCPRFHmacAlgSHA384, nil
-	case sha512Hash:
-		return commoncrypto.KCCPRFHmacAlgSHA512, nil
+	switch h := hash.(type) {
+	case *evpHash:
+		switch h.alg.ch {
+		case crypto.SHA1:
+			return commoncrypto.KCCPRFHmacAlgSHA1, nil
+		case crypto.SHA256:
+			return commoncrypto.KCCPRFHmacAlgSHA256, nil
+		case crypto.SHA384:
+			return commoncrypto.KCCPRFHmacAlgSHA384, nil
+		case crypto.SHA512:
+			return commoncrypto.KCCPRFHmacAlgSHA512, nil
+		default:
+			return 0, errors.New("unsupported hash function")
+		}
 	default:
 		return 0, errors.New("unsupported hash function")
 	}

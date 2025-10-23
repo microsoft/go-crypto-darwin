@@ -18,6 +18,9 @@ void _mkcgo_go_MD5(const uint8_t*, size_t, const uint8_t*);
 void _mkcgo_go_SHA1(const uint8_t*, size_t, const uint8_t*);
 void _mkcgo_go_SHA256(const uint8_t*, size_t, const uint8_t*);
 void _mkcgo_go_SHA384(const uint8_t*, size_t, const uint8_t*);
+void _mkcgo_go_SHA3_256(const uint8_t*, size_t, const uint8_t*);
+void _mkcgo_go_SHA3_384(const uint8_t*, size_t, const uint8_t*);
+void _mkcgo_go_SHA3_512(const uint8_t*, size_t, const uint8_t*);
 void _mkcgo_go_SHA512(const uint8_t*, size_t, const uint8_t*);
 void* _mkcgo_go_copyHMAC(int32_t, void*);
 int _mkcgo_go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
@@ -39,6 +42,7 @@ void* _mkcgo_go_initHMAC(int32_t, const uint8_t*, int);
 int _mkcgo_go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 int _mkcgo_go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
 int _mkcgo_go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
+int _mkcgo_go_supportsSHA3(void);
 void _mkcgo_go_updateHMAC(int32_t, void*, const uint8_t*, int);
 int _mkcgo_go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
 

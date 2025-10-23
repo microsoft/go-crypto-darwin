@@ -1183,6 +1183,7 @@ public func supportsMLKEM() -> Int {
 }
 
 // ML-KEM-768 functions
+#if compiler(>=6.2)
 @available(macOS 26.0, *)
 @_cdecl("go_generateKeyMLKEM768")
 public func generateKeyMLKEM768(seedPointer: UnsafeMutablePointer<UInt8>) -> Int {
@@ -1349,3 +1350,4 @@ public func decapsulateMLKEM1024(
         return 1
     }
 }
+#endif

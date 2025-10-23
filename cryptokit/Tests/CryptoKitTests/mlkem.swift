@@ -11,22 +11,19 @@ final class MLKEMTests: XCTestCase {
 
     // MARK: - ML-KEM Support Detection Tests
 
+    #if compiler(>=6.2)
+    @available(macOS 26.0, *)
     func testMLKEMSupportDetection() {
         let isSupported = supportsMLKEM()
-
-        if #available(macOS 26.0, *) {
-            XCTAssertEqual(isSupported, 1, "ML-KEM should be supported on macOS 26.0+")
-        } else {
-            XCTAssertEqual(isSupported, 0, "ML-KEM should not be supported on macOS < 26.0")
-        }
+        XCTAssertEqual(isSupported, 1, "ML-KEM should be supported on macOS 26.0+")
     }
+    #endif
 
     // MARK: - ML-KEM-768 Tests
 
+    #if compiler(>=6.2)
+    @available(macOS 26.0, *)
     func testMLKEM768KeyGeneration() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
         let result = generateKeyMLKEM768(seedPointer: &seed)
@@ -38,10 +35,8 @@ final class MLKEMTests: XCTestCase {
         XCTAssertNotEqual(seed, allZeros, "Generated seed should not be all zeros")
     }
 
+    @available(macOS 26.0, *)
     func testMLKEM768DeriveEncapsulationKey() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
@@ -62,10 +57,8 @@ final class MLKEMTests: XCTestCase {
         XCTAssertNotEqual(encapKey, allZeros, "Derived encapsulation key should not be all zeros")
     }
 
+    @available(macOS 26.0, *)
     func testMLKEM768EncapsulateDecapsulate() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
@@ -108,10 +101,8 @@ final class MLKEMTests: XCTestCase {
 
     // MARK: - ML-KEM-1024 Tests
 
+    @available(macOS 26.0, *)
     func testMLKEM1024KeyGeneration() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
         let result = generateKeyMLKEM1024(seedPointer: &seed)
@@ -123,10 +114,8 @@ final class MLKEMTests: XCTestCase {
         XCTAssertNotEqual(seed, allZeros, "Generated seed should not be all zeros")
     }
 
+    @available(macOS 26.0, *)
     func testMLKEM1024DeriveEncapsulationKey() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
@@ -147,10 +136,8 @@ final class MLKEMTests: XCTestCase {
         XCTAssertNotEqual(encapKey, allZeros, "Derived encapsulation key should not be all zeros")
     }
 
+    @available(macOS 26.0, *)
     func testMLKEM1024EncapsulateDecapsulate() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
@@ -193,10 +180,8 @@ final class MLKEMTests: XCTestCase {
 
     // MARK: - Error Handling Tests
 
+    @available(macOS 26.0, *)
     func testMLKEMErrorHandling() throws {
-        guard #available(macOS 26.0, *) else {
-            throw XCTSkip("ML-KEM is only available on macOS 26.0+")
-        }
 
         // Test decapsulation with invalid ciphertext (all zeros should fail)
         let seed = [UInt8](repeating: 1, count: 64)  // Use non-zero seed for valid key
@@ -213,6 +198,8 @@ final class MLKEMTests: XCTestCase {
         // The test mainly ensures the function doesn't crash
         XCTAssert(result == 0 || result == 1, "Decapsulation should return either success or failure")
     }
+
+    #endif
 
     // MARK: - Cross-Variant Tests
 

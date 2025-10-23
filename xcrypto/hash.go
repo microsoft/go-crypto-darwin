@@ -36,6 +36,11 @@ type hashAlgorithm struct {
 
 var cacheHash sync.Map // map[crypto.Hash]*hashAlgorithm
 
+// supportsSHA3 returns true if SHA-3 is available on this macOS version.
+func supportsSHA3() bool {
+	return cryptokit.SupportsSHA3() == 1
+}
+
 // loadHash converts a crypto.Hash to a hashAlgorithm.
 func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 	if v, ok := cacheHash.Load(ch); ok {
@@ -70,6 +75,30 @@ func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 		hash.id = sha512
 		hash.size = int(cryptokit.HashSize(sha512))
 		hash.blockSize = int(cryptokit.HashBlockSize(sha512))
+	case crypto.SHA3_256:
+		if !supportsSHA3() {
+			supported = false
+			break
+		}
+		hash.id = sha3256
+		hash.size = int(cryptokit.HashSize(sha3256))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha3256))
+	case crypto.SHA3_384:
+		if !supportsSHA3() {
+			supported = false
+			break
+		}
+		hash.id = sha3384
+		hash.size = int(cryptokit.HashSize(sha3384))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha3384))
+	case crypto.SHA3_512:
+		if !supportsSHA3() {
+			supported = false
+			break
+		}
+		hash.id = sha3512
+		hash.size = int(cryptokit.HashSize(sha3512))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha3512))
 	default:
 		supported = false
 	}
@@ -243,8 +272,15 @@ type sha3_512Hash struct {
 	*evpHash
 }
 
+// DigestSHA3 is the SHA-3 implementation using CryptoKit.
+type DigestSHA3 struct {
+	*evpHash
+}
+
 var _ hash.Hash = (*evpHash)(nil)
 var _ HashCloner = (*evpHash)(nil)
+var _ hash.Hash = (*DigestSHA3)(nil)
+var _ HashCloner = (*DigestSHA3)(nil)
 
 func MD5(p []byte) (sum [16]byte) {
 	cryptokit.MD5(addr(p), len(p), addr(sum[:]))
@@ -271,17 +307,17 @@ func SHA512(p []byte) (sum [64]byte) {
 	return
 }
 
-func SHA3_256(p []byte) (sum [32]byte) {
+func SumSHA3_256(p []byte) (sum [32]byte) {
 	cryptokit.SHA3_256(addr(p), len(p), addr(sum[:]))
 	return
 }
 
-func SHA3_384(p []byte) (sum [48]byte) {
+func SumSHA3_384(p []byte) (sum [48]byte) {
 	cryptokit.SHA3_384(addr(p), len(p), addr(sum[:]))
 	return
 }
 
-func SHA3_512(p []byte) (sum [64]byte) {
+func SumSHA3_512(p []byte) (sum [64]byte) {
 	cryptokit.SHA3_512(addr(p), len(p), addr(sum[:]))
 	return
 }
@@ -322,22 +358,22 @@ func NewSHA512() hash.Hash {
 }
 
 // NewSHA3_256 creates a new SHA3-256 hash.
-func NewSHA3_256() hash.Hash {
-	return sha3_256Hash{
+func NewSHA3_256() *DigestSHA3 {
+	return &DigestSHA3{
 		evpHash: newEVPHash(crypto.SHA3_256),
 	}
 }
 
 // NewSHA3_384 creates a new SHA3-384 hash.
-func NewSHA3_384() hash.Hash {
-	return sha3_384Hash{
+func NewSHA3_384() *DigestSHA3 {
+	return &DigestSHA3{
 		evpHash: newEVPHash(crypto.SHA3_384),
 	}
 }
 
 // NewSHA3_512 creates a new SHA3-512 hash.
-func NewSHA3_512() hash.Hash {
-	return sha3_512Hash{
+func NewSHA3_512() *DigestSHA3 {
+	return &DigestSHA3{
 		evpHash: newEVPHash(crypto.SHA3_512),
 	}
 }

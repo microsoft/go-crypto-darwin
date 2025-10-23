@@ -29,12 +29,14 @@ func cryptoToHash(h crypto.Hash) func() hash.Hash {
 		return xcrypto.NewSHA384
 	case crypto.SHA512:
 		return xcrypto.NewSHA512
+	// case crypto.SHA3_224:
+	// 	return func() hash.Hash { return xcrypto.NewSHA3_224() }
 	case crypto.SHA3_256:
-		return xcrypto.NewSHA3_256
+		return func() hash.Hash { return xcrypto.NewSHA3_256() }
 	case crypto.SHA3_384:
-		return xcrypto.NewSHA3_384
+		return func() hash.Hash { return xcrypto.NewSHA3_384() }
 	case crypto.SHA3_512:
-		return xcrypto.NewSHA3_512
+		return func() hash.Hash { return xcrypto.NewSHA3_512() }
 	}
 	return nil
 }
@@ -306,21 +308,21 @@ func TestHash_OneShot(t *testing.T) {
 			return b[:]
 		}},
 		// {crypto.SHA3_224, func(p []byte) []byte {
-		// 	b := xcrypto.SHA3_224(p)
+		// 	b := xcrypto.SumSHA3_224(p)
 		// 	return b[:]
 		// }},
-		// {crypto.SHA3_256, func(p []byte) []byte {
-		// 	b := xcrypto.SHA3_256(p)
-		// 	return b[:]
-		// }},
-		// {crypto.SHA3_384, func(p []byte) []byte {
-		// 	b := xcrypto.SHA3_384(p)
-		// 	return b[:]
-		// }},
-		// {crypto.SHA3_512, func(p []byte) []byte {
-		// 	b := xcrypto.SHA3_512(p)
-		// 	return b[:]
-		// }},
+		{crypto.SHA3_256, func(p []byte) []byte {
+			b := xcrypto.SumSHA3_256(p)
+			return b[:]
+		}},
+		{crypto.SHA3_384, func(p []byte) []byte {
+			b := xcrypto.SumSHA3_384(p)
+			return b[:]
+		}},
+		{crypto.SHA3_512, func(p []byte) []byte {
+			b := xcrypto.SumSHA3_512(p)
+			return b[:]
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.h.String(), func(t *testing.T) {

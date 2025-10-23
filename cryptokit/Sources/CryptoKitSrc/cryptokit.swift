@@ -1187,10 +1187,10 @@ public func supportsMLKEM() -> Int {
 @available(macOS 26.0, *)
 @_cdecl("go_generateKeyMLKEM768")
 public func generateKeyMLKEM768(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
-    guard seedLen == 64 else { return 1 }
     do {
         let privateKey = try MLKEM768.PrivateKey()
         let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
         let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
         seedData.copyBytes(to: buffer)
         return 0
@@ -1207,12 +1207,13 @@ public func deriveEncapsulationKeyMLKEM768(
     encapKeyPointer: UnsafeMutablePointer<UInt8>,
     encapKeyLen: Int
 ) -> Int {
-    guard seedLen == 64, encapKeyLen == 1184 else { return 1 }
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
         let privateKey = try MLKEM768.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
         let publicKey = privateKey.publicKey
         let publicKeyData = publicKey.rawRepresentation
+        guard encapKeyLen == publicKeyData.count else { return 1 }
         let buffer = UnsafeMutableRawBufferPointer(start: encapKeyPointer, count: encapKeyLen)
         publicKeyData.copyBytes(to: buffer)
         return 0
@@ -1231,11 +1232,15 @@ public func encapsulateMLKEM768(
     ciphertextPointer: UnsafeMutablePointer<UInt8>,
     ciphertextLen: Int
 ) -> Int {
-    guard encapKeyLen == 1184, sharedKeyLen == 32, ciphertextLen == 1088 else { return 1 }
     do {
         let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
         let publicKey = try MLKEM768.PublicKey(rawRepresentation: publicKeyData)
         let encapResult = try publicKey.encapsulate()
+
+        guard sharedKeyLen >= encapResult.sharedSecret.withUnsafeBytes({ $0.count }),
+            ciphertextLen >= encapResult.encapsulated.count
+        else { return 1 }
+
         let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
         let ciphertextBuffer = UnsafeMutableRawBufferPointer(start: ciphertextPointer, count: ciphertextLen)
         encapResult.sharedSecret.withUnsafeBytes { bytes in
@@ -1258,12 +1263,13 @@ public func decapsulateMLKEM768(
     sharedKeyPointer: UnsafeMutablePointer<UInt8>,
     sharedKeyLen: Int
 ) -> Int {
-    guard seedLen == 64, ciphertextLen == 1088, sharedKeyLen == 32 else { return 1 }
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
         let privateKey = try MLKEM768.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
         let ciphertextData = Data(bytes: ciphertextPointer, count: ciphertextLen)
         let sharedKey = try privateKey.decapsulate(ciphertextData)
+        guard sharedKeyLen >= sharedKey.withUnsafeBytes({ $0.count }) else { return 1 }
         sharedKey.withUnsafeBytes { sharedKeyBytes in
             let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
             sharedKeyBuffer.copyBytes(from: sharedKeyBytes)
@@ -1278,10 +1284,10 @@ public func decapsulateMLKEM768(
 @available(macOS 26.0, *)
 @_cdecl("go_generateKeyMLKEM1024")
 public func generateKeyMLKEM1024(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
-    guard seedLen == 64 else { return 1 }
     do {
         let privateKey = try MLKEM1024.PrivateKey()
         let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
         let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
         seedData.copyBytes(to: buffer)
         return 0
@@ -1298,12 +1304,13 @@ public func deriveEncapsulationKeyMLKEM1024(
     encapKeyPointer: UnsafeMutablePointer<UInt8>,
     encapKeyLen: Int
 ) -> Int {
-    guard seedLen == 64, encapKeyLen == 1568 else { return 1 }
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
         let privateKey = try MLKEM1024.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
         let publicKey = privateKey.publicKey
         let publicKeyData = publicKey.rawRepresentation
+        guard encapKeyLen == publicKeyData.count else { return 1 }
         let buffer = UnsafeMutableRawBufferPointer(start: encapKeyPointer, count: encapKeyLen)
         publicKeyData.copyBytes(to: buffer)
         return 0
@@ -1322,11 +1329,15 @@ public func encapsulateMLKEM1024(
     ciphertextPointer: UnsafeMutablePointer<UInt8>,
     ciphertextLen: Int
 ) -> Int {
-    guard encapKeyLen == 1568, sharedKeyLen == 32, ciphertextLen == 1568 else { return 1 }
     do {
         let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
         let publicKey = try MLKEM1024.PublicKey(rawRepresentation: publicKeyData)
         let encapResult = try publicKey.encapsulate()
+
+        guard sharedKeyLen >= encapResult.sharedSecret.withUnsafeBytes({ $0.count }),
+            ciphertextLen >= encapResult.encapsulated.count
+        else { return 1 }
+
         let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
         let ciphertextBuffer = UnsafeMutableRawBufferPointer(start: ciphertextPointer, count: ciphertextLen)
         encapResult.sharedSecret.withUnsafeBytes { bytes in
@@ -1349,12 +1360,13 @@ public func decapsulateMLKEM1024(
     sharedKeyPointer: UnsafeMutablePointer<UInt8>,
     sharedKeyLen: Int
 ) -> Int {
-    guard seedLen == 64, ciphertextLen == 1568, sharedKeyLen == 32 else { return 1 }
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
         let privateKey = try MLKEM1024.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        guard seedLen == privateKey.seedRepresentation.count else { return 1 }
         let ciphertextData = Data(bytes: ciphertextPointer, count: ciphertextLen)
         let sharedKey = try privateKey.decapsulate(ciphertextData)
+        guard sharedKeyLen >= sharedKey.withUnsafeBytes({ $0.count }) else { return 1 }
         sharedKey.withUnsafeBytes { sharedKeyBytes in
             let sharedKeyBuffer = UnsafeMutableRawBufferPointer(start: sharedKeyPointer, count: sharedKeyLen)
             sharedKeyBuffer.copyBytes(from: sharedKeyBytes)

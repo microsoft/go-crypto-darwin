@@ -43,9 +43,9 @@ type DecapsulationKey768 struct {
 	seed [SeedSize]byte
 }
 
-// GenerateKey768 generates a new decapsulation key, drawing random bytes from
+// GenerateKeyMLKEM768 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
-func GenerateKey768() (*DecapsulationKey768, error) {
+func GenerateKeyMLKEM768() (*DecapsulationKey768, error) {
 	dk := &DecapsulationKey768{}
 	ret := cryptokit.GenerateKeyMLKEM768(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
@@ -55,9 +55,9 @@ func GenerateKey768() (*DecapsulationKey768, error) {
 	return dk, nil
 }
 
-// NewDecapsulationKey768 expands a decapsulation key from a 64-byte seed in the
+// NewDecapsulationKeyMLKEM768 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
-func NewDecapsulationKey768(seed []byte) (*DecapsulationKey768, error) {
+func NewDecapsulationKeyMLKEM768(seed []byte) (*DecapsulationKey768, error) {
 	if len(seed) != SeedSize {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
@@ -122,9 +122,9 @@ type EncapsulationKey768 struct {
 	bytes [EncapsulationKeySize768]byte
 }
 
-// NewEncapsulationKey768 parses an encapsulation key from its encoded form. If
-// the encapsulation key is not valid, NewEncapsulationKey768 returns an error.
-func NewEncapsulationKey768(encapsulationKey []byte) (*EncapsulationKey768, error) {
+// NewEncapsulationKeyMLKEM768 parses an encapsulation key from its encoded form. If
+// the encapsulation key is not valid, NewEncapsulationKeyMLKEM768 returns an error.
+func NewEncapsulationKeyMLKEM768(encapsulationKey []byte) (*EncapsulationKey768, error) {
 	if len(encapsulationKey) != EncapsulationKeySize768 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}
@@ -168,9 +168,9 @@ type DecapsulationKey1024 struct {
 	seed [SeedSize]byte
 }
 
-// GenerateKey1024 generates a new decapsulation key, drawing random bytes from
+// GenerateKeyMLKEM1024 generates a new decapsulation key, drawing random bytes from
 // the default crypto/rand source. The decapsulation key must be kept secret.
-func GenerateKey1024() (*DecapsulationKey1024, error) {
+func GenerateKeyMLKEM1024() (*DecapsulationKey1024, error) {
 	dk := &DecapsulationKey1024{}
 	ret := cryptokit.GenerateKeyMLKEM1024(addrNeverEmpty(dk.seed[:]))
 	if ret != 0 {
@@ -180,9 +180,9 @@ func GenerateKey1024() (*DecapsulationKey1024, error) {
 	return dk, nil
 }
 
-// NewDecapsulationKey1024 expands a decapsulation key from a 64-byte seed in the
+// NewDecapsulationKeyMLKEM1024 expands a decapsulation key from a 64-byte seed in the
 // "d || z" form. The seed must be uniformly random.
-func NewDecapsulationKey1024(seed []byte) (*DecapsulationKey1024, error) {
+func NewDecapsulationKeyMLKEM1024(seed []byte) (*DecapsulationKey1024, error) {
 	if len(seed) != SeedSize {
 		return nil, errors.New("mlkem: invalid seed size")
 	}
@@ -247,9 +247,9 @@ type EncapsulationKey1024 struct {
 	bytes [EncapsulationKeySize1024]byte
 }
 
-// NewEncapsulationKey1024 parses an encapsulation key from its encoded form. If
-// the encapsulation key is not valid, NewEncapsulationKey1024 returns an error.
-func NewEncapsulationKey1024(encapsulationKey []byte) (*EncapsulationKey1024, error) {
+// NewEncapsulationKeyMLKEM1024 parses an encapsulation key from its encoded form. If
+// the encapsulation key is not valid, NewEncapsulationKeyMLKEM1024 returns an error.
+func NewEncapsulationKeyMLKEM1024(encapsulationKey []byte) (*EncapsulationKey1024, error) {
 	if len(encapsulationKey) != EncapsulationKeySize1024 {
 		return nil, errors.New("mlkem: invalid encapsulation key size")
 	}

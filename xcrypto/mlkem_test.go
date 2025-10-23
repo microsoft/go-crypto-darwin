@@ -27,10 +27,10 @@ func TestMLKEMRoundTrip(t *testing.T) {
 		t.Skip("ML-KEM not supported on this platform")
 	}
 	t.Run("768", func(t *testing.T) {
-		testRoundTrip(t, xcrypto.GenerateKey768, xcrypto.NewEncapsulationKey768, xcrypto.NewDecapsulationKey768)
+		testRoundTrip(t, xcrypto.GenerateKeyMLKEM768, xcrypto.NewEncapsulationKeyMLKEM768, xcrypto.NewDecapsulationKeyMLKEM768)
 	})
 	t.Run("1024", func(t *testing.T) {
-		testRoundTrip(t, xcrypto.GenerateKey1024, xcrypto.NewEncapsulationKey1024, xcrypto.NewDecapsulationKey1024)
+		testRoundTrip(t, xcrypto.GenerateKeyMLKEM1024, xcrypto.NewEncapsulationKeyMLKEM1024, xcrypto.NewDecapsulationKeyMLKEM1024)
 	})
 }
 
@@ -100,10 +100,10 @@ func TestMLKEMBadLengths(t *testing.T) {
 		t.Skip("ML-KEM not supported on this platform")
 	}
 	t.Run("768", func(t *testing.T) {
-		testBadLengths(t, xcrypto.GenerateKey768, xcrypto.NewEncapsulationKey768, xcrypto.NewDecapsulationKey768)
+		testBadLengths(t, xcrypto.GenerateKeyMLKEM768, xcrypto.NewEncapsulationKeyMLKEM768, xcrypto.NewDecapsulationKeyMLKEM768)
 	})
 	t.Run("1024", func(t *testing.T) {
-		testBadLengths(t, xcrypto.GenerateKey1024, xcrypto.NewEncapsulationKey1024, xcrypto.NewDecapsulationKey1024)
+		testBadLengths(t, xcrypto.GenerateKeyMLKEM1024, xcrypto.NewEncapsulationKeyMLKEM1024, xcrypto.NewDecapsulationKeyMLKEM1024)
 	})
 }
 
@@ -177,7 +177,7 @@ func BenchmarkMLKEMKeyGen(b *testing.B) {
 	rand.Read(z[:])
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dk, err := xcrypto.GenerateKey768()
+		dk, err := xcrypto.GenerateKeyMLKEM768()
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -193,14 +193,14 @@ func BenchmarkMLKEMEncaps(b *testing.B) {
 	rand.Read(seed)
 	var m [32]byte
 	rand.Read(m[:])
-	dk, err := xcrypto.NewDecapsulationKey768(seed)
+	dk, err := xcrypto.NewDecapsulationKeyMLKEM768(seed)
 	if err != nil {
 		b.Fatal(err)
 	}
 	ekBytes := dk.EncapsulationKey().Bytes()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ek, err := xcrypto.NewEncapsulationKey768(ekBytes)
+		ek, err := xcrypto.NewEncapsulationKeyMLKEM768(ekBytes)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -213,7 +213,7 @@ func BenchmarkMLKEMDecaps(b *testing.B) {
 	if !xcrypto.SupportsMLKEM() {
 		b.Skip("ML-KEM not supported on this platform")
 	}
-	dk, err := xcrypto.GenerateKey768()
+	dk, err := xcrypto.GenerateKeyMLKEM768()
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -230,7 +230,7 @@ func BenchmarkMLKEMRoundTrip(b *testing.B) {
 	if !xcrypto.SupportsMLKEM() {
 		b.Skip("ML-KEM not supported on this platform")
 	}
-	dk, err := xcrypto.GenerateKey768()
+	dk, err := xcrypto.GenerateKeyMLKEM768()
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -242,7 +242,7 @@ func BenchmarkMLKEMRoundTrip(b *testing.B) {
 	}
 	b.Run("Alice", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dkS, err := xcrypto.GenerateKey768()
+			dkS, err := xcrypto.GenerateKeyMLKEM768()
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -258,7 +258,7 @@ func BenchmarkMLKEMRoundTrip(b *testing.B) {
 	})
 	b.Run("Bob", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			ek, err := xcrypto.NewEncapsulationKey768(ekBytes)
+			ek, err := xcrypto.NewEncapsulationKeyMLKEM768(ekBytes)
 			if err != nil {
 				b.Fatal(err)
 			}

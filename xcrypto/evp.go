@@ -165,21 +165,11 @@ func evpVerify(withKey withKeyFunc, algorithmType algorithmType, hash crypto.Has
 
 // hashToCryptoHash converts a hash.Hash to a crypto.Hash.
 func hashToCryptoHash(hash hash.Hash) (crypto.Hash, error) {
-	switch hash.(type) {
-	case sha1Hash:
-		return crypto.SHA1, nil
-	case sha256Hash:
-		return crypto.SHA256, nil
-	case sha384Hash:
-		return crypto.SHA384, nil
-	case sha512Hash:
-		return crypto.SHA512, nil
-	case sha3_256Hash:
-		return crypto.SHA3_256, nil
-	case sha3_384Hash:
-		return crypto.SHA3_384, nil
-	case sha3_512Hash:
-		return crypto.SHA3_512, nil
+	switch h := hash.(type) {
+	case *evpHash:
+		return h.alg.ch, nil
+	case *DigestSHA3:
+		return h.alg.ch, nil
 	default:
 		return 0, errors.New("unsupported hash function")
 	}

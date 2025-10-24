@@ -7,6 +7,8 @@ package commoncrypto
 
 /*
 #cgo CFLAGS: -Wno-attributes
+#cgo darwin LDFLAGS: -framework System
+
 #include "zcommoncrypto.h"
 */
 import "C"

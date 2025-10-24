@@ -16,6 +16,11 @@ jobs:
         go-version: [1.24.x, 1.25.x]
         macos-version: [macos-13, macos-14, macos-15, macos-26]
         cgo: [1]
+        linkmode: ['internal', 'external']
+        exclude:
+          # CGO_ENABLED=0 doesn't support external linking
+          - cgo: 0
+            linkmode: 'external'
         include:
           - go-version: 1.26.x
             macos-version: macos-13
@@ -46,7 +51,7 @@ jobs:
           macos-version: ${{ matrix.macos-version }}
 
       - name: Run Go Tests
-        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit

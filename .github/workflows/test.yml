@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.24.x, 1.25.x, 1.26.x]
+        go-version: [1.24.x, 1.25.x, gotip]
         macos-version: [macos-13, macos-14, macos-15, macos-26]
         cgo: [0, 1]
         linkmode: ['internal', 'external']
@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
-        if: matrix.go-version != '1.26.x'
+        if: matrix.go-version != 'gotip'
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -39,13 +39,13 @@ jobs:
 
       # TODO: Remove this when 1.26 is released
       - name: Setup gotip
-        if: matrix.go-version == '1.26.x'
+        if: matrix.go-version == 'gotip'
         uses: ./.github/actions/gotip
         with:
           macos-version: ${{ matrix.macos-version }}
 
       - name: Run Go Tests
-        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == '1.26.x' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == 'gotip' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit

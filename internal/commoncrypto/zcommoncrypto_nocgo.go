@@ -14,6 +14,18 @@ import (
 
 var _ = runtime.GOOS
 
+type CCCryptorRef unsafe.Pointer
+type CCModeOptions = uint32
+
+type CCOperation int32
+type CCMode int32
+type CCOptions int32
+type CCCryptorStatus int32
+type CCPBKDFAlgorithm int32
+type CCPseudoRandomAlgorithm int32
+type CCPadding int32
+type CCAlgorithm int32
+
 //go:cgo_import_dynamic _mkcgo_CCCrypt CCCrypt "/System/Library/Frameworks/System.framework/Versions/B/System"
 //go:cgo_import_dynamic _mkcgo_CCCryptorCreate CCCryptorCreate "/System/Library/Frameworks/System.framework/Versions/B/System"
 //go:cgo_import_dynamic _mkcgo_CCCryptorCreateWithMode CCCryptorCreateWithMode "/System/Library/Frameworks/System.framework/Versions/B/System"
@@ -21,25 +33,6 @@ var _ = runtime.GOOS
 //go:cgo_import_dynamic _mkcgo_CCCryptorReset CCCryptorReset "/System/Library/Frameworks/System.framework/Versions/B/System"
 //go:cgo_import_dynamic _mkcgo_CCCryptorUpdate CCCryptorUpdate "/System/Library/Frameworks/System.framework/Versions/B/System"
 //go:cgo_import_dynamic _mkcgo_CCKeyDerivationPBKDF CCKeyDerivationPBKDF "/System/Library/Frameworks/System.framework/Versions/B/System"
-
-type CCCryptorRef unsafe.Pointer
-type CCModeOptions = uint32
-
-type CCOperation int32
-
-type CCMode int32
-
-type CCOptions int32
-
-type CCCryptorStatus int32
-
-type CCPBKDFAlgorithm int32
-
-type CCPseudoRandomAlgorithm int32
-
-type CCPadding int32
-
-type CCAlgorithm int32
 
 var _mkcgo_CCCrypt_trampoline_addr uintptr
 

@@ -14,90 +14,6 @@ import (
 
 var _ = runtime.GOOS
 
-//go:cgo_import_dynamic _mkcgo_kCFAllocatorDefault kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:linkname _mkcgo_kCFAllocatorDefault _mkcgo_kCFAllocatorDefault
-//go:cgo_import_dynamic _mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecRandomDefault _mkcgo_kSecRandomDefault
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeECSECPrimeRandom kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyTypeECSECPrimeRandom _mkcgo_kSecAttrKeyTypeECSECPrimeRandom
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeRSA kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyTypeRSA _mkcgo_kSecAttrKeyTypeRSA
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPublic kSecAttrKeyClassPublic "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyClassPublic _mkcgo_kSecAttrKeyClassPublic
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPrivate kSecAttrKeyClassPrivate "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyClassPrivate _mkcgo_kSecAttrKeyClassPrivate
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyType kSecAttrKeyType "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyType _mkcgo_kSecAttrKeyType
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeySizeInBits kSecAttrKeySizeInBits "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeySizeInBits _mkcgo_kSecAttrKeySizeInBits
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClass kSecAttrKeyClass "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecAttrKeyClass _mkcgo_kSecAttrKeyClass
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard kSecKeyAlgorithmECDHKeyExchangeStandard "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 kSecKeyAlgorithmRSASignatureDigestPSSSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 kSecKeyAlgorithmRSASignatureDigestPSSSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 kSecKeyAlgorithmRSASignatureDigestPSSSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384 kSecKeyAlgorithmRSASignatureDigestPSSSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512 kSecKeyAlgorithmRSASignatureDigestPSSSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw kSecKeyAlgorithmRSAEncryptionRaw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1 kSecKeyAlgorithmRSAEncryptionPKCS1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1 _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1 kSecKeyAlgorithmRSAEncryptionOAEPSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224 kSecKeyAlgorithmRSAEncryptionOAEPSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256 kSecKeyAlgorithmRSAEncryptionOAEPSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384 kSecKeyAlgorithmRSAEncryptionOAEPSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512 kSecKeyAlgorithmRSAEncryptionOAEPSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962 kSecKeyAlgorithmECDSASignatureDigestX962 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:linkname _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962 _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962
-
-//go:cgo_import_dynamic _mkcgo_CFDataCreate CFDataCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFDataGetBytePtr CFDataGetBytePtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFDataGetLength CFDataGetLength "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFDictionaryCreate CFDictionaryCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFDictionaryCreateMutable CFDictionaryCreateMutable "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFDictionarySetValue CFDictionarySetValue "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFErrorCopyDescription CFErrorCopyDescription "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFErrorGetCode CFErrorGetCode "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFNumberCreate CFNumberCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFRelease CFRelease "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFStringGetCStringPtr CFStringGetCStringPtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_CFStringGetLength CFStringGetLength "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
-//go:cgo_import_dynamic _mkcgo_SecKeyCopyExternalRepresentation SecKeyCopyExternalRepresentation "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCopyKeyExchangeResult SecKeyCopyKeyExchangeResult "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCopyPublicKey SecKeyCopyPublicKey "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCreateDecryptedData SecKeyCreateDecryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCreateEncryptedData SecKeyCreateEncryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCreateRandomKey SecKeyCreateRandomKey "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCreateSignature SecKeyCreateSignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCreateWithData SecKeyCreateWithData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyGetBlockSize SecKeyGetBlockSize "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyIsAlgorithmSupported SecKeyIsAlgorithmSupported "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyVerifySignature SecKeyVerifySignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecRandomCopyBytes SecRandomCopyBytes "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-
 type Boolean = byte
 type SecRandomRef unsafe.Pointer
 type SecKeyRef unsafe.Pointer
@@ -115,10 +31,68 @@ type CFIndex = int32
 type SecKeyAlgorithm = CFStringRef
 
 type SecKeyOperationType int32
-
 type CFStringEncoding int32
-
 type CFNumberType int32
+
+//go:cgo_import_dynamic _mkcgo_kCFAllocatorDefault kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeECSECPrimeRandom kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeRSA kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPublic kSecAttrKeyClassPublic "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPrivate kSecAttrKeyClassPrivate "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyType kSecAttrKeyType "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeySizeInBits kSecAttrKeySizeInBits "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecAttrKeyClass kSecAttrKeyClass "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard kSecKeyAlgorithmECDHKeyExchangeStandard "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 kSecKeyAlgorithmRSASignatureDigestPSSSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 kSecKeyAlgorithmRSASignatureDigestPSSSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 kSecKeyAlgorithmRSASignatureDigestPSSSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384 kSecKeyAlgorithmRSASignatureDigestPSSSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512 kSecKeyAlgorithmRSASignatureDigestPSSSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw kSecKeyAlgorithmRSAEncryptionRaw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1 kSecKeyAlgorithmRSAEncryptionPKCS1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1 kSecKeyAlgorithmRSAEncryptionOAEPSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224 kSecKeyAlgorithmRSAEncryptionOAEPSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256 kSecKeyAlgorithmRSAEncryptionOAEPSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384 kSecKeyAlgorithmRSAEncryptionOAEPSHA384 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512 kSecKeyAlgorithmRSAEncryptionOAEPSHA512 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962 kSecKeyAlgorithmECDSASignatureDigestX962 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+
+//go:linkname _mkcgo_kCFAllocatorDefault _mkcgo_kCFAllocatorDefault
+//go:linkname _mkcgo_kSecRandomDefault _mkcgo_kSecRandomDefault
+//go:linkname _mkcgo_kSecAttrKeyTypeECSECPrimeRandom _mkcgo_kSecAttrKeyTypeECSECPrimeRandom
+//go:linkname _mkcgo_kSecAttrKeyTypeRSA _mkcgo_kSecAttrKeyTypeRSA
+//go:linkname _mkcgo_kSecAttrKeyClassPublic _mkcgo_kSecAttrKeyClassPublic
+//go:linkname _mkcgo_kSecAttrKeyClassPrivate _mkcgo_kSecAttrKeyClassPrivate
+//go:linkname _mkcgo_kSecAttrKeyType _mkcgo_kSecAttrKeyType
+//go:linkname _mkcgo_kSecAttrKeySizeInBits _mkcgo_kSecAttrKeySizeInBits
+//go:linkname _mkcgo_kSecAttrKeyClass _mkcgo_kSecAttrKeyClass
+//go:linkname _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA384
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA512
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw _mkcgo_kSecKeyAlgorithmRSAEncryptionRaw
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1 _mkcgo_kSecKeyAlgorithmRSAEncryptionPKCS1
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512
+//go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw _mkcgo_kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA1
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA224
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA256
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA384
+//go:linkname _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512 _mkcgo_kSecKeyAlgorithmRSAEncryptionOAEPSHA512
+//go:linkname _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962 _mkcgo_kSecKeyAlgorithmECDSASignatureDigestX962
 
 var (
 	_mkcgo_kCFAllocatorDefault                              CFAllocatorRef
@@ -312,6 +286,31 @@ var (
 	KSecKeyAlgorithmRSAEncryptionOAEPSHA512          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSAEncryptionOAEPSHA512()
 	KSecKeyAlgorithmECDSASignatureDigestX962         CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmECDSASignatureDigestX962()
 )
+
+//go:cgo_import_dynamic _mkcgo_CFDataCreate CFDataCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFDataGetBytePtr CFDataGetBytePtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFDataGetLength CFDataGetLength "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFDictionaryCreate CFDictionaryCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFDictionaryCreateMutable CFDictionaryCreateMutable "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFDictionarySetValue CFDictionarySetValue "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFErrorCopyDescription CFErrorCopyDescription "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFErrorGetCode CFErrorGetCode "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFNumberCreate CFNumberCreate "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFRelease CFRelease "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFStringGetCStringPtr CFStringGetCStringPtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_CFStringGetLength CFStringGetLength "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+//go:cgo_import_dynamic _mkcgo_SecKeyCopyExternalRepresentation SecKeyCopyExternalRepresentation "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCopyKeyExchangeResult SecKeyCopyKeyExchangeResult "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCopyPublicKey SecKeyCopyPublicKey "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCreateDecryptedData SecKeyCreateDecryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCreateEncryptedData SecKeyCreateEncryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCreateRandomKey SecKeyCreateRandomKey "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCreateSignature SecKeyCreateSignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyCreateWithData SecKeyCreateWithData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyGetBlockSize SecKeyGetBlockSize "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyIsAlgorithmSupported SecKeyIsAlgorithmSupported "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecKeyVerifySignature SecKeyVerifySignature "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+//go:cgo_import_dynamic _mkcgo_SecRandomCopyBytes SecRandomCopyBytes "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 
 var _mkcgo_CFDataCreate_trampoline_addr uintptr
 

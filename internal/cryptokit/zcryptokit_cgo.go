@@ -7,6 +7,7 @@ package cryptokit
 
 /*
 #cgo CFLAGS: -Wno-attributes
+
 #include "zcryptokit.h"
 */
 import "C"

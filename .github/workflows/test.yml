@@ -23,6 +23,11 @@ jobs:
             cgo: 0
           - go-version: 1.25.x
             cgo: 0
+          # internal linking is not supported prior to Go 1.26
+          - go-version: 1.24.x
+            linkmode: 'internal'
+          - go-version: 1.25.x
+            linkmode: 'internal'
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0

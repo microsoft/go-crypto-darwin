@@ -13,12 +13,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.24.x, 1.25.x]
+        go-version: [1.24.x, 1.25.x, 1.26.x]
         macos-version: [macos-13, macos-14, macos-15, macos-26]
-        cgo: [1]
+        cgo: [0, 1]
         linkmode: ['internal', 'external']
-        include:
-          - go-version: 1.26.x
+        exclude:
+          # CGO_ENABLED=0 is not supported prior to Go 1.26
+          - go-version: 1.24.x
+            cgo: 0
+          - go-version: 1.25.x
             cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:

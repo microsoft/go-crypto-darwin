@@ -17,15 +17,6 @@ jobs:
         macos-version: [macos-13, macos-14, macos-15, macos-26]
         cgo: [1]
         linkmode: ['internal', 'external']
-        exclude:
-          # CGO_ENABLED=0 doesn't support external linking
-          - cgo: 0
-            linkmode: 'external'
-          # Go 1.24 and 1.25 do not support internal linking
-          - go-version: 1.24.x
-            linkmode: 'internal'
-          - go-version: 1.25.x
-            linkmode: 'internal'
         include:
           - go-version: 1.26.x
             cgo: 0

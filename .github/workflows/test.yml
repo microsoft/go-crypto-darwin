@@ -21,18 +21,13 @@ jobs:
           # CGO_ENABLED=0 doesn't support external linking
           - cgo: 0
             linkmode: 'external'
+          # 1.24 and 1.25 do not support internal linking
+          - go-version: 1.24.x
+            linkmode: 'internal'
+          - go-version: 1.25.x
+            linkmode: 'internal'
         include:
           - go-version: 1.26.x
-            macos-version: macos-13
-            cgo: 0
-          - go-version: 1.26.x
-            macos-version: macos-14
-            cgo: 0
-          - go-version: 1.26.x
-            macos-version: macos-15
-            cgo: 0
-          - go-version: 1.26.x
-            macos-version: macos-26
             cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:

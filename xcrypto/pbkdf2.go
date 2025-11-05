@@ -49,7 +49,7 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 // Mapping Go hash functions to CommonCrypto hash constants
 func hashToCCDigestPBKDF2(hash hash.Hash) (commoncrypto.CCPseudoRandomAlgorithm, error) {
 	switch h := hash.(type) {
-	case *evpHash:
+	case *Hash:
 		switch h.alg.ch {
 		case crypto.SHA1:
 			return commoncrypto.KCCPRFHmacAlgSHA1, nil

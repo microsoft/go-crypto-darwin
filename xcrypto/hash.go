@@ -115,7 +115,8 @@ func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 	return &hash
 }
 
-type evpHash struct {
+// Hash implements generic hash methods.
+type Hash struct {
 	ptr unsafe.Pointer
 	alg *hashAlgorithm
 }
@@ -125,44 +126,44 @@ func SupportsHash(h crypto.Hash) bool {
 	return loadHash(h, false) != nil
 }
 
-func newEVPHash(ch crypto.Hash) *evpHash {
+func newHash(ch crypto.Hash) *Hash {
 	alg := loadHash(ch, true)
 
-	h := &evpHash{
+	h := &Hash{
 		ptr: cryptokit.HashNew(alg.id),
 		alg: alg,
 	}
 
-	runtime.SetFinalizer(h, (*evpHash).finalize)
+	runtime.SetFinalizer(h, (*Hash).finalize)
 
 	return h
 }
 
-func (h *evpHash) finalize() {
+func (h *Hash) finalize() {
 	if h.ptr != nil {
 		cryptokit.HashFree(h.alg.id, h.ptr)
 		h.ptr = nil
 	}
 }
 
-func (h *evpHash) Clone() (HashCloner, error) {
+func (h *Hash) Clone() (HashCloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}
 
-	newHash := &evpHash{
+	newHash := &Hash{
 		ptr: cryptokit.HashCopy(h.alg.id, h.ptr),
 		alg: h.alg,
 	}
 
-	runtime.SetFinalizer(newHash, (*evpHash).finalize)
+	runtime.SetFinalizer(newHash, (*Hash).finalize)
 
 	runtime.KeepAlive(h)
 
 	return newHash, nil
 }
 
-func (h *evpHash) Write(p []byte) (int, error) {
+func (h *Hash) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
@@ -173,7 +174,7 @@ func (h *evpHash) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func (h *evpHash) WriteString(s string) (int, error) {
+func (h *Hash) WriteString(s string) (int, error) {
 	if len(s) == 0 {
 		return 0, nil
 	}
@@ -184,7 +185,7 @@ func (h *evpHash) WriteString(s string) (int, error) {
 	return len(s), nil
 }
 
-func (h *evpHash) WriteByte(c byte) error {
+func (h *Hash) WriteByte(c byte) error {
 	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(&c, 1))
 
 	runtime.KeepAlive(h)
@@ -192,7 +193,7 @@ func (h *evpHash) WriteByte(c byte) error {
 	return nil
 }
 
-func (h *evpHash) Sum(b []byte) []byte {
+func (h *Hash) Sum(b []byte) []byte {
 	hashSlice := make([]byte, h.alg.size, 64) // explicit cap to allow stack allocation
 	cryptokit.HashSum(h.alg.id, h.ptr, hashSlice)
 	runtime.KeepAlive(h)
@@ -210,38 +211,32 @@ func (e errMarshallUnsupported) Unwrap() error {
 	return errors.ErrUnsupported
 }
 
-func (h *evpHash) MarshalBinary() ([]byte, error) {
+func (h *Hash) MarshalBinary() ([]byte, error) {
 	return nil, errMarshallUnsupported{}
 }
 
-func (h *evpHash) AppendBinary(b []byte) ([]byte, error) {
+func (h *Hash) AppendBinary(b []byte) ([]byte, error) {
 	return nil, errMarshallUnsupported{}
 }
 
-func (h *evpHash) UnmarshalBinary(data []byte) error {
+func (h *Hash) UnmarshalBinary(data []byte) error {
 	return errMarshallUnsupported{}
 }
 
-func (h *evpHash) Reset() {
+func (h *Hash) Reset() {
 	cryptokit.HashReset(h.alg.id, h.ptr)
 }
 
-func (h *evpHash) BlockSize() int {
+func (h *Hash) BlockSize() int {
 	return h.alg.blockSize
 }
 
-func (h *evpHash) Size() int {
+func (h *Hash) Size() int {
 	return h.alg.size
 }
 
-type DigestSHA3 struct {
-	*evpHash
-}
-
-var _ hash.Hash = (*evpHash)(nil)
-var _ HashCloner = (*evpHash)(nil)
-var _ hash.Hash = (*DigestSHA3)(nil)
-var _ HashCloner = (*DigestSHA3)(nil)
+var _ hash.Hash = (*Hash)(nil)
+var _ HashCloner = (*Hash)(nil)
 
 func MD5(p []byte) (sum [16]byte) {
 	cryptokit.MD5(p, sum[:])
@@ -285,41 +280,41 @@ func SumSHA3_512(p []byte) (sum [64]byte) {
 
 // NewMD5 initializes a new MD5 hasher.
 func NewMD5() hash.Hash {
-	return newEVPHash(crypto.MD5)
+	return newHash(crypto.MD5)
 
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
-	return newEVPHash(crypto.SHA1)
+	return newHash(crypto.SHA1)
 }
 
 // NewSHA256 initializes a new SHA256 hasher.
 func NewSHA256() hash.Hash {
-	return newEVPHash(crypto.SHA256)
+	return newHash(crypto.SHA256)
 }
 
 // NewSHA384 initializes a new SHA384 hasher.
 func NewSHA384() hash.Hash {
-	return newEVPHash(crypto.SHA384)
+	return newHash(crypto.SHA384)
 }
 
 // NewSHA512 initializes a new SHA512 hasher.
 func NewSHA512() hash.Hash {
-	return newEVPHash(crypto.SHA512)
+	return newHash(crypto.SHA512)
 }
 
 // NewSHA3_256 creates a new SHA3-256 hash.
-func NewSHA3_256() DigestSHA3 {
-	return DigestSHA3{newEVPHash(crypto.SHA3_256)}
+func NewSHA3_256() *Hash {
+	return newHash(crypto.SHA3_256)
 }
 
 // NewSHA3_384 creates a new SHA3-384 hash.
-func NewSHA3_384() DigestSHA3 {
-	return DigestSHA3{newEVPHash(crypto.SHA3_384)}
+func NewSHA3_384() *Hash {
+	return newHash(crypto.SHA3_384)
 }
 
 // NewSHA3_512 creates a new SHA3-512 hash.
-func NewSHA3_512() DigestSHA3 {
-	return DigestSHA3{newEVPHash(crypto.SHA3_512)}
+func NewSHA3_512() *Hash {
+	return newHash(crypto.SHA3_512)
 }

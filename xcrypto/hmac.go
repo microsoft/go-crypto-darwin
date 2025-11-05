@@ -111,9 +111,7 @@ func (h *cryptoKitHMAC) BlockSize() int {
 
 func hashToHMACEnum(h hash.Hash) int32 {
 	switch h := h.(type) {
-	case *evpHash:
-		return h.alg.id
-	case *DigestSHA3:
+	case *Hash:
 		return h.alg.id
 	default:
 		return 0

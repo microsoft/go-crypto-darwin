@@ -310,16 +310,16 @@ func NewSHA512() hash.Hash {
 }
 
 // NewSHA3_256 creates a new SHA3-256 hash.
-func NewSHA3_256() *DigestSHA3 {
-	return &DigestSHA3{newEVPHash(crypto.SHA3_256)}
+func NewSHA3_256() DigestSHA3 {
+	return DigestSHA3{newEVPHash(crypto.SHA3_256)}
 }
 
 // NewSHA3_384 creates a new SHA3-384 hash.
-func NewSHA3_384() *DigestSHA3 {
-	return &DigestSHA3{newEVPHash(crypto.SHA3_384)}
+func NewSHA3_384() DigestSHA3 {
+	return DigestSHA3{newEVPHash(crypto.SHA3_384)}
 }
 
 // NewSHA3_512 creates a new SHA3-512 hash.
-func NewSHA3_512() *DigestSHA3 {
-	return &DigestSHA3{newEVPHash(crypto.SHA3_512)}
+func NewSHA3_512() DigestSHA3 {
+	return DigestSHA3{newEVPHash(crypto.SHA3_512)}
 }

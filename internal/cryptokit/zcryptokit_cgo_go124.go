@@ -12,6 +12,8 @@ package cryptokit
 #cgo nocallback _mkcgo_go_MD5
 #cgo noescape _mkcgo_go_SHA1
 #cgo nocallback _mkcgo_go_SHA1
+#cgo noescape _mkcgo_go_SHA224
+#cgo nocallback _mkcgo_go_SHA224
 #cgo noescape _mkcgo_go_SHA256
 #cgo nocallback _mkcgo_go_SHA256
 #cgo noescape _mkcgo_go_SHA384

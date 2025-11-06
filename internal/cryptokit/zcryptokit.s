@@ -42,6 +42,11 @@ TEXT _mkcgo_go_SHA1_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_SHA1_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_SHA1_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA1_trampoline<>(SB)
 
+TEXT _mkcgo_go_SHA224_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_SHA224(SB)
+GLOBL   ·_mkcgo_go_SHA224_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_SHA224_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA224_trampoline<>(SB)
+
 TEXT _mkcgo_go_SHA256_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_SHA256(SB)
 GLOBL   ·_mkcgo_go_SHA256_trampoline_addr(SB), RODATA, $_GOPTRSIZE

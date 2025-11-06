@@ -16,6 +16,7 @@ var _ = runtime.GOOS
 
 //go:linkname go_MD5 go_MD5
 //go:linkname go_SHA1 go_SHA1
+//go:linkname go_SHA224 go_SHA224
 //go:linkname go_SHA256 go_SHA256
 //go:linkname go_SHA384 go_SHA384
 //go:linkname go_SHA3_256 go_SHA3_256
@@ -57,6 +58,7 @@ var _ = runtime.GOOS
 
 var go_MD5 byte
 var go_SHA1 byte
+var go_SHA224 byte
 var go_SHA256 byte
 var go_SHA384 byte
 var go_SHA3_256 byte
@@ -102,6 +104,10 @@ func MD5(inputPointer []uint8, outputPointer []uint8) {
 
 func SHA1(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+}
+
+func SHA224(inputPointer []uint8, outputPointer []uint8) {
+	syscallN(0, uintptr(unsafe.Pointer(&go_SHA224)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func SHA256(inputPointer []uint8, outputPointer []uint8) {

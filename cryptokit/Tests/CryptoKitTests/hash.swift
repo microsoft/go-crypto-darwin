@@ -108,7 +108,7 @@ final class CryptoKitTests: XCTestCase {
         )
 
         // Known SHA224 hash for the test string
-        let expectedHex = "90a3ed9e32b2aaf4c61c410eb925426119e1a9dc53d4286ade99a809"
+        let expectedHex = "730e109bd7a8a32b1cb9d9a09aa2325d2430587ddbc0c38bad911525"
         XCTAssertEqual(Data(output).hexEncodedString(), expectedHex)
 
         // Test empty string
@@ -363,7 +363,7 @@ final class CryptoKitTests: XCTestCase {
                 expectedSize: Int(CC_SHA224_DIGEST_LENGTH),
                 expectedBlockSize: 64,
                 knownEmptyHashHex: "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",
-                knownTestStringHashHex: "90a3ed9e32b2aaf4c61c410eb925426119e1a9dc53d4286ade99a809"
+                knownTestStringHashHex: "2f05477fc24bb4faefd86517156dafdecec45b8ad3cf2522a563582b"
             ),
             HashingFunctions(
                 name: "SHA256",

@@ -1003,6 +1003,12 @@ public func expandHKDF(
             info: infoData,
             outputByteCount: derivedKeyLength
         )
+    case 5:
+        derivedKey = HKDF<SHA224Hasher>.expand(
+            pseudoRandomKey: prkData,
+            info: infoData,
+            outputByteCount: derivedKeyLength
+        )
     default:
         return -1  // Unsupported hash function
     }

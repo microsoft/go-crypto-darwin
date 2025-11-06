@@ -23,6 +23,8 @@ func cryptoToHash(h crypto.Hash) func() hash.Hash {
 		return xcrypto.NewMD5
 	case crypto.SHA1:
 		return xcrypto.NewSHA1
+	case crypto.SHA224:
+		return xcrypto.NewSHA224
 	case crypto.SHA256:
 		return xcrypto.NewSHA256
 	case crypto.SHA384:
@@ -42,7 +44,6 @@ func cryptoToHash(h crypto.Hash) func() hash.Hash {
 }
 
 var hashes = [...]crypto.Hash{
-	crypto.MD4,
 	crypto.MD5,
 	crypto.SHA1,
 	crypto.SHA224,

@@ -1,12 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import CommonCrypto
 import CryptoKit
 import Foundation
 
 #if canImport(CryptoKitC)
 import CryptoKitC
 #endif
+
+// Wrapper for SHA224 context since CommonCrypto's CC_SHA224_CTX may not be directly accessible
+struct SHA224Hasher {
+    private var data = Data()
+
+    mutating func update(data: Data) {
+        self.data.append(data)
+    }
+
+    func finalize() -> Data {
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA224_DIGEST_LENGTH))
+        self.data.withUnsafeBytes {
+            _ = CC_SHA224($0.baseAddress, CC_LONG(self.data.count), &hash)
+        }
+        return Data(hash)
+    }
+}
 
 // Runtime feature detection for SHA3 (available on macOS 26+ only)
 @implementation @c
@@ -741,8 +759,19 @@ public func go_SHA1(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@implementation @c
-public func go_SHA256(
+@_cdecl("go_SHA224")
+public func SHA224(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
+) -> Void {
+    var hash = [UInt8](repeating: 0, count: Int(CC_SHA224_DIGEST_LENGTH))
+    CC_SHA224(inputPointer, CC_LONG(inputLength), &hash)
+    Data(hash).copyBytes(to: outputPointer, count: hash.count)
+}
+
+@_cdecl("go_SHA256")
+public func SHA256(
     _ inputPointer: UnsafePointer<UInt8>,
     _ inputLength: Int,
     _ outputPointer: UnsafeMutablePointer<UInt8>
@@ -833,6 +862,10 @@ public func go_hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
         let hasher = UnsafeMutablePointer<Insecure.SHA1>.allocate(capacity: 1)
         hasher.initialize(to: Insecure.SHA1())
         return UnsafeMutableRawPointer(hasher)
+    case 9:
+        let hasher = UnsafeMutablePointer<SHA224Hasher>.allocate(capacity: 1)
+        hasher.initialize(to: SHA224Hasher())
+        return UnsafeMutableRawPointer(hasher)
     case 3:
         let hasher = UnsafeMutablePointer<CryptoKit.SHA256>.allocate(capacity: 1)
         hasher.initialize(to: CryptoKit.SHA256())
@@ -901,6 +934,10 @@ public func go_hashWrite(
     case 2:
         let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
         let buffer = UnsafeRawBufferPointer(start: data, count: length)
+        hasher.pointee.update(data: buffer)
+    case 9:
+        let hasher = ptr.assumingMemoryBound(to: SHA224Hasher.self)
+        let buffer = Data(bytes: data, count: length)
         hasher.pointee.update(data: buffer)
     case 3:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)
@@ -972,6 +1009,10 @@ public func go_hashSum(
 
         let hashData = hash.withUnsafeBytes { Data($0) }
         hashData.copyBytes(to: outputPointer, count: hashData.count)
+    case 9:
+        let hasher = ptr.assumingMemoryBound(to: SHA224Hasher.self)
+        let hash = hasher.pointee.finalize()
+        hash.copyBytes(to: outputPointer, count: hash.count)
     case 3:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)
         let copiedHasher = hasher.pointee
@@ -1052,6 +1093,9 @@ public func go_hashReset(
     case 2:
         let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
         hasher.pointee = Insecure.SHA1()
+    case 9:
+        let hasher = ptr.assumingMemoryBound(to: SHA224Hasher.self)
+        hasher.pointee = SHA224Hasher()
     case 3:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)
         hasher.pointee = CryptoKit.SHA256()
@@ -1103,6 +1147,8 @@ public func go_hashSize(_ hashAlgorithm: Int32) -> Int {
         return Insecure.MD5.byteCount
     case 2:
         return Insecure.SHA1.byteCount
+    case 9:
+        return Int(CC_SHA224_DIGEST_LENGTH)
     case 3:
         return CryptoKit.SHA256.byteCount
     case 4:
@@ -1148,6 +1194,8 @@ public func go_hashBlockSize(_ hashAlgorithm: Int32) -> Int {
         return Insecure.MD5.blockByteCount
     case 2:
         return Insecure.SHA1.blockByteCount
+    case 9:
+        return 64  // SHA224 block size is 64 bytes
     case 3:
         return CryptoKit.SHA256.blockByteCount
     case 4:
@@ -1200,6 +1248,13 @@ public func go_hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) 
         let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
         let copyOf = hasher.pointee
         let newHasher = UnsafeMutablePointer<Insecure.SHA1>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+
+        return UnsafeMutableRawPointer(newHasher)
+    case 9:
+        let hasher = ptr.assumingMemoryBound(to: SHA224Hasher.self)
+        let copyOf = hasher.pointee
+        let newHasher = UnsafeMutablePointer<SHA224Hasher>.allocate(capacity: 1)
         newHasher.initialize(to: copyOf)
 
         return UnsafeMutableRawPointer(newHasher)
@@ -1291,6 +1346,9 @@ public func go_hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) 
         hasher.deallocate()
     case 2:
         let hasher = ptr.assumingMemoryBound(to: Insecure.SHA1.self)
+        hasher.deallocate()
+    case 9:
+        let hasher = ptr.assumingMemoryBound(to: SHA224Hasher.self)
         hasher.deallocate()
     case 3:
         let hasher = ptr.assumingMemoryBound(to: CryptoKit.SHA256.self)

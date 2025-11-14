@@ -11,6 +11,7 @@
 
 void go_MD5(const uint8_t*, size_t, const uint8_t*);
 void go_SHA1(const uint8_t*, size_t, const uint8_t*);
+void go_SHA224(const uint8_t*, size_t, const uint8_t*);
 void go_SHA256(const uint8_t*, size_t, const uint8_t*);
 void go_SHA384(const uint8_t*, size_t, const uint8_t*);
 void go_SHA3_256(const uint8_t*, size_t, const uint8_t*);
@@ -56,6 +57,10 @@ void _mkcgo_go_MD5(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
 
 void _mkcgo_go_SHA1(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
 	go_SHA1(_arg0, _arg1, _arg2);
+}
+
+void _mkcgo_go_SHA224(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
+	go_SHA224(_arg0, _arg1, _arg2);
 }
 
 void _mkcgo_go_SHA256(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {

@@ -186,16 +186,6 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	return sharedSecret, nil
 }
 
-// isZeroBytes checks if all bytes are zero
-func isZeroBytes(b []byte) bool {
-	for _, v := range b {
-		if v != 0 {
-			return false
-		}
-	}
-	return true
-}
-
 func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	keySize := curveToKeySizeInBytes(curve)
 	if keySize == 0 {

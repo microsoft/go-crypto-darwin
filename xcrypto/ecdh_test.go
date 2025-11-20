@@ -26,15 +26,10 @@ func TestECDH(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			// For X25519, we don't need to call encodeECDHComponents
-			if name != "X25519" {
-				_, err = encodeECDHComponents(name, alicPrivBytes)
-				if err != nil {
-					t.Fatal(err)
-				}
+			_, err = encodeECDHComponents(name, alicPrivBytes)
+			if err != nil {
+				t.Fatal(err)
 			}
-
 			alicePubKeyFromPriv, err := aliceKey.PublicKey()
 			if err != nil {
 				t.Fatal(err)

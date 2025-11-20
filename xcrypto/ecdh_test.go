@@ -165,6 +165,9 @@ func hexDecode(t *testing.T, s string) []byte {
 }
 
 func TestECDHX25519Failure(t *testing.T) {
+	if !isMacOS14OrAbove() {
+		t.Skip("skipping test as it fails on macOS versions below 14")
+	}
 	identity := hexDecode(t, "0000000000000000000000000000000000000000000000000000000000000000")
 	lowOrderPoint := hexDecode(t, "e0eb7a7c3b41b8ae1656e3faf19fc46ada098deb9c32b1fd866205165f49b800")
 	randomScalar := make([]byte, 32)

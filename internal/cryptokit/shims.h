@@ -25,6 +25,10 @@ int go_newPublicKeyEd25519(uint8_t *key, const uint8_t *pub) __attribute__((stat
 int go_signEd25519(const uint8_t *privateKey, const uint8_t *message, size_t messageLength, uint8_t *sigBuffer) __attribute__((static, slice(privateKey), slice(message, messageLength), slice(sigBuffer)));
 int go_verifyEd25519(const uint8_t *publicKey, const uint8_t *message, size_t messageLength, const uint8_t *sig) __attribute__((static, slice(publicKey), slice(message, messageLength), slice(sig)));
 
+// X25519 key exchange
+int go_generateKeyX25519(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+int go_x25519(const uint8_t *privateKey, int privateKeyLen, const uint8_t *publicKey, int publicKeyLen, uint8_t *sharedSecret, int sharedSecretLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen), slice(sharedSecret, sharedSecretLen)));
+
 // HKDF key derivation
 int go_extractHKDF(int32_t hashFunction, const uint8_t *secret, size_t secretLength, const uint8_t *salt, size_t saltLength, uint8_t *prk, size_t prkLength) __attribute__((static, slice(secret, secretLength), slice(salt, saltLength), slice(prk, prkLength)));
 int go_expandHKDF(int32_t hashFunction, const uint8_t *prk, size_t prkLength, const uint8_t *info, size_t infoLength, uint8_t *okm, size_t okmLength) __attribute__((static, slice(prk, prkLength), slice(info, infoLength), slice(okm, okmLength)));

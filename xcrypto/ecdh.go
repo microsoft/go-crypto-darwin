@@ -11,6 +11,7 @@ import (
 	"slices"
 	"unsafe"
 
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 	"github.com/microsoft/go-crypto-darwin/internal/security"
 )
 
@@ -28,6 +29,8 @@ func (k *PublicKeyECDH) finalize() {
 type PrivateKeyECDH struct {
 	_pkey security.SecKeyRef
 	pub   []byte
+	priv  []byte // For X25519: the actual private key bytes
+	curve string // Track the curve type
 }
 
 func (k *PrivateKeyECDH) finalize() {
@@ -39,6 +42,10 @@ func (k *PrivateKeyECDH) finalize() {
 func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 	if len(bytes) < 1 {
 		return nil, errors.New("NewPublicKeyECDH: missing key")
+	}
+	// For X25519, we don't need a SecKeyRef since we'll use CryptoKit directly
+	if curve == "X25519" {
+		return &PublicKeyECDH{nil, slices.Clone(bytes)}, nil
 	}
 	pubKeyRef, err := createSecKeyWithData(bytes, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPublic)
 	if err != nil {
@@ -53,18 +60,65 @@ func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
 
 // bytes expects the public key to be in uncompressed ANSI X9.63 format
 func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) {
+	// For X25519, we don't use SecurityFramework
+	if curve == "X25519" {
+		// If public key is not provided, generate it from the private key
+		publicKey := pub
+		if publicKey == nil {
+			if len(priv) != 32 {
+				return nil, errors.New("crypto/ecdh: invalid private key size")
+			}
+			// Generate the public key from the private key using CryptoKit
+			// We need a 64-byte buffer: first 32 for private key, last 32 for public key output
+			buf := make([]byte, 64)
+			copy(buf[:32], priv) // Copy private key into first 32 bytes
+
+			// Call with 64-byte buffer
+			ret := cryptokit.GenerateKeyX25519(buf)
+			if ret != 0 {
+				return nil, errors.New("failed to generate X25519 public key")
+			}
+
+			// Extract the public key (written to buf[32:64])
+			publicKey = slices.Clone(buf[32:64])
+		}
+
+		privKey := &PrivateKeyECDH{
+			_pkey: nil,
+			pub:   publicKey,
+			priv:  slices.Clone(priv),
+			curve: curve,
+		}
+		return privKey, nil
+	}
+
 	key := append(slices.Clone(pub), priv...)
 	privKeyRef, err := createSecKeyWithData(key, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPrivate)
 	if err != nil {
 		return nil, err
 	}
-	privKey := &PrivateKeyECDH{privKeyRef, pub}
+	privKey := &PrivateKeyECDH{
+		_pkey: privKeyRef,
+		pub:   slices.Clone(pub),
+		priv:  slices.Clone(priv),
+		curve: curve,
+	}
 	runtime.SetFinalizer(privKey, (*PrivateKeyECDH).finalize)
 	return privKey, nil
 }
 
 func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
 	defer runtime.KeepAlive(k)
+
+	// For X25519, just return the public key bytes we stored
+	if k.curve == "X25519" {
+		return &PublicKeyECDH{
+			_pkey: nil,
+			bytes: slices.Clone(k.pub),
+		}, nil
+	}
+
+	// For EC curves, use SecurityFramework
 	pubKeyRef := security.SecKeyCopyPublicKey(k._pkey)
 	if pubKeyRef == nil {
 		return nil, errors.New("failed to extract public key")
@@ -77,6 +131,36 @@ func (k *PrivateKeyECDH) PublicKey() (*PublicKeyECDH, error) {
 func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	defer runtime.KeepAlive(priv)
 	defer runtime.KeepAlive(pub)
+
+	// Handle X25519 using CryptoKit
+	if priv.curve == "X25519" {
+		if priv == nil || pub == nil {
+			return nil, errors.New("invalid keys")
+		}
+
+		if len(priv.priv) != 32 {
+			return nil, errors.New("invalid private key size")
+		}
+
+		if len(pub.bytes) != 32 {
+			return nil, errors.New("invalid public key size")
+		}
+
+		// Use CryptoKit to perform the key exchange
+		sharedSecret := make([]byte, 32)
+
+		ret := cryptokit.X25519(priv.priv, pub.bytes, sharedSecret)
+		if ret != 0 {
+			return nil, errors.New("x25519: key exchange failed")
+		}
+
+		return sharedSecret, nil
+	}
+
+	// Handle EC curves using SecurityFramework
+	if priv._pkey == nil {
+		return nil, errors.New("ECDH: invalid private key")
+	}
 
 	var algorithm = security.KSecKeyAlgorithmECDHKeyExchangeStandard
 	supported := security.SecKeyIsAlgorithmSupported(priv._pkey, security.KSecKeyOperationTypeKeyExchange, algorithm)
@@ -102,11 +186,39 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 	return sharedSecret, nil
 }
 
+// isZeroBytes checks if all bytes are zero
+func isZeroBytes(b []byte) bool {
+	for _, v := range b {
+		if v != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 	keySize := curveToKeySizeInBytes(curve)
 	if keySize == 0 {
 		return nil, nil, errors.New("unsupported curve")
 	}
+
+	// Handle X25519 specially using CryptoKit
+	if curve == "X25519" {
+		// Generate random 32 bytes for the private key
+		privKey := make([]byte, 32)
+		if _, err := RandReader.Read(privKey); err != nil {
+			return nil, nil, err
+		}
+
+		// Use NewPrivateKeyECDH to generate public key from private key
+		privKeyObj, err := NewPrivateKeyECDH("X25519", nil, privKey)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return privKeyObj, slices.Clone(privKey), nil
+	}
+
 	keySizeInBits := curveToKeySizeInBits(curve)
 	// Generate the private key and get its DER representation
 	privKeyDER, privKeyRef, err := createSecKeyRandom(security.KSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
@@ -118,7 +230,12 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 		security.CFRelease(security.CFTypeRef(privKeyRef))
 		return nil, nil, err
 	}
-	k := &PrivateKeyECDH{privKeyRef, pub}
+	k := &PrivateKeyECDH{
+		_pkey: privKeyRef,
+		pub:   pub,
+		priv:  priv,
+		curve: curve,
+	}
 	runtime.SetFinalizer(k, (*PrivateKeyECDH).finalize)
 	return k, priv, nil
 }

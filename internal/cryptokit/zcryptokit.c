@@ -33,6 +33,7 @@ void go_freeHMAC(int32_t, void*);
 void go_generateKeyEd25519(uint8_t*);
 int go_generateKeyMLKEM1024(uint8_t*, int);
 int go_generateKeyMLKEM768(uint8_t*, int);
+int go_generateKeyX25519(uint8_t*, int);
 int go_hashBlockSize(int32_t);
 void* go_hashCopy(int32_t, void*);
 void go_hashFree(int32_t, void*);
@@ -49,6 +50,7 @@ int go_supportsMLKEM(void);
 int go_supportsSHA3(void);
 void go_updateHMAC(int32_t, void*, const uint8_t*, int);
 int go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
+int go_x25519(const uint8_t*, int, const uint8_t*, int, uint8_t*, int);
 
 void _mkcgo_go_MD5(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
 	go_MD5(_arg0, _arg1, _arg2);
@@ -146,6 +148,10 @@ int _mkcgo_go_generateKeyMLKEM768(uint8_t* _arg0, int _arg1) {
 	return go_generateKeyMLKEM768(_arg0, _arg1);
 }
 
+int _mkcgo_go_generateKeyX25519(uint8_t* _arg0, int _arg1) {
+	return go_generateKeyX25519(_arg0, _arg1);
+}
+
 int _mkcgo_go_hashBlockSize(int32_t _arg0) {
 	return go_hashBlockSize(_arg0);
 }
@@ -208,5 +214,9 @@ void _mkcgo_go_updateHMAC(int32_t _arg0, void* _arg1, const uint8_t* _arg2, int 
 
 int _mkcgo_go_verifyEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, const uint8_t* _arg3) {
 	return go_verifyEd25519(_arg0, _arg1, _arg2, _arg3);
+}
+
+int _mkcgo_go_x25519(const uint8_t* _arg0, int _arg1, const uint8_t* _arg2, int _arg3, uint8_t* _arg4, int _arg5) {
+	return go_x25519(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
 }
 

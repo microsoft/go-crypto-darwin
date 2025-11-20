@@ -43,6 +43,8 @@ package cryptokit
 #cgo nocallback _mkcgo_go_generateKeyMLKEM1024
 #cgo noescape _mkcgo_go_generateKeyMLKEM768
 #cgo nocallback _mkcgo_go_generateKeyMLKEM768
+#cgo noescape _mkcgo_go_generateKeyX25519
+#cgo nocallback _mkcgo_go_generateKeyX25519
 #cgo nocallback _mkcgo_go_hashBlockSize
 #cgo nocallback _mkcgo_go_hashCopy
 #cgo nocallback _mkcgo_go_hashFree
@@ -58,5 +60,7 @@ package cryptokit
 #cgo nocallback _mkcgo_go_supportsSHA3
 #cgo noescape _mkcgo_go_updateHMAC
 #cgo nocallback _mkcgo_go_updateHMAC
+#cgo noescape _mkcgo_go_x25519
+#cgo nocallback _mkcgo_go_x25519
 */
 import "C"

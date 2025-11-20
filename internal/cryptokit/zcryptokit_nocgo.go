@@ -50,6 +50,7 @@ var _ = runtime.GOOS
 //go:linkname go_initHMAC go_initHMAC
 //go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
+//go:linkname go_publicKeyX25519 go_publicKeyX25519
 //go:linkname go_signEd25519 go_signEd25519
 //go:linkname go_supportsMLKEM go_supportsMLKEM
 //go:linkname go_supportsSHA3 go_supportsSHA3
@@ -93,6 +94,7 @@ var go_hashWrite byte
 var go_initHMAC byte
 var go_newPrivateKeyEd25519FromSeed byte
 var go_newPublicKeyEd25519 byte
+var go_publicKeyX25519 byte
 var go_signEd25519 byte
 var go_supportsMLKEM byte
 var go_supportsSHA3 byte
@@ -209,8 +211,8 @@ func GenerateKeyMLKEM768(seed []uint8) int32 {
 	return int32(r0)
 }
 
-func GenerateKeyX25519(seed []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyX25519)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+func GenerateKeyX25519(keyPointer []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyX25519)), uintptr(unsafe.Pointer(unsafe.SliceData(keyPointer))), uintptr(len(keyPointer)))
 	return int32(r0)
 }
 
@@ -262,6 +264,11 @@ func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int32 {
 
 func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(pub))))
+	return int32(r0)
+}
+
+func PublicKeyX25519(privateKey []uint8) int32 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_publicKeyX25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)))
 	return int32(r0)
 }
 

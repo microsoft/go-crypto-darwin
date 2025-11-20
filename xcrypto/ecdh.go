@@ -68,19 +68,19 @@ func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) 
 			if len(priv) != 32 {
 				return nil, errors.New("crypto/ecdh: invalid private key size")
 			}
-			// Generate the public key from the private key using CryptoKit
-			// We need a 64-byte buffer: first 32 for private key, last 32 for public key output
+			// Derive the public key from the private key using CryptoKit
+			// We need a 64-byte buffer: first 32 for private key input, last 32 for public key output
 			buf := make([]byte, 64)
 			copy(buf[:32], priv) // Copy private key into first 32 bytes
 
-			// Call with 64-byte buffer
-			ret := cryptokit.GenerateKeyX25519(buf)
+			// Call PublicKeyX25519 to derive public key from private key
+			ret := cryptokit.PublicKeyX25519(buf)
 			if ret != 0 {
-				return nil, errors.New("failed to generate X25519 public key")
+				return nil, errors.New("failed to derive X25519 public key")
 			}
 
 			// Extract the public key (written to buf[32:64])
-			publicKey = slices.Clone(buf[32:64])
+			publicKey = buf[32:64]
 		}
 
 		privKey := &PrivateKeyECDH{
@@ -97,12 +97,7 @@ func NewPrivateKeyECDH(curve string, pub, priv []byte) (*PrivateKeyECDH, error) 
 	if err != nil {
 		return nil, err
 	}
-	privKey := &PrivateKeyECDH{
-		_pkey: privKeyRef,
-		pub:   slices.Clone(pub),
-		priv:  slices.Clone(priv),
-		curve: curve,
-	}
+	privKey := &PrivateKeyECDH{privKeyRef, pub, nil, curve}
 	runtime.SetFinalizer(privKey, (*PrivateKeyECDH).finalize)
 	return privKey, nil
 }
@@ -194,19 +189,18 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 
 	// Handle X25519 specially using CryptoKit
 	if curve == "X25519" {
-		// Generate random 32 bytes for the private key
-		privKey := make([]byte, 32)
-		if _, err := RandReader.Read(privKey); err != nil {
-			return nil, nil, err
+		privKey := make([]byte, 64)
+		result := cryptokit.GenerateKeyX25519(privKey)
+		if result != 0 {
+			return nil, nil, errors.New("X25519 key generation failed")
 		}
 
-		// Use NewPrivateKeyECDH to generate public key from private key
-		privKeyObj, err := NewPrivateKeyECDH("X25519", nil, privKey)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		return privKeyObj, slices.Clone(privKey), nil
+		return &PrivateKeyECDH{
+			_pkey: nil,
+			pub:   privKey[32:64],
+			priv:  privKey[:32],
+			curve: curve,
+		}, privKey[:32], nil
 	}
 
 	keySizeInBits := curveToKeySizeInBits(curve)

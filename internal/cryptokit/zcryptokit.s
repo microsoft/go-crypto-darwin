@@ -212,6 +212,11 @@ TEXT _mkcgo_go_newPublicKeyEd25519_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPublicKeyEd25519_trampoline<>(SB)
 
+TEXT _mkcgo_go_publicKeyX25519_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_publicKeyX25519(SB)
+GLOBL   ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyX25519_trampoline<>(SB)
+
 TEXT _mkcgo_go_signEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_signEd25519(SB)
 GLOBL   ·_mkcgo_go_signEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE

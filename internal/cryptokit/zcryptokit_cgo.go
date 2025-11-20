@@ -115,8 +115,8 @@ func GenerateKeyMLKEM768(seed []uint8) int32 {
 	return int32(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed))))
 }
 
-func GenerateKeyX25519(seed []uint8) int32 {
-	return int32(C._mkcgo_go_generateKeyX25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed))))
+func GenerateKeyX25519(keyPointer []uint8) int32 {
+	return int32(C._mkcgo_go_generateKeyX25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(keyPointer))), C.int(len(keyPointer))))
 }
 
 func HashBlockSize(hashAlgorithm int32) int32 {
@@ -161,6 +161,10 @@ func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int32 {
 
 func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
 	return int32(C._mkcgo_go_newPublicKeyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(pub)))))
+}
+
+func PublicKeyX25519(privateKey []uint8) int32 {
+	return int32(C._mkcgo_go_publicKeyX25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int(len(privateKey))))
 }
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {

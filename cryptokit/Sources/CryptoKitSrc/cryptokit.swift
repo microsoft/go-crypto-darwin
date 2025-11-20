@@ -235,26 +235,43 @@ public func verifyEd25519(
 }
 
 // X25519 Key Exchange
-@_cdecl("go_generateKeyX25519")
-public func generateKeyX25519(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
+@_cdecl("go_publicKeyX25519")
+public func go_publicKeyX25519(privKey: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
     guard seedLen == 64 else {
         return -1  // Need 64 bytes: 32 for private key input, 32 for public key output
     }
 
     do {
         // Read the private key from the first 32 bytes
-        let privateKeyData = Data(bytes: seedPointer, count: 32)
+        let privateKeyData = Data(bytes: privKey, count: 32)
         // Reconstruct private key from the seed
         let privateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
 
         // Get the public key and write it to the second 32 bytes
         let publicKeyData = privateKey.publicKey.rawRepresentation
-        publicKeyData.copyBytes(to: seedPointer + 32, count: 32)
+        publicKeyData.copyBytes(to: privKey + 32, count: 32)
 
         return 0
     } catch {
         return -2
     }
+}
+
+@_cdecl("go_generateKeyX25519")
+public func generateKeyX25519(
+    keyPointer: UnsafeMutablePointer<UInt8>,
+    keyPointerLen: Int
+) -> Int {
+    guard keyPointerLen == 64 else {
+        return -1  // Need 64 bytes: 32 for private key, 32 for public key
+    }
+    let privateKey = Curve25519.KeyAgreement.PrivateKey()
+
+    privateKey.rawRepresentation.copyBytes(to: keyPointer, count: 32)
+
+    let publicKeyData = privateKey.publicKey.rawRepresentation
+    publicKeyData.copyBytes(to: keyPointer + 32, count: 32)
+    return 0
 }
 
 @_cdecl("go_x25519")

@@ -56,6 +56,8 @@ package cryptokit
 #cgo noescape _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_initHMAC
+#cgo noescape _mkcgo_go_publicKeyX25519
+#cgo nocallback _mkcgo_go_publicKeyX25519
 #cgo nocallback _mkcgo_go_supportsMLKEM
 #cgo nocallback _mkcgo_go_supportsSHA3
 #cgo noescape _mkcgo_go_updateHMAC

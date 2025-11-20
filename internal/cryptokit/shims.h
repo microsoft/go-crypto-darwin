@@ -26,7 +26,8 @@ int go_signEd25519(const uint8_t *privateKey, const uint8_t *message, size_t mes
 int go_verifyEd25519(const uint8_t *publicKey, const uint8_t *message, size_t messageLength, const uint8_t *sig) __attribute__((static, slice(publicKey), slice(message, messageLength), slice(sig)));
 
 // X25519 key exchange
-int go_generateKeyX25519(uint8_t *seed, int seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+int go_publicKeyX25519(uint8_t *privateKey, int seedLen) __attribute__((noescape, nocallback, static, slice(privateKey, seedLen)));
+int go_generateKeyX25519(uint8_t *keyPointer, int keyPointerLen) __attribute__((noescape, nocallback, static, slice(keyPointer, keyPointerLen)));
 int go_x25519(const uint8_t *privateKey, int privateKeyLen, const uint8_t *publicKey, int publicKeyLen, uint8_t *sharedSecret, int sharedSecretLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen), slice(sharedSecret, sharedSecretLen)));
 
 // HKDF key derivation

@@ -13,6 +13,8 @@ func curveToKeySizeInBits(curve string) int {
 		return 384
 	case "P-521":
 		return 521
+	case "X25519":
+		return 256
 	default:
 		return 0
 	}
@@ -26,6 +28,8 @@ func curveToKeySizeInBytes(curve string) int {
 		return (384 + 7) / 8
 	case "P-521":
 		return (521 + 7) / 8
+	case "X25519":
+		return 32
 	default:
 		return 0
 	}

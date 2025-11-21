@@ -115,6 +115,10 @@ func GenerateKeyMLKEM768(seed []uint8) int32 {
 	return int32(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int(len(seed))))
 }
 
+func GenerateKeyX25519(keyPointer []uint8) int32 {
+	return int32(C._mkcgo_go_generateKeyX25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(keyPointer))), C.int(len(keyPointer))))
+}
+
 func HashBlockSize(hashAlgorithm int32) int32 {
 	return int32(C._mkcgo_go_hashBlockSize(C.int32_t(hashAlgorithm)))
 }
@@ -159,6 +163,10 @@ func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
 	return int32(C._mkcgo_go_newPublicKeyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(pub)))))
 }
 
+func PublicKeyX25519(privateKey []uint8) int32 {
+	return int32(C._mkcgo_go_publicKeyX25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int(len(privateKey))))
+}
+
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
 	return int32(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sigBuffer)))))
 }
@@ -177,4 +185,8 @@ func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int32 {
 	return int32(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sig)))))
+}
+
+func X25519(privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int32 {
+	return int32(C._mkcgo_go_x25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.int(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedSecret))), C.int(len(sharedSecret))))
 }

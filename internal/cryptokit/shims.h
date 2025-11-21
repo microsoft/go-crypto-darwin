@@ -70,4 +70,16 @@ int go_encapsulateMLKEM1024(const uint8_t *encapKey, int encapKeyLen, uint8_t *s
 int go_decapsulateMLKEM768(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 int go_decapsulateMLKEM1024(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 
+// ECDH for P-256, P-384, P-521
+int go_generateKeyECDH(int32_t curveID, uint8_t *privateKey, int privateKeyLen, uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));
+int go_publicKeyFromPrivateECDH(int32_t curveID, const uint8_t *privateKey, int privateKeyLen, uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));
+int go_ecdhSharedSecret(int32_t curveID, const uint8_t *privateKey, int privateKeyLen, const uint8_t *publicKey, int publicKeyLen, uint8_t *sharedSecret, int sharedSecretLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen), slice(sharedSecret, sharedSecretLen)));
+int go_validatePrivateKeyECDH(int32_t curveID, const uint8_t *privateKey, int privateKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen)));
+int go_validatePublicKeyECDH(int32_t curveID, const uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen)));
+
+// ECDSA for P-256, P-384, P-521
+int go_generateKeyECDSA(int32_t curveID, uint8_t *x, int xLen, uint8_t *y, int yLen, uint8_t *d, int dLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(d, dLen)));
+int go_ecdsaSign(int32_t curveID, const uint8_t *d, int dLen, const uint8_t *message, int messageLen, uint8_t *signature, int *signatureLen) __attribute__((noescape, nocallback, static, slice(d, dLen), slice(message, messageLen), slice(signature)));
+int go_ecdsaVerify(int32_t curveID, const uint8_t *x, int xLen, const uint8_t *y, int yLen, const uint8_t *message, int messageLen, const uint8_t *signature, int signatureLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(message, messageLen), slice(signature, signatureLen)));
+
 #endif // _GO_CRYPTOKIT_SHIMS_H

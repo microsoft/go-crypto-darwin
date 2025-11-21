@@ -482,10 +482,10 @@ public func generateKeyECDSA(
         let privateKey = P256.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.rawRepresentation
+        let publicKeyData = publicKey.x963Representation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 
@@ -493,10 +493,10 @@ public func generateKeyECDSA(
         let privateKey = P384.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.rawRepresentation
+        let publicKeyData = publicKey.x963Representation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 
@@ -504,10 +504,10 @@ public func generateKeyECDSA(
         let privateKey = P521.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.rawRepresentation
+        let publicKeyData = publicKey.x963Representation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 

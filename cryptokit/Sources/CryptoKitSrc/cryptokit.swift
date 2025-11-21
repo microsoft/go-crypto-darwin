@@ -473,7 +473,7 @@ public func generateKeyECDSA(
 
     switch curveID {
     case 1:  // P-256
-        let privateKey = P256.Signing.PrivateKey()
+        let privateKey = P256.Signing.PrivateKey(compactRepresentable: false)
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
         let publicKeyData = publicKey.rawRepresentation
@@ -484,7 +484,7 @@ public func generateKeyECDSA(
         return 0
 
     case 2:  // P-384
-        let privateKey = P384.Signing.PrivateKey()
+        let privateKey = P384.Signing.PrivateKey(compactRepresentable: false)
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
         let publicKeyData = publicKey.rawRepresentation
@@ -495,7 +495,7 @@ public func generateKeyECDSA(
         return 0
 
     case 3:  // P-521
-        let privateKey = P521.Signing.PrivateKey()
+        let privateKey = P521.Signing.PrivateKey(compactRepresentable: false)
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
         let publicKeyData = publicKey.rawRepresentation

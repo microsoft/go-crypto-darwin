@@ -288,9 +288,8 @@ public func generateKeyECDH(
         privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
 
         // Encode public key in uncompressed X9.63 format
-        let publicKeyData = privateKey.publicKey.rawRepresentation
-        publicKeyPointer[0] = 0x04  // Uncompressed format
-        publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
         return 0
 
     case 2:  // P-384
@@ -299,9 +298,8 @@ public func generateKeyECDH(
         privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
 
         // Encode public key in uncompressed X9.63 format
-        let publicKeyData = privateKey.publicKey.rawRepresentation
-        publicKeyPointer[0] = 0x04  // Uncompressed format
-        publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
         return 0
 
     case 3:  // P-521
@@ -310,9 +308,8 @@ public func generateKeyECDH(
         privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
 
         // Encode public key in uncompressed X9.63 format
-        let publicKeyData = privateKey.publicKey.rawRepresentation
-        publicKeyPointer[0] = 0x04  // Uncompressed format
-        publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
         return 0
 
     default:
@@ -355,23 +352,20 @@ public func publicKeyFromPrivateECDH(
         switch curveID {
         case 1:  // P-256
             let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKeyData = privateKey.publicKey.rawRepresentation
-            publicKeyPointer[0] = 0x04  // Uncompressed format
-            publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
             return 0
 
         case 2:  // P-384
             let privateKey = try P384.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKeyData = privateKey.publicKey.rawRepresentation
-            publicKeyPointer[0] = 0x04  // Uncompressed format
-            publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
             return 0
 
         case 3:  // P-521
             let privateKey = try P521.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKeyData = privateKey.publicKey.rawRepresentation
-            publicKeyPointer[0] = 0x04  // Uncompressed format
-            publicKeyData.copyBytes(to: publicKeyPointer + 1, count: keySize * 2)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
             return 0
 
         default:
@@ -422,12 +416,12 @@ public func ecdhSharedSecret(
 
     do {
         let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
-        let publicKeyData = Data(bytes: publicKeyPointer + 1, count: publicKeyLen - 1)
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
 
         switch curveID {
         case 1:  // P-256
             let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+            let publicKey = try P256.KeyAgreement.PublicKey(x963Representation: publicKeyData)
             let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
             let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
             guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
@@ -436,7 +430,7 @@ public func ecdhSharedSecret(
 
         case 2:  // P-384
             let privateKey = try P384.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKey = try P384.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+            let publicKey = try P384.KeyAgreement.PublicKey(x963Representation: publicKeyData)
             let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
             let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
             guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
@@ -445,7 +439,7 @@ public func ecdhSharedSecret(
 
         case 3:  // P-521
             let privateKey = try P521.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let publicKey = try P521.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+            let publicKey = try P521.KeyAgreement.PublicKey(x963Representation: publicKeyData)
             let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
             let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
             guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
@@ -482,10 +476,10 @@ public func generateKeyECDSA(
         let privateKey = P256.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.x963Representation
+        let publicKeyData = publicKey.rawRepresentation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 
@@ -493,10 +487,10 @@ public func generateKeyECDSA(
         let privateKey = P384.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.x963Representation
+        let publicKeyData = publicKey.rawRepresentation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 
@@ -504,10 +498,10 @@ public func generateKeyECDSA(
         let privateKey = P521.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let dData = privateKey.rawRepresentation
-        let publicKeyData = publicKey.x963Representation
+        let publicKeyData = publicKey.rawRepresentation
 
         dData.copyBytes(to: dPointer, count: keySize)
-        publicKeyData.dropFirst().prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
         publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
         return 0
 

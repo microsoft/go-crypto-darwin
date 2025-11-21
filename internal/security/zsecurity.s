@@ -97,11 +97,6 @@ TEXT _mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyCopyKeyExchangeResult_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCopyKeyExchangeResult(SB)
-GLOBL   ·_mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyKeyExchangeResult_trampoline<>(SB)
-
 TEXT _mkcgo_SecKeyCopyPublicKey_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_SecKeyCopyPublicKey(SB)
 GLOBL   ·_mkcgo_SecKeyCopyPublicKey_trampoline_addr(SB), RODATA, $_GOPTRSIZE

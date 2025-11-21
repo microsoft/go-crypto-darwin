@@ -6,11 +6,10 @@
 package security
 
 const (
-	KSecKeyOperationTypeSign        SecKeyOperationType = 0
-	KSecKeyOperationTypeVerify      SecKeyOperationType = 1
-	KSecKeyOperationTypeEncrypt     SecKeyOperationType = 2
-	KSecKeyOperationTypeDecrypt     SecKeyOperationType = 3
-	KSecKeyOperationTypeKeyExchange SecKeyOperationType = 4
+	KSecKeyOperationTypeSign    SecKeyOperationType = 0
+	KSecKeyOperationTypeVerify  SecKeyOperationType = 1
+	KSecKeyOperationTypeEncrypt SecKeyOperationType = 2
+	KSecKeyOperationTypeDecrypt SecKeyOperationType = 3
 )
 
 const (

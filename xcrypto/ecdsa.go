@@ -7,7 +7,6 @@ package xcrypto
 
 import (
 	"errors"
-	"runtime"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
@@ -19,18 +18,10 @@ type PrivateKeyECDSA struct {
 	curve string // curve name
 }
 
-func (k *PrivateKeyECDSA) finalize() {
-	// No cleanup needed - we just store bytes
-}
-
 type PublicKeyECDSA struct {
 	x     BigInt // public key x coordinate
 	y     BigInt // public key y coordinate
 	curve string // curve name
-}
-
-func (k *PublicKeyECDSA) finalize() {
-	// No cleanup needed - we just store bytes
 }
 
 func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
@@ -47,7 +38,6 @@ func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
 		y:     y,
 		curve: curve,
 	}
-	runtime.SetFinalizer(pubKey, (*PublicKeyECDSA).finalize)
 	return pubKey, nil
 }
 
@@ -67,7 +57,6 @@ func NewPrivateKeyECDSA(curve string, x, y, d BigInt) (*PrivateKeyECDSA, error) 
 		d:     d,
 		curve: curve,
 	}
-	runtime.SetFinalizer(privKey, (*PrivateKeyECDSA).finalize)
 	return privKey, nil
 }
 
@@ -77,17 +66,9 @@ func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
 		return nil, nil, nil, errors.New("unsupported curve")
 	}
 
-	// Determine curve ID for CryptoKit
-	var curveID int32
-	switch curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	default:
-		return nil, nil, nil, errors.New("unsupported curve")
+	curveID, err := curveToID(curve)
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
 	// Generate key using CryptoKit
@@ -108,17 +89,9 @@ func SignMarshalECDSA(priv *PrivateKeyECDSA, hashed []byte) ([]byte, error) {
 		return nil, errors.New("invalid parameters")
 	}
 
-	// Determine curve ID for CryptoKit
-	var curveID int32
-	switch priv.curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	default:
-		return nil, errors.New("unsupported curve")
+	curveID, err := curveToID(priv.curve)
+	if err != nil {
+		return nil, err
 	}
 
 	keySize := curveToKeySizeInBytes(priv.curve)
@@ -149,16 +122,8 @@ func VerifyECDSA(pub *PublicKeyECDSA, hashed []byte, sig []byte) bool {
 		return false
 	}
 
-	// Determine curve ID for CryptoKit
-	var curveID int32
-	switch pub.curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	default:
+	curveID, err := curveToID(pub.curve)
+	if err != nil {
 		return false
 	}
 

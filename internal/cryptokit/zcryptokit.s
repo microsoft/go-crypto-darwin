@@ -177,11 +177,6 @@ TEXT _mkcgo_go_generateKeyMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM768_trampoline<>(SB)
 
-TEXT _mkcgo_go_generateKeyX25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_generateKeyX25519(SB)
-GLOBL   ·_mkcgo_go_generateKeyX25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_generateKeyX25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyX25519_trampoline<>(SB)
-
 TEXT _mkcgo_go_hashBlockSize_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_hashBlockSize(SB)
 GLOBL   ·_mkcgo_go_hashBlockSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -242,11 +237,6 @@ TEXT _mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB)
 
-TEXT _mkcgo_go_publicKeyX25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_publicKeyX25519(SB)
-GLOBL   ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyX25519_trampoline<>(SB)
-
 TEXT _mkcgo_go_signEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_signEd25519(SB)
 GLOBL   ·_mkcgo_go_signEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -281,9 +271,4 @@ TEXT _mkcgo_go_verifyEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_verifyEd25519(SB)
 GLOBL   ·_mkcgo_go_verifyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_verifyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_verifyEd25519_trampoline<>(SB)
-
-TEXT _mkcgo_go_x25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_x25519(SB)
-GLOBL   ·_mkcgo_go_x25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_x25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_x25519_trampoline<>(SB)
 

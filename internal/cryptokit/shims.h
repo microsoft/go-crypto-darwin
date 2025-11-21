@@ -25,11 +25,6 @@ int go_newPublicKeyEd25519(uint8_t *key, const uint8_t *pub) __attribute__((stat
 int go_signEd25519(const uint8_t *privateKey, const uint8_t *message, size_t messageLength, uint8_t *sigBuffer) __attribute__((static, slice(privateKey), slice(message, messageLength), slice(sigBuffer)));
 int go_verifyEd25519(const uint8_t *publicKey, const uint8_t *message, size_t messageLength, const uint8_t *sig) __attribute__((static, slice(publicKey), slice(message, messageLength), slice(sig)));
 
-// X25519 key exchange
-int go_publicKeyX25519(uint8_t *privateKey, int seedLen) __attribute__((noescape, nocallback, static, slice(privateKey, seedLen)));
-int go_generateKeyX25519(uint8_t *keyPointer, int keyPointerLen) __attribute__((noescape, nocallback, static, slice(keyPointer, keyPointerLen)));
-int go_x25519(const uint8_t *privateKey, int privateKeyLen, const uint8_t *publicKey, int publicKeyLen, uint8_t *sharedSecret, int sharedSecretLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen), slice(sharedSecret, sharedSecretLen)));
-
 // HKDF key derivation
 int go_extractHKDF(int32_t hashFunction, const uint8_t *secret, size_t secretLength, const uint8_t *salt, size_t saltLength, uint8_t *prk, size_t prkLength) __attribute__((static, slice(secret, secretLength), slice(salt, saltLength), slice(prk, prkLength)));
 int go_expandHKDF(int32_t hashFunction, const uint8_t *prk, size_t prkLength, const uint8_t *info, size_t infoLength, uint8_t *okm, size_t okmLength) __attribute__((static, slice(prk, prkLength), slice(info, infoLength), slice(okm, okmLength)));
@@ -70,14 +65,14 @@ int go_encapsulateMLKEM1024(const uint8_t *encapKey, int encapKeyLen, uint8_t *s
 int go_decapsulateMLKEM768(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 int go_decapsulateMLKEM1024(const uint8_t *seed, int seedLen, const uint8_t *ciphertext, int ciphertextLen, uint8_t *sharedKey, int sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 
-// ECDH for P-256, P-384, P-521
+// ECDH
 int go_generateKeyECDH(int32_t curveID, uint8_t *privateKey, int privateKeyLen, uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));
 int go_publicKeyFromPrivateECDH(int32_t curveID, const uint8_t *privateKey, int privateKeyLen, uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));
 int go_ecdhSharedSecret(int32_t curveID, const uint8_t *privateKey, int privateKeyLen, const uint8_t *publicKey, int publicKeyLen, uint8_t *sharedSecret, int sharedSecretLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen), slice(sharedSecret, sharedSecretLen)));
 int go_validatePrivateKeyECDH(int32_t curveID, const uint8_t *privateKey, int privateKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen)));
 int go_validatePublicKeyECDH(int32_t curveID, const uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen)));
 
-// ECDSA for P-256, P-384, P-521
+// ECDSA
 int go_generateKeyECDSA(int32_t curveID, uint8_t *x, int xLen, uint8_t *y, int yLen, uint8_t *d, int dLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(d, dLen)));
 int go_ecdsaSign(int32_t curveID, const uint8_t *d, int dLen, const uint8_t *message, int messageLen, uint8_t *signature, int *signatureLen) __attribute__((noescape, nocallback, static, slice(d, dLen), slice(message, messageLen), slice(signature)));
 int go_ecdsaVerify(int32_t curveID, const uint8_t *x, int xLen, const uint8_t *y, int yLen, const uint8_t *message, int messageLen, const uint8_t *signature, int signatureLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(message, messageLen), slice(signature, signatureLen)));

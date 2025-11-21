@@ -20,63 +20,11 @@ final class ECDHCryptoTests: XCTestCase {
     }
 
     func testX25519() {
-        let keySize = 32
-
-        // 1. Generate Key
-        var keyBuffer = [UInt8](repeating: 0, count: 64)  // 32 priv + 32 pub
-        let genResult = generateKeyX25519(keyPointer: &keyBuffer, keyPointerLen: 64)
-        XCTAssertEqual(genResult, 0, "GenerateKeyX25519 failed")
-
-        let privateKey = Array(keyBuffer[0..<32])
-        let publicKey = Array(keyBuffer[32..<64])
-
-        // 2. Derive Public Key from Private Key
-        var deriveBuffer = [UInt8](repeating: 0, count: 64)
-        // Copy private key to first 32 bytes
-        for i in 0..<32 {
-            deriveBuffer[i] = privateKey[i]
-        }
-
-        let deriveResult = go_publicKeyX25519(privKey: &deriveBuffer, seedLen: 64)
-        XCTAssertEqual(deriveResult, 0, "PublicKeyX25519 failed")
-
-        let derivedPublicKey = Array(deriveBuffer[32..<64])
-        XCTAssertEqual(publicKey, derivedPublicKey, "Derived X25519 public key does not match generated public key")
-
-        // 3. Shared Secret
-        // Generate Bob's key
-        var bobKeyBuffer = [UInt8](repeating: 0, count: 64)
-        _ = generateKeyX25519(keyPointer: &bobKeyBuffer, keyPointerLen: 64)
-        let bobPrivateKey = Array(bobKeyBuffer[0..<32])
-        let bobPublicKey = Array(bobKeyBuffer[32..<64])
-
-        var aliceSharedSecret = [UInt8](repeating: 0, count: keySize)
-        let aliceResult = x25519(
-            privateKeyPointer: privateKey,
-            privateKeyLen: 32,
-            publicKeyPointer: bobPublicKey,
-            publicKeyLen: 32,
-            sharedSecretPointer: &aliceSharedSecret,
-            sharedSecretLen: 32
-        )
-        XCTAssertEqual(aliceResult, 0, "Alice X25519 failed")
-
-        var bobSharedSecret = [UInt8](repeating: 0, count: keySize)
-        let bobResult = x25519(
-            privateKeyPointer: bobPrivateKey,
-            privateKeyLen: 32,
-            publicKeyPointer: publicKey,
-            publicKeyLen: 32,
-            sharedSecretPointer: &bobSharedSecret,
-            sharedSecretLen: 32
-        )
-        XCTAssertEqual(bobResult, 0, "Bob X25519 failed")
-
-        XCTAssertEqual(aliceSharedSecret, bobSharedSecret, "X25519 shared secrets do not match")
+        testCurve(curveID: 0, keySize: 32)
     }
 
     func testCurve(curveID: Int32, keySize: Int) {
-        let pubKeySize = 1 + keySize * 2
+        let pubKeySize = (curveID == 0) ? keySize : (1 + keySize * 2)
 
         // 1. Generate Key
         var privateKey = [UInt8](repeating: 0, count: keySize)

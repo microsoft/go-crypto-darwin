@@ -43,7 +43,6 @@ int _mkcgo_go_generateKeyECDSA(int32_t, uint8_t*, int, uint8_t*, int, uint8_t*, 
 void _mkcgo_go_generateKeyEd25519(uint8_t*);
 int _mkcgo_go_generateKeyMLKEM1024(uint8_t*, int);
 int _mkcgo_go_generateKeyMLKEM768(uint8_t*, int);
-int _mkcgo_go_generateKeyX25519(uint8_t*, int);
 int _mkcgo_go_hashBlockSize(int32_t);
 void* _mkcgo_go_hashCopy(int32_t, void*);
 void _mkcgo_go_hashFree(int32_t, void*);
@@ -56,7 +55,6 @@ void* _mkcgo_go_initHMAC(int32_t, const uint8_t*, int);
 int _mkcgo_go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 int _mkcgo_go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
 int _mkcgo_go_publicKeyFromPrivateECDH(int32_t, const uint8_t*, int, uint8_t*, int);
-int _mkcgo_go_publicKeyX25519(uint8_t*, int);
 int _mkcgo_go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
 int _mkcgo_go_supportsMLKEM(void);
 int _mkcgo_go_supportsSHA3(void);
@@ -64,6 +62,5 @@ void _mkcgo_go_updateHMAC(int32_t, void*, const uint8_t*, int);
 int _mkcgo_go_validatePrivateKeyECDH(int32_t, const uint8_t*, int);
 int _mkcgo_go_validatePublicKeyECDH(int32_t, const uint8_t*, int);
 int _mkcgo_go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
-int _mkcgo_go_x25519(const uint8_t*, int, const uint8_t*, int, uint8_t*, int);
 
 #endif // MKCGO_H

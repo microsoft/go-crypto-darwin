@@ -27,25 +27,15 @@ func NewPublicKeyECDH(curve string, bytes []byte) (*PublicKeyECDH, error) {
 		return nil, errors.New("NewPublicKeyECDH: missing key")
 	}
 
-	// For EC curves, validate the key using CryptoKit
-	if curve != "X25519" {
-		var curveID int32
-		switch curve {
-		case "P-256":
-			curveID = 1
-		case "P-384":
-			curveID = 2
-		case "P-521":
-			curveID = 3
-		default:
-			return nil, errors.New("unsupported curve")
-		}
+	curveID, err := curveToID(curve)
+	if err != nil {
+		return nil, err
+	}
 
-		// Validate the public key
-		ret := cryptokit.ValidatePublicKeyECDH(curveID, bytes)
-		if ret != 0 {
-			return nil, errors.New("invalid public key")
-		}
+	// Validate the public key
+	ret := cryptokit.ValidatePublicKeyECDH(curveID, bytes)
+	if ret != 0 {
+		return nil, errors.New("invalid public key")
 	}
 
 	// For all curves (including EC curves), we just store the bytes
@@ -58,44 +48,9 @@ func (k *PublicKeyECDH) Bytes() []byte { return k.bytes }
 
 // bytes expects the public key to be in uncompressed ANSI X9.63 format
 func NewPrivateKeyECDH(curve string, priv []byte) (*PrivateKeyECDH, error) {
-	// For X25519, we don't use SecurityFramework
-	if curve == "X25519" {
-		if len(priv) != 32 {
-			return nil, errors.New("crypto/ecdh: invalid private key size")
-		}
-		// Derive the public key from the private key using CryptoKit
-		// We need a 64-byte buffer: first 32 for private key input, last 32 for public key output
-		buf := make([]byte, 64)
-		copy(buf[:32], priv) // Copy private key into first 32 bytes
-
-		// Call PublicKeyX25519 to derive public key from private key
-		ret := cryptokit.PublicKeyX25519(buf)
-		if ret != 0 {
-			return nil, errors.New("failed to derive X25519 public key")
-		}
-
-		// Extract the public key (written to buf[32:64])
-		publicKey := buf[32:64]
-
-		privKey := &PrivateKeyECDH{
-			pub:   publicKey,
-			priv:  slices.Clone(priv),
-			curve: curve,
-		}
-		return privKey, nil
-	}
-
-	// For EC curves (P-256, P-384, P-521), validate and store the keys
-	var curveID int32
-	switch curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	default:
-		return nil, errors.New("unsupported curve")
+	curveID, err := curveToID(curve)
+	if err != nil {
+		return nil, err
 	}
 
 	// Validate the private key
@@ -106,7 +61,13 @@ func NewPrivateKeyECDH(curve string, priv []byte) (*PrivateKeyECDH, error) {
 
 	// Derive the public key
 	keySize := curveToKeySizeInBytes(curve)
-	pubKeySize := 1 + keySize*2
+	var pubKeySize int
+	if curve == "X25519" {
+		pubKeySize = 32
+	} else {
+		pubKeySize = 1 + keySize*2
+	}
+
 	publicKey := make([]byte, pubKeySize)
 	ret = cryptokit.PublicKeyFromPrivateECDH(curveID, priv, publicKey)
 	if ret != 0 {
@@ -133,43 +94,11 @@ func ECDH(priv *PrivateKeyECDH, pub *PublicKeyECDH) ([]byte, error) {
 		return nil, errors.New("invalid keys")
 	}
 
-	// Determine curve ID for CryptoKit
-	var curveID int32
-	switch priv.curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	case "X25519":
-		curveID = 0
-	default:
-		return nil, errors.New("unsupported curve")
+	curveID, err := curveToID(priv.curve)
+	if err != nil {
+		return nil, err
 	}
 
-	// Handle X25519 using CryptoKit
-	if priv.curve == "X25519" {
-		if len(priv.priv) != 32 {
-			return nil, errors.New("invalid private key size")
-		}
-
-		if len(pub.bytes) != 32 {
-			return nil, errors.New("invalid public key size")
-		}
-
-		// Use CryptoKit to perform the key exchange
-		sharedSecret := make([]byte, 32)
-
-		ret := cryptokit.X25519(priv.priv, pub.bytes, sharedSecret)
-		if ret != 0 {
-			return nil, errors.New("x25519: key exchange failed")
-		}
-
-		return sharedSecret, nil
-	}
-
-	// Handle EC curves using CryptoKit
 	keySize := curveToKeySizeInBytes(priv.curve)
 	sharedSecret := make([]byte, keySize)
 
@@ -187,38 +116,18 @@ func GenerateKeyECDH(curve string) (*PrivateKeyECDH, []byte, error) {
 		return nil, nil, errors.New("unsupported curve")
 	}
 
-	// Determine curve ID for CryptoKit
-	var curveID int32
-	switch curve {
-	case "P-256":
-		curveID = 1
-	case "P-384":
-		curveID = 2
-	case "P-521":
-		curveID = 3
-	case "X25519":
-		curveID = 0
-	default:
-		return nil, nil, errors.New("unsupported curve")
+	curveID, err := curveToID(curve)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	// Handle X25519 specially using CryptoKit
+	var pubKeySize int
 	if curve == "X25519" {
-		privKey := make([]byte, 64)
-		result := cryptokit.GenerateKeyX25519(privKey)
-		if result != 0 {
-			return nil, nil, errors.New("X25519 key generation failed")
-		}
-
-		return &PrivateKeyECDH{
-			pub:   privKey[32:64],
-			priv:  privKey[:32],
-			curve: curve,
-		}, privKey[:32], nil
+		pubKeySize = 32
+	} else {
+		pubKeySize = 1 + keySize*2
 	}
 
-	// For EC curves, use CryptoKit
-	pubKeySize := 1 + keySize*2
 	privateKey := make([]byte, keySize)
 	publicKey := make([]byte, pubKeySize)
 

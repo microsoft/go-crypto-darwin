@@ -43,7 +43,6 @@ var _ = runtime.GOOS
 //go:linkname go_generateKeyEd25519 go_generateKeyEd25519
 //go:linkname go_generateKeyMLKEM1024 go_generateKeyMLKEM1024
 //go:linkname go_generateKeyMLKEM768 go_generateKeyMLKEM768
-//go:linkname go_generateKeyX25519 go_generateKeyX25519
 //go:linkname go_hashBlockSize go_hashBlockSize
 //go:linkname go_hashCopy go_hashCopy
 //go:linkname go_hashFree go_hashFree
@@ -56,7 +55,6 @@ var _ = runtime.GOOS
 //go:linkname go_newPrivateKeyEd25519FromSeed go_newPrivateKeyEd25519FromSeed
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
 //go:linkname go_publicKeyFromPrivateECDH go_publicKeyFromPrivateECDH
-//go:linkname go_publicKeyX25519 go_publicKeyX25519
 //go:linkname go_signEd25519 go_signEd25519
 //go:linkname go_supportsMLKEM go_supportsMLKEM
 //go:linkname go_supportsSHA3 go_supportsSHA3
@@ -64,7 +62,6 @@ var _ = runtime.GOOS
 //go:linkname go_validatePrivateKeyECDH go_validatePrivateKeyECDH
 //go:linkname go_validatePublicKeyECDH go_validatePublicKeyECDH
 //go:linkname go_verifyEd25519 go_verifyEd25519
-//go:linkname go_x25519 go_x25519
 
 var go_MD5 byte
 var go_SHA1 byte
@@ -95,7 +92,6 @@ var go_generateKeyECDSA byte
 var go_generateKeyEd25519 byte
 var go_generateKeyMLKEM1024 byte
 var go_generateKeyMLKEM768 byte
-var go_generateKeyX25519 byte
 var go_hashBlockSize byte
 var go_hashCopy byte
 var go_hashFree byte
@@ -108,7 +104,6 @@ var go_initHMAC byte
 var go_newPrivateKeyEd25519FromSeed byte
 var go_newPublicKeyEd25519 byte
 var go_publicKeyFromPrivateECDH byte
-var go_publicKeyX25519 byte
 var go_signEd25519 byte
 var go_supportsMLKEM byte
 var go_supportsSHA3 byte
@@ -116,7 +111,6 @@ var go_updateHMAC byte
 var go_validatePrivateKeyECDH byte
 var go_validatePublicKeyECDH byte
 var go_verifyEd25519 byte
-var go_x25519 byte
 
 func MD5(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
@@ -252,11 +246,6 @@ func GenerateKeyMLKEM768(seed []uint8) int32 {
 	return int32(r0)
 }
 
-func GenerateKeyX25519(keyPointer []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyX25519)), uintptr(unsafe.Pointer(unsafe.SliceData(keyPointer))), uintptr(len(keyPointer)))
-	return int32(r0)
-}
-
 func HashBlockSize(hashAlgorithm int32) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashBlockSize)), uintptr(hashAlgorithm))
 	return int32(r0)
@@ -313,11 +302,6 @@ func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uin
 	return int32(r0)
 }
 
-func PublicKeyX25519(privateKey []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_publicKeyX25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)))
-	return int32(r0)
-}
-
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sigBuffer))))
 	return int32(r0)
@@ -349,10 +333,5 @@ func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int32 {
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int32 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))))
-	return int32(r0)
-}
-
-func X25519(privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_x25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedSecret))), uintptr(len(sharedSecret)))
 	return int32(r0)
 }

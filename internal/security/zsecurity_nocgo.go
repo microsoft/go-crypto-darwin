@@ -36,14 +36,12 @@ type CFNumberType int32
 
 //go:cgo_import_dynamic _mkcgo_kCFAllocatorDefault kCFAllocatorDefault "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
 //go:cgo_import_dynamic _mkcgo_kSecRandomDefault kSecRandomDefault "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeECSECPrimeRandom kSecAttrKeyTypeECSECPrimeRandom "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyTypeRSA kSecAttrKeyTypeRSA "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPublic kSecAttrKeyClassPublic "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyClassPrivate kSecAttrKeyClassPrivate "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyType kSecAttrKeyType "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeySizeInBits kSecAttrKeySizeInBits "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecAttrKeyClass kSecAttrKeyClass "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard kSecKeyAlgorithmECDHKeyExchangeStandard "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 kSecKeyAlgorithmRSASignatureDigestPSSSHA1 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 kSecKeyAlgorithmRSASignatureDigestPSSSHA224 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 kSecKeyAlgorithmRSASignatureDigestPSSSHA256 "/System/Library/Frameworks/Security.framework/Versions/A/Security"
@@ -66,14 +64,12 @@ type CFNumberType int32
 
 //go:linkname _mkcgo_kCFAllocatorDefault _mkcgo_kCFAllocatorDefault
 //go:linkname _mkcgo_kSecRandomDefault _mkcgo_kSecRandomDefault
-//go:linkname _mkcgo_kSecAttrKeyTypeECSECPrimeRandom _mkcgo_kSecAttrKeyTypeECSECPrimeRandom
 //go:linkname _mkcgo_kSecAttrKeyTypeRSA _mkcgo_kSecAttrKeyTypeRSA
 //go:linkname _mkcgo_kSecAttrKeyClassPublic _mkcgo_kSecAttrKeyClassPublic
 //go:linkname _mkcgo_kSecAttrKeyClassPrivate _mkcgo_kSecAttrKeyClassPrivate
 //go:linkname _mkcgo_kSecAttrKeyType _mkcgo_kSecAttrKeyType
 //go:linkname _mkcgo_kSecAttrKeySizeInBits _mkcgo_kSecAttrKeySizeInBits
 //go:linkname _mkcgo_kSecAttrKeyClass _mkcgo_kSecAttrKeyClass
-//go:linkname _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard _mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard
 //go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1
 //go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224
 //go:linkname _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256 _mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256
@@ -97,14 +93,12 @@ type CFNumberType int32
 var (
 	_mkcgo_kCFAllocatorDefault                              CFAllocatorRef
 	_mkcgo_kSecRandomDefault                                SecRandomRef
-	_mkcgo_kSecAttrKeyTypeECSECPrimeRandom                  CFStringRef
 	_mkcgo_kSecAttrKeyTypeRSA                               CFStringRef
 	_mkcgo_kSecAttrKeyClassPublic                           CFStringRef
 	_mkcgo_kSecAttrKeyClassPrivate                          CFStringRef
 	_mkcgo_kSecAttrKeyType                                  CFStringRef
 	_mkcgo_kSecAttrKeySizeInBits                            CFStringRef
 	_mkcgo_kSecAttrKeyClass                                 CFStringRef
-	_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard          CFStringRef
 	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA1        CFStringRef
 	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA224      CFStringRef
 	_mkcgo_kSecKeyAlgorithmRSASignatureDigestPSSSHA256      CFStringRef
@@ -133,11 +127,6 @@ func _mkcgo_addr_kCFAllocatorDefault() *CFAllocatorRef { return &_mkcgo_kCFAlloc
 func _mkcgo_addr_kSecRandomDefault() *SecRandomRef { return &_mkcgo_kSecRandomDefault }
 
 //go:noinline
-func _mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom() *CFStringRef {
-	return &_mkcgo_kSecAttrKeyTypeECSECPrimeRandom
-}
-
-//go:noinline
 func _mkcgo_addr_kSecAttrKeyTypeRSA() *CFStringRef { return &_mkcgo_kSecAttrKeyTypeRSA }
 
 //go:noinline
@@ -154,11 +143,6 @@ func _mkcgo_addr_kSecAttrKeySizeInBits() *CFStringRef { return &_mkcgo_kSecAttrK
 
 //go:noinline
 func _mkcgo_addr_kSecAttrKeyClass() *CFStringRef { return &_mkcgo_kSecAttrKeyClass }
-
-//go:noinline
-func _mkcgo_addr_kSecKeyAlgorithmECDHKeyExchangeStandard() *CFStringRef {
-	return &_mkcgo_kSecKeyAlgorithmECDHKeyExchangeStandard
-}
 
 //go:noinline
 func _mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA1() *CFStringRef {
@@ -258,14 +242,12 @@ func _mkcgo_addr_kSecKeyAlgorithmECDSASignatureDigestX962() *CFStringRef {
 var (
 	KCFAllocatorDefault                              CFAllocatorRef = *_mkcgo_addr_kCFAllocatorDefault()
 	KSecRandomDefault                                SecRandomRef   = *_mkcgo_addr_kSecRandomDefault()
-	KSecAttrKeyTypeECSECPrimeRandom                  CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeECSECPrimeRandom()
 	KSecAttrKeyTypeRSA                               CFStringRef    = *_mkcgo_addr_kSecAttrKeyTypeRSA()
 	KSecAttrKeyClassPublic                           CFStringRef    = *_mkcgo_addr_kSecAttrKeyClassPublic()
 	KSecAttrKeyClassPrivate                          CFStringRef    = *_mkcgo_addr_kSecAttrKeyClassPrivate()
 	KSecAttrKeyType                                  CFStringRef    = *_mkcgo_addr_kSecAttrKeyType()
 	KSecAttrKeySizeInBits                            CFStringRef    = *_mkcgo_addr_kSecAttrKeySizeInBits()
 	KSecAttrKeyClass                                 CFStringRef    = *_mkcgo_addr_kSecAttrKeyClass()
-	KSecKeyAlgorithmECDHKeyExchangeStandard          CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmECDHKeyExchangeStandard()
 	KSecKeyAlgorithmRSASignatureDigestPSSSHA1        CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA1()
 	KSecKeyAlgorithmRSASignatureDigestPSSSHA224      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA224()
 	KSecKeyAlgorithmRSASignatureDigestPSSSHA256      CFStringRef    = *_mkcgo_addr_kSecKeyAlgorithmRSASignatureDigestPSSSHA256()
@@ -300,7 +282,6 @@ var (
 //go:cgo_import_dynamic _mkcgo_CFStringGetCStringPtr CFStringGetCStringPtr "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
 //go:cgo_import_dynamic _mkcgo_CFStringGetLength CFStringGetLength "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
 //go:cgo_import_dynamic _mkcgo_SecKeyCopyExternalRepresentation SecKeyCopyExternalRepresentation "/System/Library/Frameworks/Security.framework/Versions/A/Security"
-//go:cgo_import_dynamic _mkcgo_SecKeyCopyKeyExchangeResult SecKeyCopyKeyExchangeResult "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_SecKeyCopyPublicKey SecKeyCopyPublicKey "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_SecKeyCreateDecryptedData SecKeyCreateDecryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
 //go:cgo_import_dynamic _mkcgo_SecKeyCreateEncryptedData SecKeyCreateEncryptedData "/System/Library/Frameworks/Security.framework/Versions/A/Security"
@@ -398,13 +379,6 @@ var _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr uintptr
 
 func SecKeyCopyExternalRepresentation(key SecKeyRef, __error *CFErrorRef) CFDataRef {
 	r0, _ := syscallN(0, _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr, uintptr(key), uintptr(unsafe.Pointer(__error)))
-	return CFDataRef(r0)
-}
-
-var _mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr uintptr
-
-func SecKeyCopyKeyExchangeResult(privateKey SecKeyRef, algorithm SecKeyAlgorithm, publicKey SecKeyRef, parameters CFDictionaryRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr, uintptr(privateKey), uintptr(algorithm), uintptr(publicKey), uintptr(parameters), uintptr(unsafe.Pointer(__error)))
 	return CFDataRef(r0)
 }
 

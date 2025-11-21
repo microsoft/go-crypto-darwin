@@ -28,14 +28,12 @@ typedef CFStringRef SecKeyAlgorithm;
 
 extern const CFAllocatorRef kCFAllocatorDefault;
 extern const SecRandomRef kSecRandomDefault;
-extern const CFStringRef kSecAttrKeyTypeECSECPrimeRandom;
 extern const CFStringRef kSecAttrKeyTypeRSA;
 extern const CFStringRef kSecAttrKeyClassPublic;
 extern const CFStringRef kSecAttrKeyClassPrivate;
 extern const CFStringRef kSecAttrKeyType;
 extern const CFStringRef kSecAttrKeySizeInBits;
 extern const CFStringRef kSecAttrKeyClass;
-extern const CFStringRef kSecKeyAlgorithmECDHKeyExchangeStandard;
 extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA1;
 extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA224;
 extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA256;
@@ -61,7 +59,6 @@ typedef enum {
 	kSecKeyOperationTypeVerify = 1,
 	kSecKeyOperationTypeEncrypt = 2,
 	kSecKeyOperationTypeDecrypt = 3,
-	kSecKeyOperationTypeKeyExchange = 4,
 } SecKeyOperationType;
 
 typedef enum {
@@ -89,7 +86,6 @@ void _mkcgo_CFRelease(CFTypeRef);
 const char* _mkcgo_CFStringGetCStringPtr(CFStringRef, CFStringEncoding);
 CFIndex _mkcgo_CFStringGetLength(CFStringRef);
 CFDataRef _mkcgo_SecKeyCopyExternalRepresentation(SecKeyRef, CFErrorRef*);
-CFDataRef _mkcgo_SecKeyCopyKeyExchangeResult(SecKeyRef, SecKeyAlgorithm, SecKeyRef, CFDictionaryRef, CFErrorRef*);
 SecKeyRef _mkcgo_SecKeyCopyPublicKey(SecKeyRef);
 CFDataRef _mkcgo_SecKeyCreateDecryptedData(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFErrorRef*);
 CFDataRef _mkcgo_SecKeyCreateEncryptedData(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFErrorRef*);

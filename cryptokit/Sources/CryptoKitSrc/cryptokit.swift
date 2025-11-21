@@ -1787,6 +1787,7 @@ public func decapsulateMLKEM1024(
         return 1
     }
 }
+#endif
 
 // ECDH Key Validation
 @_cdecl("go_validatePrivateKeyECDH")
@@ -1853,4 +1854,3 @@ public func validatePublicKeyECDH(
         return -2  // Invalid key
     }
 }
-#endif

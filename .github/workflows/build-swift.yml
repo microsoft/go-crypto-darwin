@@ -62,6 +62,8 @@ jobs:
 
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git push
+            echo "Triggering test workflow..."
+            gh workflow run test.yml --ref ${{ github.head_ref }}
           else
             BRANCH=autogen/update-cryptokit-obj-$(date +%s)
             git checkout -b $BRANCH

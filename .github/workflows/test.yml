@@ -1,7 +1,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +19,7 @@ jobs:
         go-version: [1.24.x, 1.25.x, gotip]
         macos-version: [macos-13, macos-14, macos-15, macos-26]
         cgo: [0, 1]
-        linkmode: ['internal', 'external']
+        linkmode: ["internal", "external"]
         exclude:
           # CGO_ENABLED=0 is not supported prior to Go 1.26
           - go-version: 1.24.x
@@ -25,11 +28,11 @@ jobs:
             cgo: 0
           # internal linking is not supported prior to Go 1.26
           - go-version: 1.24.x
-            linkmode: 'internal'
+            linkmode: "internal"
           - go-version: 1.25.x
-            linkmode: 'internal'
+            linkmode: "internal"
           # external linking is not supported with CGO_ENABLED=0
-          - linkmode: 'external'
+          - linkmode: "external"
             cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:

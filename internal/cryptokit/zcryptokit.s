@@ -102,6 +102,21 @@ TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB)
 
+TEXT _mkcgo_go_ecdhSharedSecret_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_ecdhSharedSecret(SB)
+GLOBL   ·_mkcgo_go_ecdhSharedSecret_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_ecdhSharedSecret_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdhSharedSecret_trampoline<>(SB)
+
+TEXT _mkcgo_go_ecdsaSign_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_ecdsaSign(SB)
+GLOBL   ·_mkcgo_go_ecdsaSign_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_ecdsaSign_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdsaSign_trampoline<>(SB)
+
+TEXT _mkcgo_go_ecdsaVerify_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_ecdsaVerify(SB)
+GLOBL   ·_mkcgo_go_ecdsaVerify_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_ecdsaVerify_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdsaVerify_trampoline<>(SB)
+
 TEXT _mkcgo_go_encapsulateMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_encapsulateMLKEM1024(SB)
 GLOBL   ·_mkcgo_go_encapsulateMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -137,6 +152,16 @@ TEXT _mkcgo_go_freeHMAC_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_freeHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_freeHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_freeHMAC_trampoline<>(SB)
 
+TEXT _mkcgo_go_generateKeyECDH_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_generateKeyECDH(SB)
+GLOBL   ·_mkcgo_go_generateKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_generateKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyECDSA_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_generateKeyECDSA(SB)
+GLOBL   ·_mkcgo_go_generateKeyECDSA_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_generateKeyECDSA_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyECDSA_trampoline<>(SB)
+
 TEXT _mkcgo_go_generateKeyEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_generateKeyEd25519(SB)
 GLOBL   ·_mkcgo_go_generateKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -151,11 +176,6 @@ TEXT _mkcgo_go_generateKeyMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_generateKeyMLKEM768(SB)
 GLOBL   ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM768_trampoline<>(SB)
-
-TEXT _mkcgo_go_generateKeyX25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_generateKeyX25519(SB)
-GLOBL   ·_mkcgo_go_generateKeyX25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_generateKeyX25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyX25519_trampoline<>(SB)
 
 TEXT _mkcgo_go_hashBlockSize_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_hashBlockSize(SB)
@@ -212,10 +232,10 @@ TEXT _mkcgo_go_newPublicKeyEd25519_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPublicKeyEd25519_trampoline<>(SB)
 
-TEXT _mkcgo_go_publicKeyX25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_publicKeyX25519(SB)
-GLOBL   ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_publicKeyX25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyX25519_trampoline<>(SB)
+TEXT _mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_publicKeyFromPrivateECDH(SB)
+GLOBL   ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB)
 
 TEXT _mkcgo_go_signEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_signEd25519(SB)
@@ -237,13 +257,18 @@ TEXT _mkcgo_go_updateHMAC_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_updateHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_updateHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_updateHMAC_trampoline<>(SB)
 
+TEXT _mkcgo_go_validatePrivateKeyECDH_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_validatePrivateKeyECDH(SB)
+GLOBL   ·_mkcgo_go_validatePrivateKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_validatePrivateKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_validatePrivateKeyECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_validatePublicKeyECDH_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_validatePublicKeyECDH(SB)
+GLOBL   ·_mkcgo_go_validatePublicKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_validatePublicKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_validatePublicKeyECDH_trampoline<>(SB)
+
 TEXT _mkcgo_go_verifyEd25519_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_verifyEd25519(SB)
 GLOBL   ·_mkcgo_go_verifyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_verifyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_verifyEd25519_trampoline<>(SB)
-
-TEXT _mkcgo_go_x25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_x25519(SB)
-GLOBL   ·_mkcgo_go_x25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_x25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_x25519_trampoline<>(SB)
 

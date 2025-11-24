@@ -22,7 +22,6 @@ void CFRelease(CFTypeRef);
 const char* CFStringGetCStringPtr(CFStringRef, CFStringEncoding);
 CFIndex CFStringGetLength(CFStringRef);
 CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef, CFErrorRef*);
-CFDataRef SecKeyCopyKeyExchangeResult(SecKeyRef, SecKeyAlgorithm, SecKeyRef, CFDictionaryRef, CFErrorRef*);
 SecKeyRef SecKeyCopyPublicKey(SecKeyRef);
 CFDataRef SecKeyCreateDecryptedData(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFErrorRef*);
 CFDataRef SecKeyCreateEncryptedData(SecKeyRef, SecKeyAlgorithm, CFDataRef, CFErrorRef*);
@@ -84,10 +83,6 @@ CFIndex _mkcgo_CFStringGetLength(CFStringRef _arg0) {
 
 CFDataRef _mkcgo_SecKeyCopyExternalRepresentation(SecKeyRef _arg0, CFErrorRef* _arg1) {
 	return SecKeyCopyExternalRepresentation(_arg0, _arg1);
-}
-
-CFDataRef _mkcgo_SecKeyCopyKeyExchangeResult(SecKeyRef _arg0, SecKeyAlgorithm _arg1, SecKeyRef _arg2, CFDictionaryRef _arg3, CFErrorRef* _arg4) {
-	return SecKeyCopyKeyExchangeResult(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
 SecKeyRef _mkcgo_SecKeyCopyPublicKey(SecKeyRef _arg0) {

@@ -32,6 +32,12 @@ package cryptokit
 #cgo nocallback _mkcgo_go_deriveEncapsulationKeyMLKEM1024
 #cgo noescape _mkcgo_go_deriveEncapsulationKeyMLKEM768
 #cgo nocallback _mkcgo_go_deriveEncapsulationKeyMLKEM768
+#cgo noescape _mkcgo_go_ecdhSharedSecret
+#cgo nocallback _mkcgo_go_ecdhSharedSecret
+#cgo noescape _mkcgo_go_ecdsaSign
+#cgo nocallback _mkcgo_go_ecdsaSign
+#cgo noescape _mkcgo_go_ecdsaVerify
+#cgo nocallback _mkcgo_go_ecdsaVerify
 #cgo noescape _mkcgo_go_encapsulateMLKEM1024
 #cgo nocallback _mkcgo_go_encapsulateMLKEM1024
 #cgo noescape _mkcgo_go_encapsulateMLKEM768
@@ -39,12 +45,14 @@ package cryptokit
 #cgo noescape _mkcgo_go_finalizeHMAC
 #cgo nocallback _mkcgo_go_finalizeHMAC
 #cgo nocallback _mkcgo_go_freeHMAC
+#cgo noescape _mkcgo_go_generateKeyECDH
+#cgo nocallback _mkcgo_go_generateKeyECDH
+#cgo noescape _mkcgo_go_generateKeyECDSA
+#cgo nocallback _mkcgo_go_generateKeyECDSA
 #cgo noescape _mkcgo_go_generateKeyMLKEM1024
 #cgo nocallback _mkcgo_go_generateKeyMLKEM1024
 #cgo noescape _mkcgo_go_generateKeyMLKEM768
 #cgo nocallback _mkcgo_go_generateKeyMLKEM768
-#cgo noescape _mkcgo_go_generateKeyX25519
-#cgo nocallback _mkcgo_go_generateKeyX25519
 #cgo nocallback _mkcgo_go_hashBlockSize
 #cgo nocallback _mkcgo_go_hashCopy
 #cgo nocallback _mkcgo_go_hashFree
@@ -56,13 +64,15 @@ package cryptokit
 #cgo noescape _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_hashWrite
 #cgo nocallback _mkcgo_go_initHMAC
-#cgo noescape _mkcgo_go_publicKeyX25519
-#cgo nocallback _mkcgo_go_publicKeyX25519
+#cgo noescape _mkcgo_go_publicKeyFromPrivateECDH
+#cgo nocallback _mkcgo_go_publicKeyFromPrivateECDH
 #cgo nocallback _mkcgo_go_supportsMLKEM
 #cgo nocallback _mkcgo_go_supportsSHA3
 #cgo noescape _mkcgo_go_updateHMAC
 #cgo nocallback _mkcgo_go_updateHMAC
-#cgo noescape _mkcgo_go_x25519
-#cgo nocallback _mkcgo_go_x25519
+#cgo noescape _mkcgo_go_validatePrivateKeyECDH
+#cgo nocallback _mkcgo_go_validatePrivateKeyECDH
+#cgo noescape _mkcgo_go_validatePublicKeyECDH
+#cgo nocallback _mkcgo_go_validatePublicKeyECDH
 */
 import "C"

@@ -234,48 +234,151 @@ public func verifyEd25519(
     return isValid ? 1 : 0  // Return 1 for valid, 0 for invalid
 }
 
-// X25519 Key Exchange
-@_cdecl("go_publicKeyX25519")
-public func go_publicKeyX25519(privKey: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
-    guard seedLen == 64 else {
-        return -1  // Need 64 bytes: 32 for private key input, 32 for public key output
+// X25519 Key Exchange (Now handled by generic ECDH functions with curveID=0)
+
+// ECDH for P-256, P-384, P-521 using CryptoKit
+
+// Helper function to determine key size based on curve
+@_cdecl("go_getECDHKeySizeForCurve")
+public func getECDHKeySizeForCurve(_ curveID: Int32) -> Int {
+    switch curveID {
+    case 0:  // X25519
+        return 32
+    case 1:  // P-256
+        return 32
+    case 2:  // P-384
+        return 48
+    case 3:  // P-521
+        return 66
+    default:
+        return -1
+    }
+}
+
+@_cdecl("go_generateKeyECDH")
+public func generateKeyECDH(
+    curveID: Int32,
+    privateKeyPointer: UnsafeMutablePointer<UInt8>,
+    privateKeyLen: Int,
+    publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    publicKeyLen: Int
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0 else { return -1 }
+
+    if curveID == 0 {
+        // X25519
+        guard privateKeyLen == keySize, publicKeyLen == keySize else { return -1 }
+        let privateKey = Curve25519.KeyAgreement.PrivateKey()
+        let privateKeyData = privateKey.rawRepresentation
+        privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
+        let publicKeyData = privateKey.publicKey.rawRepresentation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: keySize)
+        return 0
+    }
+
+    guard privateKeyLen == keySize, publicKeyLen == 1 + keySize * 2 else {
+        return -1  // Invalid key sizes
+    }
+
+    switch curveID {
+    case 1:  // P-256
+        let privateKey = P256.KeyAgreement.PrivateKey()
+        let privateKeyData = privateKey.rawRepresentation
+        privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
+
+        // Encode public key in uncompressed X9.63 format
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+        return 0
+
+    case 2:  // P-384
+        let privateKey = P384.KeyAgreement.PrivateKey()
+        let privateKeyData = privateKey.rawRepresentation
+        privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
+
+        // Encode public key in uncompressed X9.63 format
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+        return 0
+
+    case 3:  // P-521
+        let privateKey = P521.KeyAgreement.PrivateKey()
+        let privateKeyData = privateKey.rawRepresentation
+        privateKeyData.copyBytes(to: privateKeyPointer, count: keySize)
+
+        // Encode public key in uncompressed X9.63 format
+        let publicKeyData = privateKey.publicKey.x963Representation
+        publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+        return 0
+
+    default:
+        return -1  // Unsupported curve
+    }
+}
+
+@_cdecl("go_publicKeyFromPrivateECDH")
+public func publicKeyFromPrivateECDH(
+    curveID: Int32,
+    privateKeyPointer: UnsafePointer<UInt8>,
+    privateKeyLen: Int,
+    publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    publicKeyLen: Int
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0 else { return -1 }
+
+    if curveID == 0 {
+        // X25519
+        guard privateKeyLen == keySize, publicKeyLen == keySize else { return -1 }
+        do {
+            let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
+            let privateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKeyData = privateKey.publicKey.rawRepresentation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: keySize)
+            return 0
+        } catch {
+            return -2
+        }
+    }
+
+    guard privateKeyLen == keySize, publicKeyLen == 1 + keySize * 2 else {
+        return -1  // Invalid key sizes
     }
 
     do {
-        // Read the private key from the first 32 bytes
-        let privateKeyData = Data(bytes: privKey, count: 32)
-        // Reconstruct private key from the seed
-        let privateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+        let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
 
-        // Get the public key and write it to the second 32 bytes
-        let publicKeyData = privateKey.publicKey.rawRepresentation
-        publicKeyData.copyBytes(to: privKey + 32, count: 32)
+        switch curveID {
+        case 1:  // P-256
+            let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+            return 0
 
-        return 0
+        case 2:  // P-384
+            let privateKey = try P384.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+            return 0
+
+        case 3:  // P-521
+            let privateKey = try P521.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKeyData = privateKey.publicKey.x963Representation
+            publicKeyData.copyBytes(to: publicKeyPointer, count: publicKeyLen)
+            return 0
+
+        default:
+            return -1  // Unsupported curve
+        }
     } catch {
-        return -2
+        return -2  // Error during key derivation
     }
 }
 
-@_cdecl("go_generateKeyX25519")
-public func generateKeyX25519(
-    keyPointer: UnsafeMutablePointer<UInt8>,
-    keyPointerLen: Int
-) -> Int {
-    guard keyPointerLen == 64 else {
-        return -1  // Need 64 bytes: 32 for private key, 32 for public key
-    }
-    let privateKey = Curve25519.KeyAgreement.PrivateKey()
-
-    privateKey.rawRepresentation.copyBytes(to: keyPointer, count: 32)
-
-    let publicKeyData = privateKey.publicKey.rawRepresentation
-    publicKeyData.copyBytes(to: keyPointer + 32, count: 32)
-    return 0
-}
-
-@_cdecl("go_x25519")
-public func x25519(
+@_cdecl("go_ecdhSharedSecret")
+public func ecdhSharedSecret(
+    curveID: Int32,
     privateKeyPointer: UnsafePointer<UInt8>,
     privateKeyLen: Int,
     publicKeyPointer: UnsafePointer<UInt8>,
@@ -283,31 +386,235 @@ public func x25519(
     sharedSecretPointer: UnsafeMutablePointer<UInt8>,
     sharedSecretLen: Int
 ) -> Int {
-    guard privateKeyLen == 32 && publicKeyLen == 32 && sharedSecretLen == 32 else {
-        return -1  // Invalid key lengths
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0 else { return -1 }
+
+    if curveID == 0 {
+        // X25519
+        guard privateKeyLen == keySize, publicKeyLen == keySize else { return -1 }
+        do {
+            let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
+            let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+
+            let privateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKey = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+
+            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+            let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
+
+            guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
+            sharedSecretBytes.copyBytes(to: sharedSecretPointer, count: sharedSecretBytes.count)
+            return 0
+        } catch {
+            return -2
+        }
+    }
+
+    guard privateKeyLen == keySize, publicKeyLen == 1 + keySize * 2 else {
+        return -1  // Invalid key sizes
     }
 
     do {
-        // Reconstruct the private key from the seed
         let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
-        let privateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-
-        // Reconstruct the peer's public key
         let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
-        let publicKey = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
 
-        // Perform the key exchange
-        let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+        switch curveID {
+        case 1:  // P-256
+            let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKey = try P256.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+            let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
+            guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
+            sharedSecretBytes.copyBytes(to: sharedSecretPointer, count: sharedSecretBytes.count)
+            return 0
 
-        // Extract the raw bytes from the shared secret
-        let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
+        case 2:  // P-384
+            let privateKey = try P384.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKey = try P384.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+            let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
+            guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
+            sharedSecretBytes.copyBytes(to: sharedSecretPointer, count: sharedSecretBytes.count)
+            return 0
 
-        // Copy to output buffer
-        sharedSecretBytes.copyBytes(to: sharedSecretPointer, count: sharedSecretLen)
+        case 3:  // P-521
+            let privateKey = try P521.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let publicKey = try P521.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+            let sharedSecretBytes = sharedSecret.withUnsafeBytes { Data($0) }
+            guard sharedSecretLen >= sharedSecretBytes.count else { return -3 }
+            sharedSecretBytes.copyBytes(to: sharedSecretPointer, count: sharedSecretBytes.count)
+            return 0
 
-        return 0
+        default:
+            return -1  // Unsupported curve
+        }
     } catch {
-        return -2  // Error during key exchange
+        return -2  // Error during key agreement
+    }
+}
+
+// ECDSA for P-256, P-384, P-521 using CryptoKit
+
+@_cdecl("go_generateKeyECDSA")
+public func generateKeyECDSA(
+    curveID: Int32,
+    xPointer: UnsafeMutablePointer<UInt8>,
+    xLen: Int,
+    yPointer: UnsafeMutablePointer<UInt8>,
+    yLen: Int,
+    dPointer: UnsafeMutablePointer<UInt8>,
+    dLen: Int
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0, xLen == keySize, yLen == keySize, dLen == keySize else {
+        return -1  // Invalid key sizes
+    }
+
+    switch curveID {
+    case 1:  // P-256
+        let privateKey = P256.Signing.PrivateKey()
+        let publicKey = privateKey.publicKey
+        let dData = privateKey.rawRepresentation
+        let publicKeyData = publicKey.rawRepresentation
+
+        dData.copyBytes(to: dPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
+        return 0
+
+    case 2:  // P-384
+        let privateKey = P384.Signing.PrivateKey()
+        let publicKey = privateKey.publicKey
+        let dData = privateKey.rawRepresentation
+        let publicKeyData = publicKey.rawRepresentation
+
+        dData.copyBytes(to: dPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
+        return 0
+
+    case 3:  // P-521
+        let privateKey = P521.Signing.PrivateKey()
+        let publicKey = privateKey.publicKey
+        let dData = privateKey.rawRepresentation
+        let publicKeyData = publicKey.rawRepresentation
+
+        dData.copyBytes(to: dPointer, count: keySize)
+        publicKeyData.prefix(keySize).copyBytes(to: xPointer, count: keySize)
+        publicKeyData.suffix(keySize).copyBytes(to: yPointer, count: keySize)
+        return 0
+
+    default:
+        return -1  // Unsupported curve
+    }
+}
+
+@_cdecl("go_ecdsaSign")
+public func ecdsaSign(
+    curveID: Int32,
+    dPointer: UnsafePointer<UInt8>,
+    dLen: Int,
+    messagePointer: UnsafePointer<UInt8>,
+    messageLen: Int,
+    signaturePointer: UnsafeMutablePointer<UInt8>,
+    signatureLen: UnsafeMutablePointer<Int>
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0, dLen == keySize else {
+        return -1  // Invalid key size
+    }
+
+    do {
+        let dData = Data(bytes: dPointer, count: dLen)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+
+        switch curveID {
+        case 1:  // P-256
+            let privateKey = try P256.Signing.PrivateKey(rawRepresentation: dData)
+            let signature = try privateKey.signature(for: messageData)
+            let derBytes = signature.derRepresentation
+            guard derBytes.count <= 128 else { return -3 }  // Signature too large
+            derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
+            signatureLen.pointee = derBytes.count
+            return 0
+
+        case 2:  // P-384
+            let privateKey = try P384.Signing.PrivateKey(rawRepresentation: dData)
+            let signature = try privateKey.signature(for: messageData)
+            let derBytes = signature.derRepresentation
+            guard derBytes.count <= 192 else { return -3 }  // Signature too large
+            derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
+            signatureLen.pointee = derBytes.count
+            return 0
+
+        case 3:  // P-521
+            let privateKey = try P521.Signing.PrivateKey(rawRepresentation: dData)
+            let signature = try privateKey.signature(for: messageData)
+            let derBytes = signature.derRepresentation
+            guard derBytes.count <= 256 else { return -3 }  // Signature too large
+            derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
+            signatureLen.pointee = derBytes.count
+            return 0
+
+        default:
+            return -1  // Unsupported curve
+        }
+    } catch {
+        return -2  // Error during signing
+    }
+}
+
+@_cdecl("go_ecdsaVerify")
+public func ecdsaVerify(
+    curveID: Int32,
+    xPointer: UnsafePointer<UInt8>,
+    xLen: Int32,
+    yPointer: UnsafePointer<UInt8>,
+    yLen: Int32,
+    messagePointer: UnsafePointer<UInt8>,
+    messageLen: Int32,
+    signaturePointer: UnsafePointer<UInt8>,
+    signatureLen: Int32
+) -> Int32 {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0, Int(xLen) == keySize, Int(yLen) == keySize else {
+        return -1  // Invalid key sizes
+    }
+
+    do {
+        let xData = Data(bytes: xPointer, count: Int(xLen))
+        let yData = Data(bytes: yPointer, count: Int(yLen))
+        let messageData = Data(bytes: messagePointer, count: Int(messageLen))
+        let signatureDERData = Data(bytes: signaturePointer, count: Int(signatureLen))
+
+        switch curveID {
+        case 1:  // P-256
+            let publicKeyData = xData + yData
+            let publicKey = try P256.Signing.PublicKey(rawRepresentation: publicKeyData)
+            let signature = try P256.Signing.ECDSASignature(derRepresentation: signatureDERData)
+            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            return isValid ? 1 : 0
+
+        case 2:  // P-384
+            let publicKeyData = xData + yData
+            let publicKey = try P384.Signing.PublicKey(rawRepresentation: publicKeyData)
+            let signature = try P384.Signing.ECDSASignature(derRepresentation: signatureDERData)
+            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            return isValid ? 1 : 0
+
+        case 3:  // P-521
+            let publicKeyData = xData + yData
+            let publicKey = try P521.Signing.PublicKey(rawRepresentation: publicKeyData)
+            let signature = try P521.Signing.ECDSASignature(derRepresentation: signatureDERData)
+            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            return isValid ? 1 : 0
+
+        default:
+            return -1  // Unsupported curve
+        }
+    } catch {
+        return -2  // Error during verification
     }
 }
 
@@ -1454,3 +1761,86 @@ public func decapsulateMLKEM1024(
     }
 }
 #endif
+
+// ECDH Key Validation
+@_cdecl("go_validatePrivateKeyECDH")
+public func validatePrivateKeyECDH(
+    curveID: Int32,
+    privateKeyPointer: UnsafePointer<UInt8>,
+    privateKeyLen: Int
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0, privateKeyLen == keySize else {
+        return -1  // Invalid key size
+    }
+
+    do {
+        let privateKeyData = Data(bytes: privateKeyPointer, count: privateKeyLen)
+
+        switch curveID {
+        case 0:  // X25519
+            _ = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            return 0  // Valid
+        case 1:  // P-256
+            _ = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            return 0  // Valid
+        case 2:  // P-384
+            _ = try P384.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            return 0  // Valid
+        case 3:  // P-521
+            _ = try P521.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            return 0  // Valid
+        default:
+            return -1  // Unsupported curve
+        }
+    } catch {
+        return -2  // Invalid key
+    }
+}
+
+@_cdecl("go_validatePublicKeyECDH")
+public func validatePublicKeyECDH(
+    curveID: Int32,
+    publicKeyPointer: UnsafePointer<UInt8>,
+    publicKeyLen: Int
+) -> Int {
+    let keySize = getECDHKeySizeForCurve(curveID)
+    guard keySize > 0 else { return -1 }
+
+    if curveID == 0 {
+        // X25519
+        guard publicKeyLen == keySize else { return -1 }
+        do {
+            let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+            _ = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+            return 0
+        } catch {
+            return -2
+        }
+    }
+
+    guard publicKeyLen == 1 + keySize * 2 else {
+        return -1  // Invalid key size
+    }
+
+    do {
+        // Use x963Representation which includes the 0x04 prefix and performs validation
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+
+        switch curveID {
+        case 1:  // P-256
+            _ = try P256.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            return 0  // Valid
+        case 2:  // P-384
+            _ = try P384.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            return 0  // Valid
+        case 3:  // P-521
+            _ = try P521.KeyAgreement.PublicKey(x963Representation: publicKeyData)
+            return 0  // Valid
+        default:
+            return -1  // Unsupported curve
+        }
+    } catch {
+        return -2  // Invalid key
+    }
+}

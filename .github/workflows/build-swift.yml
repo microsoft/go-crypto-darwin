@@ -3,6 +3,8 @@
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [labeled]
   push:
     branches:
       - main
@@ -14,12 +16,17 @@ on:
 name: Build Swift
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.label.name == 'generate-bindings'
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     runs-on: macos-26
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+
       - name: Build Swift
         run: bash gen-swift-bindings.sh
 
@@ -30,20 +37,37 @@ jobs:
       - name: Run go generate
         run: go generate ./...
 
-      - name: Commit changes and create PR
+      - name: Commit and Push Changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --global user.name "GitHub Actions"
+
           git add internal/cryptokit/CryptoKit*.syso
           git add internal/cryptokit/zcryptokit_swift_*.go
+
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git add internal/cryptokit/zcryptokit.h
+            COMMIT_MSG="Regenerate bindings"
+          else
+            COMMIT_MSG="Update CryptoKit Object files"
+          fi
+
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Update CryptoKit Object files"
-          BRANCH=autogen/update-cryptokit-obj-$(date +%s)
-          git checkout -b $BRANCH
-          git push origin $BRANCH
-          gh pr create --fill --base main --head $BRANCH
+
+          git commit -m "$COMMIT_MSG"
+
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git push
+            echo "Triggering test workflow..."
+            gh workflow run test.yml --ref ${{ github.head_ref }}
+          else
+            BRANCH=autogen/update-cryptokit-obj-$(date +%s)
+            git checkout -b $BRANCH
+            git push origin $BRANCH
+            gh pr create --fill --base main --head $BRANCH
+          fi

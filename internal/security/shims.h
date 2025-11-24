@@ -36,7 +36,6 @@ typedef enum {
   kSecKeyOperationTypeVerify = 1,
   kSecKeyOperationTypeEncrypt = 2,
   kSecKeyOperationTypeDecrypt = 3,
-  kSecKeyOperationTypeKeyExchange = 4
 } SecKeyOperationType;
 
 typedef enum {
@@ -49,14 +48,12 @@ typedef enum {
 
 extern const CFAllocatorRef kCFAllocatorDefault __attribute__((framework(CoreFoundation, A)));
 extern const SecRandomRef kSecRandomDefault __attribute__((framework(Security, A)));
-extern const CFStringRef kSecAttrKeyTypeECSECPrimeRandom __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeyTypeRSA __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeyClassPublic __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeyClassPrivate __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeyType __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeySizeInBits __attribute__((framework(Security, A)));
 extern const CFStringRef kSecAttrKeyClass __attribute__((framework(Security, A)));
-extern const CFStringRef kSecKeyAlgorithmECDHKeyExchangeStandard __attribute__((framework(Security, A)));
 // PSS
 extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA1 __attribute__((framework(Security, A)));
 extern const CFStringRef kSecKeyAlgorithmRSASignatureDigestPSSSHA224 __attribute__((framework(Security, A)));
@@ -87,7 +84,6 @@ SecKeyRef SecKeyCopyPublicKey(SecKeyRef key) __attribute__((framework(Security, 
 SecKeyRef SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, CFErrorRef *error) __attribute__((framework(Security, A)));
 SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef key, CFErrorRef *error) __attribute__((framework(Security, A)));
-CFDataRef SecKeyCopyKeyExchangeResult(SecKeyRef privateKey, SecKeyAlgorithm algorithm, SecKeyRef publicKey, CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef data, CFErrorRef *error) __attribute__((framework(Security, A)));

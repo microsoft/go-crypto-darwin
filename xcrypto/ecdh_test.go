@@ -5,9 +5,7 @@ package xcrypto_test
 
 import (
 	"bytes"
-	"crypto/elliptic"
 	"encoding/hex"
-	"errors"
 	"strings"
 	"testing"
 
@@ -23,10 +21,6 @@ func TestECDH(t *testing.T) {
 				t.Fatal(err)
 			}
 			bobKey, _, err := xcrypto.GenerateKeyECDH(name)
-			if err != nil {
-				t.Fatal(err)
-			}
-			_, err = encodeECDHComponents(name, alicPrivBytes)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -128,7 +122,7 @@ var ecdhvectors = []struct {
 func TestECDHVectors(t *testing.T) {
 	for _, tt := range ecdhvectors {
 		t.Run(tt.Name, func(t *testing.T) {
-			key, err := encodeECDHComponents(tt.Name, hexDecode(t, tt.PrivateKey))
+			key, err := xcrypto.NewPrivateKeyECDH(tt.Name, hexDecode(t, tt.PrivateKey))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -178,7 +172,7 @@ func TestECDHX25519Failure(t *testing.T) {
 }
 
 func testX25519Failure(t *testing.T, private, public []byte) {
-	priv, err := xcrypto.NewPrivateKeyECDH("X25519", nil, private)
+	priv, err := xcrypto.NewPrivateKeyECDH("X25519", private)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -342,7 +336,7 @@ func TestECDHNewPrivateKeyECDH_Invalid(t *testing.T) {
 					t.Logf("Skipping test for curve %s with key %q due to condition", curve, test.key)
 					continue
 				}
-				k, err := encodeECDHComponents(curve, hexDecode(t, test.key))
+				k, err := xcrypto.NewPrivateKeyECDH(curve, hexDecode(t, test.key))
 				if err == nil {
 					t.Errorf("unexpectedly accepted %q", test.key)
 				} else if k != nil {
@@ -371,36 +365,4 @@ func TestECDHNewPublicKeyECDH_Invalid(t *testing.T) {
 			}
 		})
 	}
-}
-
-func encodeECDHComponents(curve string, privateComponent []byte) (*xcrypto.PrivateKeyECDH, error) {
-	keySize := xcrypto.CurveToKeySizeInBytes(curve)
-	if len(privateComponent) != keySize {
-		return nil, errors.New("invalid key length: private component size does not match expected key size for the given curve")
-	}
-	// generate public key from privateComponent
-	var p elliptic.Curve
-	switch curve {
-	case "P-256":
-		p = elliptic.P256()
-	case "P-384":
-		p = elliptic.P384()
-	case "P-521":
-		p = elliptic.P521()
-	case "X25519":
-		// For X25519, we don't need to call encodeECDHComponents
-		key, err := xcrypto.NewPrivateKeyECDH("X25519", nil, privateComponent)
-		return key, err
-	default:
-		return nil, errors.New("unsupported curve")
-	}
-	// curve.ScalarBaseMult is deprecated unless using the built-in curves namely P-256, P-384, P-521.
-	x, y := p.ScalarBaseMult(privateComponent)
-	xBytes := xcrypto.NormalizeBigInt(x.Bytes())
-	yBytes := xcrypto.NormalizeBigInt(y.Bytes())
-	encodedKey, err := xcrypto.EncodeToUncompressedAnsiX963Key(xBytes, yBytes, nil, keySize)
-	if err != nil {
-		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
-	}
-	return xcrypto.NewPrivateKeyECDH(curve, encodedKey, privateComponent)
 }

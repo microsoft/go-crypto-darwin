@@ -73,7 +73,7 @@ int go_validatePrivateKeyECDH(int32_t curveID, const uint8_t *privateKey, int pr
 int go_validatePublicKeyECDH(int32_t curveID, const uint8_t *publicKey, int publicKeyLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen)));
 
 // ECDSA
-int go_generateKeyECDSA(int32_t curveID, uint8_t *x, int xLen, uint8_t *y, int yLen, uint8_t *d, int dLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(d, dLen)));
+int go_generateKeyECDSA(int32_t curveID, uint8_t *x, uint8_t *y, uint8_t *d) __attribute__((noescape, nocallback, static, slice(x), slice(y), slice(d)));
 int go_ecdsaSign(int32_t curveID, const uint8_t *d, int dLen, const uint8_t *message, int messageLen, uint8_t *signature, int *signatureLen) __attribute__((noescape, nocallback, static, slice(d, dLen), slice(message, messageLen), slice(signature)));
 int go_ecdsaVerify(int32_t curveID, const uint8_t *x, int xLen, const uint8_t *y, int yLen, const uint8_t *message, int messageLen, const uint8_t *signature, int signatureLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(message, messageLen), slice(signature, signatureLen)));
 

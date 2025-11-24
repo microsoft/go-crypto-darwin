@@ -34,7 +34,7 @@ int go_extractHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint
 void go_finalizeHMAC(int32_t, void*, uint8_t*);
 void go_freeHMAC(int32_t, void*);
 int go_generateKeyECDH(int32_t, uint8_t*, int, uint8_t*, int);
-int go_generateKeyECDSA(int32_t, uint8_t*, int, uint8_t*, int, uint8_t*, int);
+int go_generateKeyECDSA(int32_t, uint8_t*, uint8_t*, uint8_t*);
 void go_generateKeyEd25519(uint8_t*);
 int go_generateKeyMLKEM1024(uint8_t*, int);
 int go_generateKeyMLKEM768(uint8_t*, int);
@@ -158,8 +158,8 @@ int _mkcgo_go_generateKeyECDH(int32_t _arg0, uint8_t* _arg1, int _arg2, uint8_t*
 	return go_generateKeyECDH(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
-int _mkcgo_go_generateKeyECDSA(int32_t _arg0, uint8_t* _arg1, int _arg2, uint8_t* _arg3, int _arg4, uint8_t* _arg5, int _arg6) {
-	return go_generateKeyECDSA(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
+int _mkcgo_go_generateKeyECDSA(int32_t _arg0, uint8_t* _arg1, uint8_t* _arg2, uint8_t* _arg3) {
+	return go_generateKeyECDSA(_arg0, _arg1, _arg2, _arg3);
 }
 
 void _mkcgo_go_generateKeyEd25519(uint8_t* _arg0) {

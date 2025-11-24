@@ -228,7 +228,7 @@ func GenerateKeyECDH(curveID int32, privateKey []uint8, publicKey []uint8) int32
 }
 
 func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDSA)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(len(x)), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(len(y)), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDSA)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(unsafe.Pointer(unsafe.SliceData(d))))
 	return int32(r0)
 }
 

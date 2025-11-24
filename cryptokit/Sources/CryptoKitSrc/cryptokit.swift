@@ -460,14 +460,11 @@ public func ecdhSharedSecret(
 public func generateKeyECDSA(
     curveID: Int32,
     xPointer: UnsafeMutablePointer<UInt8>,
-    xLen: Int,
     yPointer: UnsafeMutablePointer<UInt8>,
-    yLen: Int,
-    dPointer: UnsafeMutablePointer<UInt8>,
-    dLen: Int
+    dPointer: UnsafeMutablePointer<UInt8>
 ) -> Int {
     let keySize = getECDHKeySizeForCurve(curveID)
-    guard keySize > 0, xLen == keySize, yLen == keySize, dLen == keySize else {
+    guard keySize > 0 else {
         return -1  // Invalid key sizes
     }
 

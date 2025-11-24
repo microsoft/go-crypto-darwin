@@ -23,9 +23,9 @@ int go_decapsulateMLKEM768(const uint8_t*, int, const uint8_t*, int, uint8_t*, i
 int go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
 int go_deriveEncapsulationKeyMLKEM1024(const uint8_t*, int, uint8_t*, int);
 int go_deriveEncapsulationKeyMLKEM768(const uint8_t*, int, uint8_t*, int);
-int go_ecdhSharedSecret(int32_t, const uint8_t*, int, const uint8_t*, int, uint8_t*, int);
-int go_ecdsaSign(int32_t, const uint8_t*, int, const uint8_t*, int, uint8_t*, int*);
-int go_ecdsaVerify(int32_t, const uint8_t*, int, const uint8_t*, int, const uint8_t*, int, const uint8_t*, int);
+int64_t go_ecdhSharedSecret(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
+int64_t go_ecdsaSign(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t*);
+int64_t go_ecdsaVerify(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t, const uint8_t*, int64_t, const uint8_t*, int64_t);
 int go_encapsulateMLKEM1024(const uint8_t*, int, uint8_t*, int, uint8_t*, int);
 int go_encapsulateMLKEM768(const uint8_t*, int, uint8_t*, int, uint8_t*, int);
 int go_encryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
@@ -33,8 +33,8 @@ int go_expandHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8
 int go_extractHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 void go_finalizeHMAC(int32_t, void*, uint8_t*);
 void go_freeHMAC(int32_t, void*);
-int go_generateKeyECDH(int32_t, uint8_t*, int, uint8_t*, int);
-int go_generateKeyECDSA(int32_t, uint8_t*, uint8_t*, uint8_t*);
+int64_t go_generateKeyECDH(int32_t, uint8_t*, int64_t, uint8_t*, int64_t);
+int64_t go_generateKeyECDSA(int32_t, uint8_t*, int64_t, uint8_t*, int64_t, uint8_t*, int64_t);
 void go_generateKeyEd25519(uint8_t*);
 int go_generateKeyMLKEM1024(uint8_t*, int);
 int go_generateKeyMLKEM768(uint8_t*, int);
@@ -49,13 +49,13 @@ void go_hashWrite(int32_t, void*, const uint8_t*, int);
 void* go_initHMAC(int32_t, const uint8_t*, int);
 int go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 int go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
-int go_publicKeyFromPrivateECDH(int32_t, const uint8_t*, int, uint8_t*, int);
+int64_t go_publicKeyFromPrivateECDH(int32_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
 int go_supportsMLKEM(void);
 int go_supportsSHA3(void);
 void go_updateHMAC(int32_t, void*, const uint8_t*, int);
-int go_validatePrivateKeyECDH(int32_t, const uint8_t*, int);
-int go_validatePublicKeyECDH(int32_t, const uint8_t*, int);
+int64_t go_validatePrivateKeyECDH(int32_t, const uint8_t*, int64_t);
+int64_t go_validatePublicKeyECDH(int32_t, const uint8_t*, int64_t);
 int go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
 
 void _mkcgo_go_MD5(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2) {
@@ -114,15 +114,15 @@ int _mkcgo_go_deriveEncapsulationKeyMLKEM768(const uint8_t* _arg0, int _arg1, ui
 	return go_deriveEncapsulationKeyMLKEM768(_arg0, _arg1, _arg2, _arg3);
 }
 
-int _mkcgo_go_ecdhSharedSecret(int32_t _arg0, const uint8_t* _arg1, int _arg2, const uint8_t* _arg3, int _arg4, uint8_t* _arg5, int _arg6) {
+int64_t _mkcgo_go_ecdhSharedSecret(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2, const uint8_t* _arg3, int64_t _arg4, uint8_t* _arg5, int64_t _arg6) {
 	return go_ecdhSharedSecret(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
 }
 
-int _mkcgo_go_ecdsaSign(int32_t _arg0, const uint8_t* _arg1, int _arg2, const uint8_t* _arg3, int _arg4, uint8_t* _arg5, int* _arg6) {
+int64_t _mkcgo_go_ecdsaSign(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2, const uint8_t* _arg3, int64_t _arg4, uint8_t* _arg5, int64_t* _arg6) {
 	return go_ecdsaSign(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
 }
 
-int _mkcgo_go_ecdsaVerify(int32_t _arg0, const uint8_t* _arg1, int _arg2, const uint8_t* _arg3, int _arg4, const uint8_t* _arg5, int _arg6, const uint8_t* _arg7, int _arg8) {
+int64_t _mkcgo_go_ecdsaVerify(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2, const uint8_t* _arg3, int64_t _arg4, const uint8_t* _arg5, int64_t _arg6, const uint8_t* _arg7, int64_t _arg8) {
 	return go_ecdsaVerify(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8);
 }
 
@@ -154,12 +154,12 @@ void _mkcgo_go_freeHMAC(int32_t _arg0, void* _arg1) {
 	go_freeHMAC(_arg0, _arg1);
 }
 
-int _mkcgo_go_generateKeyECDH(int32_t _arg0, uint8_t* _arg1, int _arg2, uint8_t* _arg3, int _arg4) {
+int64_t _mkcgo_go_generateKeyECDH(int32_t _arg0, uint8_t* _arg1, int64_t _arg2, uint8_t* _arg3, int64_t _arg4) {
 	return go_generateKeyECDH(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
-int _mkcgo_go_generateKeyECDSA(int32_t _arg0, uint8_t* _arg1, uint8_t* _arg2, uint8_t* _arg3) {
-	return go_generateKeyECDSA(_arg0, _arg1, _arg2, _arg3);
+int64_t _mkcgo_go_generateKeyECDSA(int32_t _arg0, uint8_t* _arg1, int64_t _arg2, uint8_t* _arg3, int64_t _arg4, uint8_t* _arg5, int64_t _arg6) {
+	return go_generateKeyECDSA(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
 }
 
 void _mkcgo_go_generateKeyEd25519(uint8_t* _arg0) {
@@ -218,7 +218,7 @@ int _mkcgo_go_newPublicKeyEd25519(uint8_t* _arg0, const uint8_t* _arg1) {
 	return go_newPublicKeyEd25519(_arg0, _arg1);
 }
 
-int _mkcgo_go_publicKeyFromPrivateECDH(int32_t _arg0, const uint8_t* _arg1, int _arg2, uint8_t* _arg3, int _arg4) {
+int64_t _mkcgo_go_publicKeyFromPrivateECDH(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2, uint8_t* _arg3, int64_t _arg4) {
 	return go_publicKeyFromPrivateECDH(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
@@ -238,11 +238,11 @@ void _mkcgo_go_updateHMAC(int32_t _arg0, void* _arg1, const uint8_t* _arg2, int 
 	go_updateHMAC(_arg0, _arg1, _arg2, _arg3);
 }
 
-int _mkcgo_go_validatePrivateKeyECDH(int32_t _arg0, const uint8_t* _arg1, int _arg2) {
+int64_t _mkcgo_go_validatePrivateKeyECDH(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2) {
 	return go_validatePrivateKeyECDH(_arg0, _arg1, _arg2);
 }
 
-int _mkcgo_go_validatePublicKeyECDH(int32_t _arg0, const uint8_t* _arg1, int _arg2) {
+int64_t _mkcgo_go_validatePublicKeyECDH(int32_t _arg0, const uint8_t* _arg1, int64_t _arg2) {
 	return go_validatePublicKeyECDH(_arg0, _arg1, _arg2);
 }
 

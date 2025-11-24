@@ -28,8 +28,11 @@ final class ECDSACryptoTests: XCTestCase {
         let genResult = generateKeyECDSA(
             curveID: curveID,
             xPointer: &x,
+            xLen: keySize,
             yPointer: &y,
-            dPointer: &d
+            yLen: keySize,
+            dPointer: &d,
+            dLen: keySize
         )
         XCTAssertEqual(genResult, 0, "GenerateKeyECDSA failed for curve \(curveID)")
 

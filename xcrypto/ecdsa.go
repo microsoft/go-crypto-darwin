@@ -103,14 +103,14 @@ func SignMarshalECDSA(priv *PrivateKeyECDSA, hashed []byte) ([]byte, error) {
 	// Allocate signature buffer (max size for DER-encoded signature)
 	maxSigLen := 256
 	signature := make([]byte, maxSigLen)
-	sigLen := int32(0)
+	sigLen := int64(0)
 
 	ret := cryptokit.EcdsaSign(curveID, dBytes, hashed, signature, &sigLen)
 	if ret != 0 {
 		return nil, errors.New("ECDSA signing failed")
 	}
 
-	if sigLen <= 0 || sigLen > int32(len(signature)) {
+	if sigLen <= 0 || sigLen > int64(len(signature)) {
 		return nil, errors.New("invalid signature length")
 	}
 

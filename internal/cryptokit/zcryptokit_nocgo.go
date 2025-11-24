@@ -174,19 +174,19 @@ func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int32 {
 	return int32(r0)
 }
 
-func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int32 {
+func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdhSharedSecret)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedSecret))), uintptr(len(sharedSecret)))
-	return int32(r0)
+	return int64(r0)
 }
 
-func EcdsaSign(curveID int32, d []uint8, message []uint8, signature []uint8, signatureLen *int32) int32 {
+func EcdsaSign(curveID int32, d []uint8, message []uint8, signature []uint8, signatureLen *int64) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdsaSign)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
-	return int32(r0)
+	return int64(r0)
 }
 
-func EcdsaVerify(curveID int32, x []uint8, y []uint8, message []uint8, signature []uint8) int32 {
+func EcdsaVerify(curveID int32, x []uint8, y []uint8, message []uint8, signature []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdsaVerify)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(len(x)), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(len(y)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
-	return int32(r0)
+	return int64(r0)
 }
 
 func EncapsulateMLKEM1024(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int32 {
@@ -222,14 +222,14 @@ func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr))
 }
 
-func GenerateKeyECDH(curveID int32, privateKey []uint8, publicKey []uint8) int32 {
+func GenerateKeyECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
-	return int32(r0)
+	return int64(r0)
 }
 
-func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int32 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDSA)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(unsafe.Pointer(unsafe.SliceData(d))))
-	return int32(r0)
+func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDSA)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(len(x)), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(len(y)), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)))
+	return int64(r0)
 }
 
 func GenerateKeyEd25519(key []uint8) {
@@ -297,9 +297,9 @@ func NewPublicKeyEd25519(key []uint8, pub []uint8) int32 {
 	return int32(r0)
 }
 
-func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uint8) int32 {
+func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_publicKeyFromPrivateECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
-	return int32(r0)
+	return int64(r0)
 }
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int32 {
@@ -321,14 +321,14 @@ func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)))
 }
 
-func ValidatePrivateKeyECDH(curveID int32, privateKey []uint8) int32 {
+func ValidatePrivateKeyECDH(curveID int32, privateKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePrivateKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)))
-	return int32(r0)
+	return int64(r0)
 }
 
-func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int32 {
+func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
-	return int32(r0)
+	return int64(r0)
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int32 {

@@ -60,13 +60,13 @@ final class ECDSACryptoTests: XCTestCase {
             ecdsaVerify(
                 curveID: curveID,
                 xPointer: &x,
-                xLen: Int32(keySize),
+                xLen: keySize,
                 yPointer: &y,
-                yLen: Int32(keySize),
+                yLen: keySize,
                 messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                messageLen: Int32(message.count),
+                messageLen: message.count,
                 signaturePointer: &signature,
-                signatureLen: Int32(signatureLen)
+                signatureLen: signatureLen
             )
         }
         XCTAssertEqual(verifyResult, 1, "ECDSAVerify failed for curve \(curveID)")
@@ -77,13 +77,13 @@ final class ECDSACryptoTests: XCTestCase {
             ecdsaVerify(
                 curveID: curveID,
                 xPointer: &x,
-                xLen: Int32(keySize),
+                xLen: keySize,
                 yPointer: &y,
-                yLen: Int32(keySize),
+                yLen: keySize,
                 messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                messageLen: Int32(wrongMessage.count),
+                messageLen: wrongMessage.count,
                 signaturePointer: &signature,
-                signatureLen: Int32(signatureLen)
+                signatureLen: signatureLen
             )
         }
         XCTAssertEqual(verifyWrongResult, 0, "ECDSAVerify should fail for wrong message")

@@ -112,11 +112,11 @@ func decodeECDSASignature(sig []byte) (r, s *big.Int, err error) {
 	return ecdsaSig.R, ecdsaSig.S, nil
 }
 
-func TestECDSAInteropStdlibSign(t *testing.T) {
-	testAllCurves(t, testECDSAInteropStdlibSign)
+func TestECDSAInteropSign(t *testing.T) {
+	testAllCurves(t, testECDSAInteropSign)
 }
 
-func testECDSAInteropStdlibSign(t *testing.T, c elliptic.Curve) {
+func testECDSAInteropSign(t *testing.T, c elliptic.Curve) {
 	// Generate key with xcrypto
 	key, err := generateKeycurve(c)
 	if err != nil {
@@ -156,11 +156,11 @@ func testECDSAInteropStdlibSign(t *testing.T, c elliptic.Curve) {
 	}
 }
 
-func TestECDSAInteropStdlibVerify(t *testing.T) {
-	testAllCurves(t, testECDSAInteropStdlibVerify)
+func TestECDSAInteropVerify(t *testing.T) {
+	testAllCurves(t, testECDSAInteropVerify)
 }
 
-func testECDSAInteropStdlibVerify(t *testing.T, c elliptic.Curve) {
+func testECDSAInteropVerify(t *testing.T, c elliptic.Curve) {
 	// Generate key with xcrypto
 	key, err := generateKeycurve(c)
 	if err != nil {
@@ -192,11 +192,11 @@ func testECDSAInteropStdlibVerify(t *testing.T, c elliptic.Curve) {
 	}
 }
 
-func TestECDSAInteropStdlibKey(t *testing.T) {
-	testAllCurves(t, testECDSAInteropStdlibKey)
+func TestECDSAInteropKey(t *testing.T) {
+	testAllCurves(t, testECDSAInteropKey)
 }
 
-func testECDSAInteropStdlibKey(t *testing.T, c elliptic.Curve) {
+func testECDSAInteropKey(t *testing.T, c elliptic.Curve) {
 	// Generate key with standard library
 	key, err := ecdsa.GenerateKey(c, xcrypto.RandReader)
 	if err != nil {

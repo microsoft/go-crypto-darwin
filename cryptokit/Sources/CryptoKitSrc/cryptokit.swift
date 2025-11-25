@@ -569,24 +569,24 @@ public func ecdsaSign(
 public func ecdsaVerify(
     curveID: Int32,
     xPointer: UnsafePointer<UInt8>,
-    xLen: Int32,
+    xLen: Int,
     yPointer: UnsafePointer<UInt8>,
-    yLen: Int32,
+    yLen: Int,
     messagePointer: UnsafePointer<UInt8>,
-    messageLen: Int32,
+    messageLen: Int,
     signaturePointer: UnsafePointer<UInt8>,
-    signatureLen: Int32
-) -> Int32 {
+    signatureLen: Int
+) -> Int {
     let keySize = getECDHKeySizeForCurve(curveID)
-    guard keySize > 0, Int(xLen) == keySize, Int(yLen) == keySize else {
+    guard keySize > 0, xLen == keySize, yLen == keySize else {
         return -1  // Invalid key sizes
     }
 
     do {
-        let xData = Data(bytes: xPointer, count: Int(xLen))
-        let yData = Data(bytes: yPointer, count: Int(yLen))
-        let messageData = Data(bytes: messagePointer, count: Int(messageLen))
-        let signatureDERData = Data(bytes: signaturePointer, count: Int(signatureLen))
+        let xData = Data(bytes: xPointer, count: xLen)
+        let yData = Data(bytes: yPointer, count: yLen)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let signatureDERData = Data(bytes: signaturePointer, count: signatureLen)
 
         switch curveID {
         case 1:  // P-256

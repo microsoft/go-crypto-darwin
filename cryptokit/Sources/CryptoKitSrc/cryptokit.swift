@@ -511,6 +511,12 @@ public func generateKeyECDSA(
 }
 
 func castToDigest<D: Digest>(_ data: Data, to type: D.Type) -> D {
+    // Ensure that the Digest type has the expected size.
+    // This is a safety check to prevent buffer overflows if the internal implementation of Digest changes.
+    if MemoryLayout<D>.size != D.byteCount {
+        fatalError("Digest layout mismatch: \(MemoryLayout<D>.size) != \(D.byteCount)")
+    }
+
     let digestBytes: Data
     if data.count > D.byteCount {
         digestBytes = data.prefix(D.byteCount)

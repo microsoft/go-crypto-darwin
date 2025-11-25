@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         go-version: [1.24.x, 1.25.x, gotip]
-        macos-version: [macos-13, macos-14, macos-15, macos-26]
+        macos-version: [macos-14, macos-15, macos-15-intel, macos-26]
         cgo: [0, 1]
         linkmode: ["internal", "external"]
         exclude:
@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        macos-version: [macos-13, macos-14, macos-15, macos-26]
+        macos-version: [macos-14, macos-15, macos-15-intel, macos-26]
     runs-on: ${{ matrix.macos-version }}
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0

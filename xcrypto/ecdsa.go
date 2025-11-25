@@ -145,57 +145,10 @@ func VerifyECDSA(pub *PublicKeyECDSA, hashed []byte, sig []byte) bool {
 	return ret == 1
 }
 
-// encodeToUncompressedAnsiX963Key encodes the given elliptic curve point (x, y) and optional private key (d)
-// into an uncompressed ANSI X9.63 format byte slice.
-func encodeToUncompressedAnsiX963Key(x, y, d BigInt, keySize int) ([]byte, error) {
-	// Build the uncompressed key point (0x04 || x || y { || d })
-	size := 1 + keySize*2
-	if d != nil {
-		size += keySize
-	}
-	out := make([]byte, size)
-	out[0] = 0x04
-	err := encodeBigInt(out[1:], []sizedBigInt{
-		{x, keySize}, {y, keySize},
-		{d, keySize},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func normalizeBigInt(b []byte) BigInt {
 	// Remove leading zero bytes
 	for len(b) > 0 && b[0] == 0 {
 		b = b[1:]
 	}
 	return b
-}
-
-// sizedBigInt defines a big integer with
-// a size that can be different from the
-// one provided by len(b).
-type sizedBigInt struct {
-	b    BigInt
-	size int
-}
-
-// encodeBigInt encodes ints into data.
-// It stops iterating over ints when it finds one nil element.
-func encodeBigInt(data []byte, ints []sizedBigInt) error {
-	for _, v := range ints {
-		if v.b == nil {
-			return nil
-		}
-		normalized := normalizeBigInt(v.b)
-		// b might be shorter than size if the original big number contained leading zeros.
-		leadingZeros := int(v.size) - len(normalized)
-		if leadingZeros < 0 {
-			return errors.New("commoncrypto: invalid parameters")
-		}
-		copy(data[leadingZeros:], normalized)
-		data = data[v.size:]
-	}
-	return nil
 }

@@ -510,6 +510,27 @@ public func generateKeyECDSA(
     }
 }
 
+// Helper struct to wrap a pre-computed hash as a Digest
+struct PrecomputedDigest<D: HashFunction>: Digest {
+    let bytes: Data
+    
+    static var byteCount: Int {
+        return D.Digest.byteCount
+    }
+    
+    init(bytes: Data) {
+        self.bytes = bytes
+    }
+    
+    func makeIterator() -> Data.Iterator {
+        return bytes.makeIterator()
+    }
+    
+    func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+        return try bytes.withUnsafeBytes(body)
+    }
+}
+
 @_cdecl("go_ecdsaSign")
 public func ecdsaSign(
     curveID: Int32,
@@ -527,12 +548,14 @@ public func ecdsaSign(
 
     do {
         let dData = Data(bytes: dPointer, count: dLen)
-        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let messageDigest = Data(bytes: messagePointer, count: messageLen)
 
         switch curveID {
         case 1:  // P-256
             let privateKey = try P256.Signing.PrivateKey(rawRepresentation: dData)
-            let signature = try privateKey.signature(for: messageData)
+            // The message is already SHA256 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA256>(bytes: messageDigest)
+            let signature = try privateKey.signature(for: digest)
             let derBytes = signature.derRepresentation
             guard derBytes.count <= 128 else { return -3 }  // Signature too large
             derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
@@ -541,7 +564,9 @@ public func ecdsaSign(
 
         case 2:  // P-384
             let privateKey = try P384.Signing.PrivateKey(rawRepresentation: dData)
-            let signature = try privateKey.signature(for: messageData)
+            // The message is already SHA384 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA384>(bytes: messageDigest)
+            let signature = try privateKey.signature(for: digest)
             let derBytes = signature.derRepresentation
             guard derBytes.count <= 192 else { return -3 }  // Signature too large
             derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
@@ -550,7 +575,9 @@ public func ecdsaSign(
 
         case 3:  // P-521
             let privateKey = try P521.Signing.PrivateKey(rawRepresentation: dData)
-            let signature = try privateKey.signature(for: messageData)
+            // The message is already SHA512 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA512>(bytes: messageDigest)
+            let signature = try privateKey.signature(for: digest)
             let derBytes = signature.derRepresentation
             guard derBytes.count <= 256 else { return -3 }  // Signature too large
             derBytes.copyBytes(to: signaturePointer, count: derBytes.count)
@@ -585,7 +612,7 @@ public func ecdsaVerify(
     do {
         let xData = Data(bytes: xPointer, count: xLen)
         let yData = Data(bytes: yPointer, count: yLen)
-        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let messageDigest = Data(bytes: messagePointer, count: messageLen)
         let signatureDERData = Data(bytes: signaturePointer, count: signatureLen)
 
         switch curveID {
@@ -593,21 +620,27 @@ public func ecdsaVerify(
             let publicKeyData = xData + yData
             let publicKey = try P256.Signing.PublicKey(rawRepresentation: publicKeyData)
             let signature = try P256.Signing.ECDSASignature(derRepresentation: signatureDERData)
-            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            // The message is already SHA256 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA256>(bytes: messageDigest)
+            let isValid = publicKey.isValidSignature(signature, for: digest)
             return isValid ? 1 : 0
 
         case 2:  // P-384
             let publicKeyData = xData + yData
             let publicKey = try P384.Signing.PublicKey(rawRepresentation: publicKeyData)
             let signature = try P384.Signing.ECDSASignature(derRepresentation: signatureDERData)
-            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            // The message is already SHA384 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA384>(bytes: messageDigest)
+            let isValid = publicKey.isValidSignature(signature, for: digest)
             return isValid ? 1 : 0
 
         case 3:  // P-521
             let publicKeyData = xData + yData
             let publicKey = try P521.Signing.PublicKey(rawRepresentation: publicKeyData)
             let signature = try P521.Signing.ECDSASignature(derRepresentation: signatureDERData)
-            let isValid = publicKey.isValidSignature(signature, for: messageData)
+            // The message is already SHA512 hashed, wrap it as a digest
+            let digest = PrecomputedDigest<SHA512>(bytes: messageDigest)
+            let isValid = publicKey.isValidSignature(signature, for: digest)
             return isValid ? 1 : 0
 
         default:

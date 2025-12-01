@@ -73,6 +73,11 @@ func ExpandHKDF(h func() hash.Hash, pseudorandomKey, info []byte, keyLength int)
 
 	// Allocate buffer for derived key
 	expandedKey := make([]byte, keyLength)
+	if len(expandedKey) == 0 {
+		// Nothing to do, and CryptoKit may error on zero-length output.
+		// We do need to validate the inputs for consistency, though.
+		return expandedKey, nil
+	}
 
 	result := cryptokit.ExpandHKDF(swiftHash, pseudorandomKey, info, expandedKey)
 	if result != 0 {

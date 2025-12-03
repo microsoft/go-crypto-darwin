@@ -4,6 +4,8 @@
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
   pull_request:
 
 concurrency:
@@ -56,6 +58,7 @@ jobs:
       - name: Run Swift Tests
         working-directory: cryptokit
         run: swift test
+
   verify-reproducible-build:
     runs-on: macos-26
     steps:
@@ -84,6 +87,7 @@ jobs:
             exit 1
           fi
           echo "✅ Object files are reproducible and match the source code"
+
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -98,6 +102,7 @@ jobs:
 
       - name: Run Build (cgoless)
         run: CGO_ENABLED=0 go build ./...
+
   check-headers:
     strategy:
       fail-fast: false
@@ -118,3 +123,20 @@ jobs:
       - name: Check for any changed files
         run: |
           git diff --exit-code || (echo "Generated files are out of date. Please run 'go generate'." && exit 1)
+
+  conclusion:
+    needs:
+      - test
+      - verify-reproducible-build
+      - linux
+      - check-headers
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Result
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more jobs failed or were cancelled."
+            exit 1
+          fi
+          echo "All jobs passed."

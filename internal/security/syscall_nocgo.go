@@ -6,15 +6,10 @@
 package security
 
 import (
-	_ "unsafe"
+	"github.com/microsoft/go-crypto-darwin/internal/xsyscall"
 )
 
-//go:linkname syscall_syscallN syscall.syscalln
-
-//go:noescape
-func syscall_syscallN(fn uintptr, args ...uintptr) (r1, r2 uintptr)
-
 //go:nosplit
-func syscallN(_ uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
-	return syscall_syscallN(fn, args...)
+func syscallN(errType uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
+	return xsyscall.SyscallN(errType, fn, args...)
 }

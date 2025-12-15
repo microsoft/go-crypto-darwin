@@ -88,7 +88,7 @@ jobs:
           fi
           echo "✅ Object files are reproducible and match the source code"
 
-  linux:
+  linux-x64:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -102,6 +102,23 @@ jobs:
 
       - name: Run Build (cgoless)
         run: CGO_ENABLED=0 go build ./...
+
+  linux-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+        with:
+          go-version: 1.25
+
+      - name: Run Build for ARM32
+        run: |
+          GOARCH=arm go build ./...
+
+      - name: Run Build for ARM32 (cgoless)
+        run: |
+          CGO_ENABLED=0 GOARCH=arm go build ./...
 
   check-headers:
     strategy:
@@ -128,7 +145,8 @@ jobs:
     needs:
       - test
       - verify-reproducible-build
-      - linux
+      - linux-x64
+      - linux-arm
       - check-headers
     runs-on: ubuntu-latest
     if: always()

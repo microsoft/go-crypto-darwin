@@ -3,4 +3,4 @@
 
 package fakecgo
 
-//go:generate ./update.sh
+//go:generate go run update_tool.go

@@ -23,7 +23,7 @@ var filesToSkip = makeSet(
 
 var noTagModification = makeSet(
 	"libcgo_darwin.go",
-	"symbols_darwin.go",
+	"zsymbols_darwin.go",
 )
 
 func makeSet(items ...string) map[string]bool {

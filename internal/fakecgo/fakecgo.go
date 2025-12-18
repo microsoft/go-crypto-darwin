@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
-// SPDX-FileCopyrightText: 2022 The Ebitengine Authors
+// SPDX-FileCopyrightText: 2025 The Ebitengine Authors
 
 //go:build !cgo && darwin
 
 package fakecgo
 
-import "unsafe"
+import _ "unsafe"
 
-// argset matches runtime/cgocall.go:argset.
-type argset struct {
-	args   *uintptr
-	retval uintptr
-}
+// setg_trampoline calls setg with the G provided
+func setg_trampoline(setg uintptr, G uintptr)
 
-//go:nosplit
-//go:norace
-func (a *argset) arg(i int) unsafe.Pointer {
-	// this indirection is to avoid go vet complaining about possible misuse of unsafe.Pointer
-	return *(*unsafe.Pointer)(unsafe.Add(unsafe.Pointer(a.args), uintptr(i)*unsafe.Sizeof(uintptr(0))))
-}
+// call5 takes fn the C function and 5 arguments and calls the function with those arguments
+func call5(fn, a1, a2, a3, a4, a5 uintptr) uintptr

@@ -18,7 +18,6 @@ const baseURL = "https://raw.githubusercontent.com/ebitengine/purego/main/intern
 var filesToSkip = makeSet(
 	"update_tool.go",
 	"generate.go",
-	"fakecgo.go",
 )
 
 var noTagModification = makeSet(

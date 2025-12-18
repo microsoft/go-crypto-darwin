@@ -26,6 +26,7 @@ var _ = runtime.GOOS
 //go:linkname go_decapsulateMLKEM1024 go_decapsulateMLKEM1024
 //go:linkname go_decapsulateMLKEM768 go_decapsulateMLKEM768
 //go:linkname go_decryptAESGCM go_decryptAESGCM
+//go:linkname go_decryptChaChaPoly go_decryptChaChaPoly
 //go:linkname go_deriveEncapsulationKeyMLKEM1024 go_deriveEncapsulationKeyMLKEM1024
 //go:linkname go_deriveEncapsulationKeyMLKEM768 go_deriveEncapsulationKeyMLKEM768
 //go:linkname go_ecdhSharedSecret go_ecdhSharedSecret
@@ -34,6 +35,7 @@ var _ = runtime.GOOS
 //go:linkname go_encapsulateMLKEM1024 go_encapsulateMLKEM1024
 //go:linkname go_encapsulateMLKEM768 go_encapsulateMLKEM768
 //go:linkname go_encryptAESGCM go_encryptAESGCM
+//go:linkname go_encryptChaChaPoly go_encryptChaChaPoly
 //go:linkname go_expandHKDF go_expandHKDF
 //go:linkname go_extractHKDF go_extractHKDF
 //go:linkname go_finalizeHMAC go_finalizeHMAC
@@ -75,6 +77,7 @@ var go_copyHMAC byte
 var go_decapsulateMLKEM1024 byte
 var go_decapsulateMLKEM768 byte
 var go_decryptAESGCM byte
+var go_decryptChaChaPoly byte
 var go_deriveEncapsulationKeyMLKEM1024 byte
 var go_deriveEncapsulationKeyMLKEM768 byte
 var go_ecdhSharedSecret byte
@@ -83,6 +86,7 @@ var go_ecdsaVerify byte
 var go_encapsulateMLKEM1024 byte
 var go_encapsulateMLKEM768 byte
 var go_encryptAESGCM byte
+var go_encryptChaChaPoly byte
 var go_expandHKDF byte
 var go_extractHKDF byte
 var go_finalizeHMAC byte
@@ -164,6 +168,11 @@ func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []
 	return int64(r0)
 }
 
+func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
+	return int64(r0)
+}
+
 func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)))
 	return int64(r0)
@@ -201,6 +210,11 @@ func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8
 
 func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
+	return int64(r0)
+}
+
+func EncryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
 	return int64(r0)
 }
 

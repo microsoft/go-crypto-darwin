@@ -21,6 +21,7 @@ void* go_copyHMAC(int32_t, void*);
 int64_t go_decapsulateMLKEM1024(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_decapsulateMLKEM768(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
+int64_t go_decryptChaChaPoly(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
 int64_t go_deriveEncapsulationKeyMLKEM1024(const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_deriveEncapsulationKeyMLKEM768(const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_ecdhSharedSecret(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
@@ -29,6 +30,7 @@ int64_t go_ecdsaVerify(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t
 int64_t go_encapsulateMLKEM1024(const uint8_t*, int64_t, uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_encapsulateMLKEM768(const uint8_t*, int64_t, uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t go_encryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
+int64_t go_encryptChaChaPoly(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
 int64_t go_expandHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 int64_t go_extractHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 void go_finalizeHMAC(int32_t, void*, uint8_t*);
@@ -106,6 +108,10 @@ int64_t _mkcgo_go_decryptAESGCM(const uint8_t* _arg0, size_t _arg1, const uint8_
 	return go_decryptAESGCM(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10, _arg11);
 }
 
+int64_t _mkcgo_go_decryptChaChaPoly(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2, size_t _arg3, const uint8_t* _arg4, size_t _arg5, const uint8_t* _arg6, size_t _arg7, const uint8_t* _arg8, size_t _arg9, uint8_t* _arg10, size_t* _arg11) {
+	return go_decryptChaChaPoly(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10, _arg11);
+}
+
 int64_t _mkcgo_go_deriveEncapsulationKeyMLKEM1024(const uint8_t* _arg0, int64_t _arg1, uint8_t* _arg2, int64_t _arg3) {
 	return go_deriveEncapsulationKeyMLKEM1024(_arg0, _arg1, _arg2, _arg3);
 }
@@ -136,6 +142,10 @@ int64_t _mkcgo_go_encapsulateMLKEM768(const uint8_t* _arg0, int64_t _arg1, uint8
 
 int64_t _mkcgo_go_encryptAESGCM(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2, size_t _arg3, const uint8_t* _arg4, size_t _arg5, const uint8_t* _arg6, size_t _arg7, uint8_t* _arg8, size_t _arg9, uint8_t* _arg10) {
 	return go_encryptAESGCM(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10);
+}
+
+int64_t _mkcgo_go_encryptChaChaPoly(const uint8_t* _arg0, size_t _arg1, const uint8_t* _arg2, size_t _arg3, const uint8_t* _arg4, size_t _arg5, const uint8_t* _arg6, size_t _arg7, uint8_t* _arg8, size_t _arg9, uint8_t* _arg10) {
+	return go_encryptChaChaPoly(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9, _arg10);
 }
 
 int64_t _mkcgo_go_expandHKDF(int32_t _arg0, const uint8_t* _arg1, size_t _arg2, const uint8_t* _arg3, size_t _arg4, uint8_t* _arg5, size_t _arg6) {

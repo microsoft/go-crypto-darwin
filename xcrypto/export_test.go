@@ -16,9 +16,3 @@ var (
 	CiphertextSizeMLKEM1024       = ciphertextSizeMLKEM1024
 	EncapsulationKeySizeMLKEM1024 = encapsulationKeySizeMLKEM1024
 )
-
-// ChaCha20-Poly1305 constants for testing against the stdlib
-var (
-	ChaChaNonceSize = chachaNonceSize
-	ChaChaKeySize   = chachaKeySize
-)

@@ -67,6 +67,10 @@ func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []
 	return int64(C._mkcgo_go_decryptAESGCM((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag))), C.size_t(len(tag)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(out))), (*C.size_t)(unsafe.Pointer(outLength))))
 }
 
+func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
+	return int64(C._mkcgo_go_decryptChaChaPoly((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag))), C.size_t(len(tag)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(out))), (*C.size_t)(unsafe.Pointer(outLength))))
+}
+
 func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int64 {
 	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int64_t(len(encapKey))))
 }
@@ -97,6 +101,10 @@ func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8
 
 func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
 	return int64(C._mkcgo_go_encryptAESGCM((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(cipherText))), C.size_t(len(cipherText)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag)))))
+}
+
+func EncryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
+	return int64(C._mkcgo_go_encryptChaChaPoly((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.size_t(len(key)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.size_t(len(data)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(nonce))), C.size_t(len(nonce)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(aad))), C.size_t(len(aad)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(cipherText))), C.size_t(len(cipherText)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(tag)))))
 }
 
 func ExpandHKDF(hashFunction int32, prk []uint8, info []uint8, okm []uint8) int64 {

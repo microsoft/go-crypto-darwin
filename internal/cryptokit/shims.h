@@ -17,6 +17,10 @@
 int64_t go_encryptAESGCM(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, uint8_t *cipherText, size_t cipherTextLength, uint8_t *tag) __attribute__((static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(cipherText, cipherTextLength), slice(tag)));
 int64_t go_decryptAESGCM(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, const uint8_t *tag, size_t tagLength, uint8_t *out, size_t *outLength) __attribute__((static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(tag, tagLength), slice(out)));
 
+// ChaChaPoly encryption and decryption
+int64_t go_encryptChaChaPoly(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, uint8_t *cipherText, size_t cipherTextLength, uint8_t *tag) __attribute__((static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(cipherText, cipherTextLength), slice(tag)));
+int64_t go_decryptChaChaPoly(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, const uint8_t *tag, size_t tagLength, uint8_t *out, size_t *outLength) __attribute__((static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(tag, tagLength), slice(out)));
+
 // Generates an Ed25519 keypair.
 // The private key is 64 bytes (first 32 bytes are the seed, next 32 bytes are the public key). The public key is 32 bytes.
 void go_generateKeyEd25519(uint8_t *key) __attribute__((static, slice(key)));

@@ -92,6 +92,11 @@ TEXT _mkcgo_go_decryptAESGCM_trampoline<>(SB),NOSPLIT,$0-0
 GLOBL   ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decryptAESGCM_trampoline<>(SB)
 
+TEXT _mkcgo_go_decryptChaChaPoly_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_decryptChaChaPoly(SB)
+GLOBL   ·_mkcgo_go_decryptChaChaPoly_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_decryptChaChaPoly_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decryptChaChaPoly_trampoline<>(SB)
+
 TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_deriveEncapsulationKeyMLKEM1024(SB)
 GLOBL   ·_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
@@ -131,6 +136,11 @@ TEXT _mkcgo_go_encryptAESGCM_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_encryptAESGCM(SB)
 GLOBL   ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA    ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encryptAESGCM_trampoline<>(SB)
+
+TEXT _mkcgo_go_encryptChaChaPoly_trampoline<>(SB),NOSPLIT,$0-0
+    JMP _mkcgo_go_encryptChaChaPoly(SB)
+GLOBL   ·_mkcgo_go_encryptChaChaPoly_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA    ·_mkcgo_go_encryptChaChaPoly_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encryptChaChaPoly_trampoline<>(SB)
 
 TEXT _mkcgo_go_expandHKDF_trampoline<>(SB),NOSPLIT,$0-0
     JMP _mkcgo_go_expandHKDF(SB)

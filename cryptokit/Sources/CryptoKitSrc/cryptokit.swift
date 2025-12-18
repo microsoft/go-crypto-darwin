@@ -88,6 +88,79 @@ public func decryptAESGCM(
     }
 }
 
+@_cdecl("go_encryptChaChaPoly")
+public func encryptChaChaPoly(
+    keyPointer: UnsafePointer<UInt8>,
+    keyLength: Int,
+    dataPointer: UnsafePointer<UInt8>,
+    dataLength: Int,
+    noncePointer: UnsafePointer<UInt8>,
+    nonceLength: Int,
+    aadPointer: UnsafePointer<UInt8>,
+    aadLength: Int,
+    cipherTextPointer: UnsafeMutablePointer<UInt8>,
+    cipherTextLength: Int,
+    tagPointer: UnsafeMutablePointer<UInt8>
+) -> Int {
+    let keyData = Data(bytes: keyPointer, count: keyLength)
+    let data = Data(bytes: dataPointer, count: dataLength)
+    let nonce = try! ChaChaPoly.Nonce(data: Data(bytes: noncePointer, count: nonceLength))
+
+    let symmetricKey = SymmetricKey(data: keyData)
+    let aad: Data = Data(bytes: aadPointer, count: aadLength)
+
+    do {
+        let sealedBox: ChaChaPoly.SealedBox = try ChaChaPoly.seal(
+            data,
+            using: symmetricKey,
+            nonce: nonce,
+            authenticating: aad
+        )
+        let result = sealedBox.ciphertext
+        result.copyBytes(to: cipherTextPointer, count: result.count)
+        let resultTag = Data(sealedBox.tag)
+        resultTag.copyBytes(to: tagPointer, count: sealedBox.tag.count)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@_cdecl("go_decryptChaChaPoly")
+public func decryptChaChaPoly(
+    keyPointer: UnsafePointer<UInt8>,
+    keyLength: Int,
+    dataPointer: UnsafePointer<UInt8>,
+    dataLength: Int,
+    noncePointer: UnsafePointer<UInt8>,
+    nonceLength: Int,
+    aadPointer: UnsafePointer<UInt8>,
+    aadLength: Int,
+    tagPointer: UnsafePointer<UInt8>,
+    tagLength: Int,
+    outPointer: UnsafeMutablePointer<UInt8>,
+    outLength: UnsafeMutablePointer<Int>
+) -> Int {
+    let keyData = Data(bytes: keyPointer, count: keyLength)
+    let nonceData = Data(bytes: noncePointer, count: nonceLength)
+    let symmetricKey: SymmetricKey = SymmetricKey(data: keyData)
+    let nonce: ChaChaPoly.Nonce = try! ChaChaPoly.Nonce(data: nonceData)
+
+    let tag: Data = Data(bytes: tagPointer, count: tagLength)
+    let ciphertext = Data(bytes: dataPointer, count: dataLength)
+    let aad = Data(bytes: aadPointer, count: aadLength)
+
+    do {
+        let sealedBox = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
+        let decryptedData = try ChaChaPoly.open(sealedBox, using: symmetricKey, authenticating: aad)
+        decryptedData.copyBytes(to: outPointer, count: decryptedData.count)
+        outLength.pointee = decryptedData.count
+        return 0
+    } catch {
+        return 1
+    }
+}
+
 var publicKeySizeEd25519 = 32
 var signatureSizeEd25519 = 64
 var seedSizeEd25519 = 32

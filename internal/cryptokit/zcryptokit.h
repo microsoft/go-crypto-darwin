@@ -26,6 +26,7 @@ void* _mkcgo_go_copyHMAC(int32_t, void*);
 int64_t _mkcgo_go_decapsulateMLKEM1024(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_decapsulateMLKEM768(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
+int64_t _mkcgo_go_decryptChaChaPoly(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
 int64_t _mkcgo_go_deriveEncapsulationKeyMLKEM1024(const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_deriveEncapsulationKeyMLKEM768(const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_ecdhSharedSecret(int32_t, const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
@@ -34,6 +35,7 @@ int64_t _mkcgo_go_ecdsaVerify(int32_t, const uint8_t*, int64_t, const uint8_t*, 
 int64_t _mkcgo_go_encapsulateMLKEM1024(const uint8_t*, int64_t, uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_encapsulateMLKEM768(const uint8_t*, int64_t, uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_encryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
+int64_t _mkcgo_go_encryptChaChaPoly(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
 int64_t _mkcgo_go_expandHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 int64_t _mkcgo_go_extractHKDF(int32_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t);
 void _mkcgo_go_finalizeHMAC(int32_t, void*, uint8_t*);

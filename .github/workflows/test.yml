@@ -52,6 +52,22 @@ jobs:
         working-directory: cryptokit
         run: swift test
 
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install Dependencies
+        working-directory: cryptokit
+        run: swift package resolve
+
+      - name: Run iOS Tests
+        working-directory: cryptokit
+        run: |
+          xcodebuild test \
+            -scheme CryptoKitSrc \
+            -destination 'platform=iOS Simulator,name=iPhone 17'
+
   verify-reproducible-build:
     runs-on: macos-26
     steps:
@@ -137,6 +153,7 @@ jobs:
   conclusion:
     needs:
       - test
+      - ios
       - verify-reproducible-build
       - linux-x64
       - linux-arm

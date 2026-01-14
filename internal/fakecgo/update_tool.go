@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const baseURL = "https://raw.githubusercontent.com/ebitengine/purego/main/internal/fakecgo"
@@ -18,11 +19,6 @@ const baseURL = "https://raw.githubusercontent.com/ebitengine/purego/main/intern
 var filesToSkip = makeSet(
 	"update_tool.go",
 	"generate.go",
-)
-
-var noTagModification = makeSet(
-	"libcgo_darwin.go",
-	"zsymbols_darwin.go",
 )
 
 func makeSet(items ...string) map[string]bool {
@@ -76,7 +72,7 @@ func updateFile(name string) error {
 		return fmt.Errorf("failed to read body: %w", err)
 	}
 
-	if !noTagModification[name] {
+	if !strings.Contains(name, "darwin") {
 		content = modifyBuildTags(content)
 	}
 

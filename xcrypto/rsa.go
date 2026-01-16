@@ -6,6 +6,7 @@
 package xcrypto
 
 import (
+	"bytes"
 	"crypto"
 	"errors"
 	"hash"
@@ -102,18 +103,35 @@ func (k *PrivateKeyRSA) withKey(f func(security.SecKeyRef) error) error {
 
 // DecryptRSAOAEP decrypts data using RSA-OAEP.
 func DecryptRSAOAEP(h hash.Hash, priv *PrivateKeyRSA, ciphertext, label []byte) ([]byte, error) {
-	if len(label) > 0 {
-		// https://github.com/microsoft/go-crypto-darwin/issues/22
-		panic("crypto/rsa: label is not supported on macOS")
+	plaintext, err := evpDecrypt(priv.withKey, algorithmTypeOAEP, ciphertext, h)
+	if err != nil {
+		return nil, err
 	}
-	return evpDecrypt(priv.withKey, algorithmTypeOAEP, ciphertext, h)
+	// If a label was provided, validate it
+	if len(label) > 0 {
+		h.Write(label)
+		labelHash := h.Sum(nil)
+		h.Reset()
+		if len(plaintext) < len(labelHash) {
+			return nil, errors.New("invalid ciphertext: missing label hash")
+		}
+		// Extract and verify the label hash
+		if !bytes.Equal(plaintext[:len(labelHash)], labelHash) {
+			return nil, errors.New("invalid label hash")
+		}
+		plaintext = plaintext[len(labelHash):]
+	}
+	return plaintext, nil
 }
 
 // EncryptRSAOAEP encrypts data using RSA-OAEP.
 func EncryptRSAOAEP(h hash.Hash, pub *PublicKeyRSA, msg, label []byte) ([]byte, error) {
+	// Combine label with plaintext for encryption
 	if len(label) > 0 {
-		// https://github.com/microsoft/go-crypto-darwin/issues/22
-		panic("crypto/rsa: label is not supported on macOS")
+		h.Write(label)
+		labelHash := h.Sum(nil)
+		msg = append(labelHash, msg...) // Prepend label hash to the message
+		h.Reset()
 	}
 	return evpEncrypt(pub.withKey, algorithmTypeOAEP, msg, h)
 }

@@ -26,9 +26,9 @@ type CCPadding = C.CCPadding
 type CCPseudoRandomAlgorithm = C.CCPseudoRandomAlgorithm
 
 //go:nosplit
-func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
+func mkcgoNoEscape(p *C.uintptr_t) *C.uintptr_t {
 	x := uintptr(unsafe.Pointer(p))
-	return (*C.mkcgo_err_state)(unsafe.Pointer(x ^ 0))
+	return (*C.uintptr_t)(unsafe.Pointer(x ^ 0))
 }
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {

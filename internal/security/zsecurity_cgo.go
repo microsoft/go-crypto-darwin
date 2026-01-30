@@ -270,9 +270,9 @@ type SecKeyRef = C.SecKeyRef
 type SecRandomRef = C.SecRandomRef
 
 //go:nosplit
-func mkcgoNoEscape(p *C.mkcgo_err_state) *C.mkcgo_err_state {
+func mkcgoNoEscape(p *C.uintptr_t) *C.uintptr_t {
 	x := uintptr(unsafe.Pointer(p))
-	return (*C.mkcgo_err_state)(unsafe.Pointer(x ^ 0))
+	return (*C.uintptr_t)(unsafe.Pointer(x ^ 0))
 }
 
 func CFDataCreate(allocator CFAllocatorRef, bytes []uint8) CFDataRef {

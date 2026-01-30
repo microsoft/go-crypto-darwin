@@ -10,9 +10,7 @@
 #include <stdint.h>
 
 
-typedef void* mkcgo_err_state;
-mkcgo_err_state mkcgo_err_retrieve();
-void mkcgo_err_free(mkcgo_err_state);
+uintptr_t mkcgo_err_retrieve();
 
 void _mkcgo_go_MD5(const uint8_t*, size_t, const uint8_t*);
 void _mkcgo_go_SHA1(const uint8_t*, size_t, const uint8_t*);

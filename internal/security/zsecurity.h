@@ -69,9 +69,7 @@ typedef enum {
 	kCFNumberIntType = 9,
 } CFNumberType;
 
-typedef void* mkcgo_err_state;
-mkcgo_err_state mkcgo_err_retrieve();
-void mkcgo_err_free(mkcgo_err_state);
+uintptr_t mkcgo_err_retrieve();
 
 CFDataRef _mkcgo_CFDataCreate(CFAllocatorRef, const uint8_t*, CFIndex);
 const uint8_t* _mkcgo_CFDataGetBytePtr(CFDataRef);

@@ -61,7 +61,7 @@ jobs:
         run: |
           xcodebuild test \
             -scheme CryptoKitSrc \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
+            -destination "platform=iOS,name=Any iOS Device"
 
   verify-reproducible-build:
     runs-on: macos-26

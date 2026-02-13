@@ -56,9 +56,7 @@ typedef enum {
 	kCCAlgorithmRC4 = 4,
 } CCAlgorithm;
 
-typedef void* mkcgo_err_state;
-mkcgo_err_state mkcgo_err_retrieve();
-void mkcgo_err_free(mkcgo_err_state);
+uintptr_t mkcgo_err_retrieve();
 
 CCCryptorStatus _mkcgo_CCCrypt(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, const unsigned char*, size_t, unsigned char*, size_t, size_t*);
 CCCryptorStatus _mkcgo_CCCryptorCreate(CCOperation, CCAlgorithm, CCOptions, const unsigned char*, size_t, const unsigned char*, CCCryptorRef*);

@@ -1,7 +1,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,50 +18,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.24.x, 1.25.x, gotip]
-        macos-version: [macos-13, macos-14, macos-15, macos-26]
+        go-version: [1.25.x, 1.26.x]
+        macos-version: [macos-14, macos-15, macos-15-intel, macos-26]
         cgo: [0, 1]
-        linkmode: ['internal', 'external']
+        linkmode: ["internal", "external"]
         exclude:
           # CGO_ENABLED=0 is not supported prior to Go 1.26
-          - go-version: 1.24.x
-            cgo: 0
           - go-version: 1.25.x
             cgo: 0
           # internal linking is not supported prior to Go 1.26
-          - go-version: 1.24.x
-            linkmode: 'internal'
           - go-version: 1.25.x
-            linkmode: 'internal'
+            linkmode: "internal"
           # external linking is not supported with CGO_ENABLED=0
-          - linkmode: 'external'
+          - linkmode: "external"
             cgo: 0
     runs-on: ${{ matrix.macos-version }}
     steps:
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
-        if: matrix.go-version != 'gotip'
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
           go-version: ${{ matrix.go-version }}
 
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      # TODO: Remove this when 1.26 is released
-      - name: Setup gotip
-        if: matrix.go-version == 'gotip'
-        uses: ./.github/actions/gotip
-        with:
-          macos-version: ${{ matrix.macos-version }}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Run Go Tests
-        run: CGO_ENABLED=${{ matrix.cgo }} ${{ matrix.go-version == 'gotip' && 'gotip' || 'go' }} test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} go test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit
         run: swift test
+
   verify-reproducible-build:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Backup existing object files
         run: |
@@ -81,32 +75,51 @@ jobs:
             exit 1
           fi
           echo "✅ Object files are reproducible and match the source code"
-  linux:
+
+  linux-x64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version: 1.25
+          go-version: "stable"
 
       - name: Run Build
         run: go build ./...
 
       - name: Run Build (cgoless)
         run: CGO_ENABLED=0 go build ./...
+
+  linux-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version: "stable"
+
+      - name: Run Build for ARM32
+        run: |
+          GOARCH=arm go build ./...
+
+      - name: Run Build for ARM32 (cgoless)
+        run: |
+          CGO_ENABLED=0 GOARCH=arm go build ./...
+
   check-headers:
     strategy:
       fail-fast: false
       matrix:
-        macos-version: [macos-13, macos-14, macos-15, macos-26]
+        macos-version: [macos-14, macos-15, macos-15-intel, macos-26]
     runs-on: ${{ matrix.macos-version }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version: 1.25
+          go-version: "stable"
 
       - name: Run go generate
         run: |
@@ -115,3 +128,21 @@ jobs:
       - name: Check for any changed files
         run: |
           git diff --exit-code || (echo "Generated files are out of date. Please run 'go generate'." && exit 1)
+
+  conclusion:
+    needs:
+      - test
+      - verify-reproducible-build
+      - linux-x64
+      - linux-arm
+      - check-headers
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Result
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more jobs failed or were cancelled."
+            exit 1
+          fi
+          echo "All jobs passed."

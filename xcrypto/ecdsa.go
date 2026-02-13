@@ -7,39 +7,21 @@ package xcrypto
 
 import (
 	"errors"
-	"runtime"
 
-	"github.com/microsoft/go-crypto-darwin/internal/security"
+	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
 
 type PrivateKeyECDSA struct {
-	_pkey security.SecKeyRef
-}
-
-func (k *PrivateKeyECDSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
-	}
-}
-
-func (k *PrivateKeyECDSA) withKey(f func(security.SecKeyRef) error) error {
-	defer runtime.KeepAlive(k)
-	return f(k._pkey)
+	x     BigInt // public key x coordinate
+	y     BigInt // public key y coordinate
+	d     BigInt // private key
+	curve string // curve name
 }
 
 type PublicKeyECDSA struct {
-	_pkey security.SecKeyRef
-}
-
-func (k *PublicKeyECDSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
-	}
-}
-
-func (k *PublicKeyECDSA) withKey(f func(security.SecKeyRef) error) error {
-	defer runtime.KeepAlive(k)
-	return f(k._pkey)
+	x     BigInt // public key x coordinate
+	y     BigInt // public key y coordinate
+	curve string // curve name
 }
 
 func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
@@ -47,18 +29,15 @@ func NewPublicKeyECDSA(curve string, x, y BigInt) (*PublicKeyECDSA, error) {
 	if keySize == 0 {
 		return nil, errors.New("unsupported curve")
 	}
-	encodedKey, err := encodeToUncompressedAnsiX963Key(x, y, nil, keySize)
-	if err != nil {
-		return nil, errors.New("failed to encode public key to uncompressed ANSI X9.63 format")
+	// Validate that x and y are of appropriate length
+	if len(x) > keySize || len(y) > keySize {
+		return nil, errors.New("public key coordinates are too large")
 	}
-
-	pubKeyRef, err := createSecKeyWithData(encodedKey, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPublic)
-	if err != nil {
-		return nil, err
+	pubKey := &PublicKeyECDSA{
+		x:     x,
+		y:     y,
+		curve: curve,
 	}
-
-	pubKey := &PublicKeyECDSA{_pkey: pubKeyRef}
-	runtime.SetFinalizer(pubKey, (*PublicKeyECDSA).finalize)
 	return pubKey, nil
 }
 
@@ -68,20 +47,17 @@ func NewPrivateKeyECDSA(curve string, x, y, d BigInt) (*PrivateKeyECDSA, error) 
 	if keySize == 0 {
 		return nil, errors.New("unsupported curve")
 	}
-	encodedKey, err := encodeToUncompressedAnsiX963Key(x, y, d, keySize)
-	if err != nil {
-		return nil, errors.New("crypto/ecdsa: failed to encode private key: " + err.Error())
+	// Validate that x, y, and d are of appropriate length
+	if len(x) > keySize || len(y) > keySize || len(d) > keySize {
+		return nil, errors.New("key parameters are too large")
 	}
-
-	privKeyRef, err := createSecKeyWithData(encodedKey, security.KSecAttrKeyTypeECSECPrimeRandom, security.KSecAttrKeyClassPrivate)
-	if err != nil {
-		return nil, err
+	privKey := &PrivateKeyECDSA{
+		x:     x,
+		y:     y,
+		d:     d,
+		curve: curve,
 	}
-
-	// Wrap and finalize
-	k := &PrivateKeyECDSA{_pkey: privKeyRef}
-	runtime.SetFinalizer(k, (*PrivateKeyECDSA).finalize)
-	return k, nil
+	return privKey, nil
 }
 
 func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
@@ -90,59 +66,83 @@ func GenerateKeyECDSA(curve string) (x, y, d BigInt, err error) {
 		return nil, nil, nil, errors.New("unsupported curve")
 	}
 
-	keySizeInBits := curveToKeySizeInBits(curve)
-	privKeyDER, privKeyRef, err := createSecKeyRandom(security.KSecAttrKeyTypeECSECPrimeRandom, keySizeInBits)
+	curveID, err := curveToID(curve)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	defer security.CFRelease(security.CFTypeRef(privKeyRef))
-	return decodeFromUncompressedAnsiX963Key(privKeyDER, keySize)
+
+	// Generate key using CryptoKit
+	xBytes := make([]byte, keySize)
+	yBytes := make([]byte, keySize)
+	dBytes := make([]byte, keySize)
+
+	ret := cryptokit.GenerateKeyECDSA(curveID, xBytes, yBytes, dBytes)
+	if ret != 0 {
+		return nil, nil, nil, errors.New("ECDSA key generation failed")
+	}
+
+	return normalizeBigInt(xBytes), normalizeBigInt(yBytes), normalizeBigInt(dBytes), nil
 }
 
 func SignMarshalECDSA(priv *PrivateKeyECDSA, hashed []byte) ([]byte, error) {
-	return evpSign(priv.withKey, algorithmTypeECDSA, 0, hashed)
-}
-
-func VerifyECDSA(pub *PublicKeyECDSA, hashed []byte, sig []byte) bool {
-	return evpVerify(pub.withKey, algorithmTypeECDSA, 0, hashed, sig) == nil
-}
-
-// encodeToUncompressedAnsiX963Key encodes the given elliptic curve point (x, y) and optional private key (d)
-// into an uncompressed ANSI X9.63 format byte slice.
-func encodeToUncompressedAnsiX963Key(x, y, d BigInt, keySize int) ([]byte, error) {
-	// Build the uncompressed key point (0x04 || x || y { || d })
-	size := 1 + keySize*2
-	if d != nil {
-		size += keySize
+	if priv == nil || len(hashed) == 0 {
+		return nil, errors.New("invalid parameters")
 	}
-	out := make([]byte, size)
-	out[0] = 0x04
-	err := encodeBigInt(out[1:], []sizedBigInt{
-		{x, keySize}, {y, keySize},
-		{d, keySize},
-	})
+
+	curveID, err := curveToID(priv.curve)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+
+	keySize := curveToKeySizeInBytes(priv.curve)
+
+	// Normalize private key to proper size
+	dBytes := make([]byte, keySize)
+	copy(dBytes[len(dBytes)-len(priv.d):], priv.d)
+
+	// Allocate signature buffer (max size for DER-encoded signature)
+	maxSigLen := 256
+	signature := make([]byte, maxSigLen)
+	sigLen := int64(0)
+
+	ret := cryptokit.EcdsaSign(curveID, dBytes, hashed, signature, &sigLen)
+	if ret != 0 {
+		return nil, errors.New("ECDSA signing failed")
+	}
+
+	if sigLen <= 0 || sigLen > int64(len(signature)) {
+		return nil, errors.New("invalid signature length")
+	}
+
+	return signature[:sigLen], nil
 }
 
-// decodeFromUncompressedAnsiX963Key decodes the given uncompressed ANSI X9.63 format byte slice into
-// the elliptic curve point (x, y) and optional private key (d).
-func decodeFromUncompressedAnsiX963Key(key []byte, keySize int) (x, y, d BigInt, err error) {
-	if len(key) < 1 || key[0] != 0x04 {
-		return nil, nil, nil, errors.New("invalid uncompressed key format")
+func VerifyECDSA(pub *PublicKeyECDSA, hashed []byte, sig []byte) bool {
+	if pub == nil || len(hashed) == 0 || len(sig) == 0 {
+		return false
 	}
-	if len(key) < 1+keySize*2 {
-		return nil, nil, nil, errors.New("invalid key length")
+
+	curveID, err := curveToID(pub.curve)
+	if err != nil {
+		return false
 	}
-	x = normalizeBigInt(key[1 : 1+keySize])
-	y = normalizeBigInt(key[1+keySize : 1+keySize*2])
-	if len(key) > 1+keySize*2 {
-		d = normalizeBigInt(key[1+keySize*2:])
-		return x, y, d, nil
+
+	keySize := curveToKeySizeInBytes(pub.curve)
+
+	// Normalize public key coordinates to proper size
+	xBytes := make([]byte, keySize)
+	yBytes := make([]byte, keySize)
+
+	// Safety check: ensure BigInts are not longer than keySize
+	if len(pub.x) > keySize || len(pub.y) > keySize {
+		return false
 	}
-	return x, y, nil, nil
+
+	copy(xBytes[len(xBytes)-len(pub.x):], pub.x)
+	copy(yBytes[len(yBytes)-len(pub.y):], pub.y)
+
+	ret := cryptokit.EcdsaVerify(curveID, xBytes, yBytes, hashed, sig)
+	return ret == 1
 }
 
 func normalizeBigInt(b []byte) BigInt {
@@ -151,31 +151,4 @@ func normalizeBigInt(b []byte) BigInt {
 		b = b[1:]
 	}
 	return b
-}
-
-// sizedBigInt defines a big integer with
-// a size that can be different from the
-// one provided by len(b).
-type sizedBigInt struct {
-	b    BigInt
-	size int
-}
-
-// encodeBigInt encodes ints into data.
-// It stops iterating over ints when it finds one nil element.
-func encodeBigInt(data []byte, ints []sizedBigInt) error {
-	for _, v := range ints {
-		if v.b == nil {
-			return nil
-		}
-		normalized := normalizeBigInt(v.b)
-		// b might be shorter than size if the original big number contained leading zeros.
-		leadingZeros := int(v.size) - len(normalized)
-		if leadingZeros < 0 {
-			return errors.New("commoncrypto: invalid parameters")
-		}
-		copy(data[leadingZeros:], normalized)
-		data = data[v.size:]
-	}
-	return nil
 }

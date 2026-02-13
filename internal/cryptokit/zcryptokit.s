@@ -7,7 +7,6 @@
 
 #include "textflag.h"
 
-
 #ifndef GOARCH_amd64
 #ifndef GOARCH_arm64
 #ifndef GOARCH_riscv64
@@ -28,212 +27,312 @@
 #endif
 #endif
 
-
 #ifndef _GOPTRSIZE
 #define _GOPTRSIZE 8
 #endif
-TEXT _mkcgo_go_MD5_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_MD5(SB)
-GLOBL   ·_mkcgo_go_MD5_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_MD5_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_MD5_trampoline<>(SB)
+TEXT _mkcgo_go_MD5_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_MD5(SB)
 
-TEXT _mkcgo_go_SHA1_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA1(SB)
-GLOBL   ·_mkcgo_go_SHA1_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA1_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA1_trampoline<>(SB)
+GLOBL ·_mkcgo_go_MD5_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_MD5_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_MD5_trampoline<>(SB)
 
-TEXT _mkcgo_go_SHA224_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA224(SB)
-GLOBL   ·_mkcgo_go_SHA224_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA224_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA224_trampoline<>(SB)
+TEXT _mkcgo_go_SHA1_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA1(SB)
 
-TEXT _mkcgo_go_SHA256_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA256(SB)
-GLOBL   ·_mkcgo_go_SHA256_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA256_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA256_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA1_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA1_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA1_trampoline<>(SB)
 
-TEXT _mkcgo_go_SHA384_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA384(SB)
-GLOBL   ·_mkcgo_go_SHA384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA384_trampoline<>(SB)
+TEXT _mkcgo_go_SHA224_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA224(SB)
 
-TEXT _mkcgo_go_SHA3_256_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA3_256(SB)
-GLOBL   ·_mkcgo_go_SHA3_256_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA3_256_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_256_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA224_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA224_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA224_trampoline<>(SB)
 
-TEXT _mkcgo_go_SHA3_384_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA3_384(SB)
-GLOBL   ·_mkcgo_go_SHA3_384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA3_384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_384_trampoline<>(SB)
+TEXT _mkcgo_go_SHA256_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA256(SB)
 
-TEXT _mkcgo_go_SHA3_512_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA3_512(SB)
-GLOBL   ·_mkcgo_go_SHA3_512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA3_512_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_512_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA256_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA256_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA256_trampoline<>(SB)
 
-TEXT _mkcgo_go_SHA512_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_SHA512(SB)
-GLOBL   ·_mkcgo_go_SHA512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_SHA512_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA512_trampoline<>(SB)
+TEXT _mkcgo_go_SHA384_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA384(SB)
 
-TEXT _mkcgo_go_copyHMAC_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_copyHMAC(SB)
-GLOBL   ·_mkcgo_go_copyHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_copyHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_copyHMAC_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA384_trampoline<>(SB)
 
-TEXT _mkcgo_go_decapsulateMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_decapsulateMLKEM1024(SB)
-GLOBL   ·_mkcgo_go_decapsulateMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_decapsulateMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decapsulateMLKEM1024_trampoline<>(SB)
+TEXT _mkcgo_go_SHA3_256_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA3_256(SB)
 
-TEXT _mkcgo_go_decapsulateMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_decapsulateMLKEM768(SB)
-GLOBL   ·_mkcgo_go_decapsulateMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_decapsulateMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decapsulateMLKEM768_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA3_256_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA3_256_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_256_trampoline<>(SB)
 
-TEXT _mkcgo_go_decryptAESGCM_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_decryptAESGCM(SB)
-GLOBL   ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decryptAESGCM_trampoline<>(SB)
+TEXT _mkcgo_go_SHA3_384_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA3_384(SB)
 
-TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_deriveEncapsulationKeyMLKEM1024(SB)
-GLOBL   ·_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA3_384_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA3_384_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_384_trampoline<>(SB)
 
-TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_deriveEncapsulationKeyMLKEM768(SB)
-GLOBL   ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB)
+TEXT _mkcgo_go_SHA3_512_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA3_512(SB)
 
-TEXT _mkcgo_go_encapsulateMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_encapsulateMLKEM1024(SB)
-GLOBL   ·_mkcgo_go_encapsulateMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_encapsulateMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encapsulateMLKEM1024_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA3_512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA3_512_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA3_512_trampoline<>(SB)
 
-TEXT _mkcgo_go_encapsulateMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_encapsulateMLKEM768(SB)
-GLOBL   ·_mkcgo_go_encapsulateMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_encapsulateMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encapsulateMLKEM768_trampoline<>(SB)
+TEXT _mkcgo_go_SHA512_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_SHA512(SB)
 
-TEXT _mkcgo_go_encryptAESGCM_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_encryptAESGCM(SB)
-GLOBL   ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encryptAESGCM_trampoline<>(SB)
+GLOBL ·_mkcgo_go_SHA512_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_SHA512_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_SHA512_trampoline<>(SB)
 
-TEXT _mkcgo_go_expandHKDF_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_expandHKDF(SB)
-GLOBL   ·_mkcgo_go_expandHKDF_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_expandHKDF_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_expandHKDF_trampoline<>(SB)
+TEXT _mkcgo_go_copyHMAC_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_copyHMAC(SB)
 
-TEXT _mkcgo_go_extractHKDF_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_extractHKDF(SB)
-GLOBL   ·_mkcgo_go_extractHKDF_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_extractHKDF_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_extractHKDF_trampoline<>(SB)
+GLOBL ·_mkcgo_go_copyHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_copyHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_copyHMAC_trampoline<>(SB)
 
-TEXT _mkcgo_go_finalizeHMAC_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_finalizeHMAC(SB)
-GLOBL   ·_mkcgo_go_finalizeHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_finalizeHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_finalizeHMAC_trampoline<>(SB)
+TEXT _mkcgo_go_decapsulateMLKEM1024_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_decapsulateMLKEM1024(SB)
 
-TEXT _mkcgo_go_freeHMAC_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_freeHMAC(SB)
-GLOBL   ·_mkcgo_go_freeHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_freeHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_freeHMAC_trampoline<>(SB)
+GLOBL ·_mkcgo_go_decapsulateMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_decapsulateMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decapsulateMLKEM1024_trampoline<>(SB)
 
-TEXT _mkcgo_go_generateKeyEd25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_generateKeyEd25519(SB)
-GLOBL   ·_mkcgo_go_generateKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_generateKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyEd25519_trampoline<>(SB)
+TEXT _mkcgo_go_decapsulateMLKEM768_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_decapsulateMLKEM768(SB)
 
-TEXT _mkcgo_go_generateKeyMLKEM1024_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_generateKeyMLKEM1024(SB)
-GLOBL   ·_mkcgo_go_generateKeyMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_generateKeyMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM1024_trampoline<>(SB)
+GLOBL ·_mkcgo_go_decapsulateMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_decapsulateMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decapsulateMLKEM768_trampoline<>(SB)
 
-TEXT _mkcgo_go_generateKeyMLKEM768_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_generateKeyMLKEM768(SB)
-GLOBL   ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM768_trampoline<>(SB)
+TEXT _mkcgo_go_decryptAESGCM_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_decryptAESGCM(SB)
 
-TEXT _mkcgo_go_hashBlockSize_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashBlockSize(SB)
-GLOBL   ·_mkcgo_go_hashBlockSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashBlockSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashBlockSize_trampoline<>(SB)
+GLOBL ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_decryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decryptAESGCM_trampoline<>(SB)
 
-TEXT _mkcgo_go_hashCopy_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashCopy(SB)
-GLOBL   ·_mkcgo_go_hashCopy_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashCopy_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashCopy_trampoline<>(SB)
+TEXT _mkcgo_go_decryptChaChaPoly_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_decryptChaChaPoly(SB)
 
-TEXT _mkcgo_go_hashFree_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashFree(SB)
-GLOBL   ·_mkcgo_go_hashFree_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashFree_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashFree_trampoline<>(SB)
+GLOBL ·_mkcgo_go_decryptChaChaPoly_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_decryptChaChaPoly_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_decryptChaChaPoly_trampoline<>(SB)
 
-TEXT _mkcgo_go_hashNew_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashNew(SB)
-GLOBL   ·_mkcgo_go_hashNew_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashNew_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashNew_trampoline<>(SB)
+TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_deriveEncapsulationKeyMLKEM1024(SB)
 
-TEXT _mkcgo_go_hashReset_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashReset(SB)
-GLOBL   ·_mkcgo_go_hashReset_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashReset_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashReset_trampoline<>(SB)
+GLOBL ·_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_deriveEncapsulationKeyMLKEM1024_trampoline<>(SB)
 
-TEXT _mkcgo_go_hashSize_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashSize(SB)
-GLOBL   ·_mkcgo_go_hashSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashSize_trampoline<>(SB)
+TEXT _mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_deriveEncapsulationKeyMLKEM768(SB)
 
-TEXT _mkcgo_go_hashSum_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashSum(SB)
-GLOBL   ·_mkcgo_go_hashSum_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashSum_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashSum_trampoline<>(SB)
+GLOBL ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_deriveEncapsulationKeyMLKEM768_trampoline<>(SB)
 
-TEXT _mkcgo_go_hashWrite_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_hashWrite(SB)
-GLOBL   ·_mkcgo_go_hashWrite_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_hashWrite_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashWrite_trampoline<>(SB)
+TEXT _mkcgo_go_ecdhSharedSecret_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_ecdhSharedSecret(SB)
 
-TEXT _mkcgo_go_initHMAC_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_initHMAC(SB)
-GLOBL   ·_mkcgo_go_initHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_initHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_initHMAC_trampoline<>(SB)
+GLOBL ·_mkcgo_go_ecdhSharedSecret_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_ecdhSharedSecret_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdhSharedSecret_trampoline<>(SB)
 
-TEXT _mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_newPrivateKeyEd25519FromSeed(SB)
-GLOBL   ·_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline<>(SB)
+TEXT _mkcgo_go_ecdsaSign_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_ecdsaSign(SB)
 
-TEXT _mkcgo_go_newPublicKeyEd25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_newPublicKeyEd25519(SB)
-GLOBL   ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPublicKeyEd25519_trampoline<>(SB)
+GLOBL ·_mkcgo_go_ecdsaSign_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_ecdsaSign_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdsaSign_trampoline<>(SB)
 
-TEXT _mkcgo_go_signEd25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_signEd25519(SB)
-GLOBL   ·_mkcgo_go_signEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_signEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_signEd25519_trampoline<>(SB)
+TEXT _mkcgo_go_ecdsaVerify_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_ecdsaVerify(SB)
 
-TEXT _mkcgo_go_supportsMLKEM_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_supportsMLKEM(SB)
-GLOBL   ·_mkcgo_go_supportsMLKEM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_supportsMLKEM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_supportsMLKEM_trampoline<>(SB)
+GLOBL ·_mkcgo_go_ecdsaVerify_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_ecdsaVerify_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_ecdsaVerify_trampoline<>(SB)
 
-TEXT _mkcgo_go_supportsSHA3_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_supportsSHA3(SB)
-GLOBL   ·_mkcgo_go_supportsSHA3_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_supportsSHA3_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_supportsSHA3_trampoline<>(SB)
+TEXT _mkcgo_go_encapsulateMLKEM1024_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_encapsulateMLKEM1024(SB)
 
-TEXT _mkcgo_go_updateHMAC_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_updateHMAC(SB)
-GLOBL   ·_mkcgo_go_updateHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_updateHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_updateHMAC_trampoline<>(SB)
+GLOBL ·_mkcgo_go_encapsulateMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_encapsulateMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encapsulateMLKEM1024_trampoline<>(SB)
 
-TEXT _mkcgo_go_verifyEd25519_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_go_verifyEd25519(SB)
-GLOBL   ·_mkcgo_go_verifyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_go_verifyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_verifyEd25519_trampoline<>(SB)
+TEXT _mkcgo_go_encapsulateMLKEM768_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_encapsulateMLKEM768(SB)
+
+GLOBL ·_mkcgo_go_encapsulateMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_encapsulateMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encapsulateMLKEM768_trampoline<>(SB)
+
+TEXT _mkcgo_go_encryptAESGCM_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_encryptAESGCM(SB)
+
+GLOBL ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_encryptAESGCM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encryptAESGCM_trampoline<>(SB)
+
+TEXT _mkcgo_go_encryptChaChaPoly_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_encryptChaChaPoly(SB)
+
+GLOBL ·_mkcgo_go_encryptChaChaPoly_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_encryptChaChaPoly_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_encryptChaChaPoly_trampoline<>(SB)
+
+TEXT _mkcgo_go_expandHKDF_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_expandHKDF(SB)
+
+GLOBL ·_mkcgo_go_expandHKDF_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_expandHKDF_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_expandHKDF_trampoline<>(SB)
+
+TEXT _mkcgo_go_extractHKDF_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_extractHKDF(SB)
+
+GLOBL ·_mkcgo_go_extractHKDF_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_extractHKDF_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_extractHKDF_trampoline<>(SB)
+
+TEXT _mkcgo_go_finalizeHMAC_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_finalizeHMAC(SB)
+
+GLOBL ·_mkcgo_go_finalizeHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_finalizeHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_finalizeHMAC_trampoline<>(SB)
+
+TEXT _mkcgo_go_freeHMAC_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_freeHMAC(SB)
+
+GLOBL ·_mkcgo_go_freeHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_freeHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_freeHMAC_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyECDH_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_generateKeyECDH(SB)
+
+GLOBL ·_mkcgo_go_generateKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_generateKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyECDSA_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_generateKeyECDSA(SB)
+
+GLOBL ·_mkcgo_go_generateKeyECDSA_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_generateKeyECDSA_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyECDSA_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyEd25519_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_generateKeyEd25519(SB)
+
+GLOBL ·_mkcgo_go_generateKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_generateKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyEd25519_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyMLKEM1024_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_generateKeyMLKEM1024(SB)
+
+GLOBL ·_mkcgo_go_generateKeyMLKEM1024_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_generateKeyMLKEM1024_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM1024_trampoline<>(SB)
+
+TEXT _mkcgo_go_generateKeyMLKEM768_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_generateKeyMLKEM768(SB)
+
+GLOBL ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_generateKeyMLKEM768_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_generateKeyMLKEM768_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashBlockSize_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashBlockSize(SB)
+
+GLOBL ·_mkcgo_go_hashBlockSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashBlockSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashBlockSize_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashCopy_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashCopy(SB)
+
+GLOBL ·_mkcgo_go_hashCopy_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashCopy_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashCopy_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashFree_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashFree(SB)
+
+GLOBL ·_mkcgo_go_hashFree_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashFree_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashFree_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashNew_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashNew(SB)
+
+GLOBL ·_mkcgo_go_hashNew_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashNew_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashNew_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashReset_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashReset(SB)
+
+GLOBL ·_mkcgo_go_hashReset_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashReset_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashReset_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashSize_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashSize(SB)
+
+GLOBL ·_mkcgo_go_hashSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashSize_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashSum_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashSum(SB)
+
+GLOBL ·_mkcgo_go_hashSum_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashSum_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashSum_trampoline<>(SB)
+
+TEXT _mkcgo_go_hashWrite_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_hashWrite(SB)
+
+GLOBL ·_mkcgo_go_hashWrite_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_hashWrite_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_hashWrite_trampoline<>(SB)
+
+TEXT _mkcgo_go_initHMAC_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_initHMAC(SB)
+
+GLOBL ·_mkcgo_go_initHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_initHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_initHMAC_trampoline<>(SB)
+
+TEXT _mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_newPrivateKeyEd25519FromSeed(SB)
+
+GLOBL ·_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPrivateKeyEd25519FromSeed_trampoline<>(SB)
+
+TEXT _mkcgo_go_newPublicKeyEd25519_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_newPublicKeyEd25519(SB)
+
+GLOBL ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_newPublicKeyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_newPublicKeyEd25519_trampoline<>(SB)
+
+TEXT _mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_publicKeyFromPrivateECDH(SB)
+
+GLOBL ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_publicKeyFromPrivateECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_publicKeyFromPrivateECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_signEd25519_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_signEd25519(SB)
+
+GLOBL ·_mkcgo_go_signEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_signEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_signEd25519_trampoline<>(SB)
+
+TEXT _mkcgo_go_supportsMLKEM_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_supportsMLKEM(SB)
+
+GLOBL ·_mkcgo_go_supportsMLKEM_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_supportsMLKEM_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_supportsMLKEM_trampoline<>(SB)
+
+TEXT _mkcgo_go_supportsSHA3_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_supportsSHA3(SB)
+
+GLOBL ·_mkcgo_go_supportsSHA3_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_supportsSHA3_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_supportsSHA3_trampoline<>(SB)
+
+TEXT _mkcgo_go_updateHMAC_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_updateHMAC(SB)
+
+GLOBL ·_mkcgo_go_updateHMAC_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_updateHMAC_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_updateHMAC_trampoline<>(SB)
+
+TEXT _mkcgo_go_validatePrivateKeyECDH_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_validatePrivateKeyECDH(SB)
+
+GLOBL ·_mkcgo_go_validatePrivateKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_validatePrivateKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_validatePrivateKeyECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_validatePublicKeyECDH_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_validatePublicKeyECDH(SB)
+
+GLOBL ·_mkcgo_go_validatePublicKeyECDH_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_validatePublicKeyECDH_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_validatePublicKeyECDH_trampoline<>(SB)
+
+TEXT _mkcgo_go_verifyEd25519_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_go_verifyEd25519(SB)
+
+GLOBL ·_mkcgo_go_verifyEd25519_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_go_verifyEd25519_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_go_verifyEd25519_trampoline<>(SB)
 

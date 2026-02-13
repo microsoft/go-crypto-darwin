@@ -357,3 +357,20 @@ func TestHKDFUnsupportedHash(t *testing.T) {
 		t.Error("expected error for unsupported hash")
 	}
 }
+
+func TestExpandHKDFZeroLengthKey(t *testing.T) {
+	hash := xcrypto.NewSHA256
+	master := []byte{0x00, 0x01, 0x02, 0x03}
+	info := []byte{}
+	prk, err := xcrypto.ExtractHKDF(hash, master, nil)
+	if err != nil {
+		t.Fatalf("error extracting HKDF: %v.", err)
+	}
+	out, err := xcrypto.ExpandHKDF(hash, prk, info, 0)
+	if err != nil {
+		t.Errorf("error expanding HKDF zero-length key: %v.", err)
+	}
+	if len(out) != 0 {
+		t.Errorf("incorrect output length for zero-length key: have %d, need 0.", len(out))
+	}
+}

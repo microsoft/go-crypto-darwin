@@ -7,7 +7,6 @@
 
 #include "textflag.h"
 
-
 #ifndef GOARCH_amd64
 #ifndef GOARCH_arm64
 #ifndef GOARCH_riscv64
@@ -28,127 +27,144 @@
 #endif
 #endif
 
-
 #ifndef _GOPTRSIZE
 #define _GOPTRSIZE 8
 #endif
-TEXT _mkcgo_CFDataCreate_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDataCreate(SB)
-GLOBL   ·_mkcgo_CFDataCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDataCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataCreate_trampoline<>(SB)
+TEXT _mkcgo_CFDataCreate_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDataCreate(SB)
 
-TEXT _mkcgo_CFDataGetBytePtr_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDataGetBytePtr(SB)
-GLOBL   ·_mkcgo_CFDataGetBytePtr_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDataGetBytePtr_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataGetBytePtr_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDataCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDataCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataCreate_trampoline<>(SB)
 
-TEXT _mkcgo_CFDataGetLength_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDataGetLength(SB)
-GLOBL   ·_mkcgo_CFDataGetLength_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDataGetLength_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataGetLength_trampoline<>(SB)
+TEXT _mkcgo_CFDataGetBytePtr_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDataGetBytePtr(SB)
 
-TEXT _mkcgo_CFDictionaryCreate_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDictionaryCreate(SB)
-GLOBL   ·_mkcgo_CFDictionaryCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDictionaryCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionaryCreate_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDataGetBytePtr_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDataGetBytePtr_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataGetBytePtr_trampoline<>(SB)
 
-TEXT _mkcgo_CFDictionaryCreateMutable_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDictionaryCreateMutable(SB)
-GLOBL   ·_mkcgo_CFDictionaryCreateMutable_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDictionaryCreateMutable_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionaryCreateMutable_trampoline<>(SB)
+TEXT _mkcgo_CFDataGetLength_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDataGetLength(SB)
 
-TEXT _mkcgo_CFDictionarySetValue_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFDictionarySetValue(SB)
-GLOBL   ·_mkcgo_CFDictionarySetValue_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFDictionarySetValue_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionarySetValue_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDataGetLength_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDataGetLength_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDataGetLength_trampoline<>(SB)
 
-TEXT _mkcgo_CFErrorCopyDescription_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFErrorCopyDescription(SB)
-GLOBL   ·_mkcgo_CFErrorCopyDescription_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFErrorCopyDescription_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFErrorCopyDescription_trampoline<>(SB)
+TEXT _mkcgo_CFDictionaryCreate_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDictionaryCreate(SB)
 
-TEXT _mkcgo_CFErrorGetCode_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFErrorGetCode(SB)
-GLOBL   ·_mkcgo_CFErrorGetCode_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFErrorGetCode_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFErrorGetCode_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDictionaryCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDictionaryCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionaryCreate_trampoline<>(SB)
 
-TEXT _mkcgo_CFNumberCreate_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFNumberCreate(SB)
-GLOBL   ·_mkcgo_CFNumberCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFNumberCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFNumberCreate_trampoline<>(SB)
+TEXT _mkcgo_CFDictionaryCreateMutable_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDictionaryCreateMutable(SB)
 
-TEXT _mkcgo_CFRelease_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFRelease(SB)
-GLOBL   ·_mkcgo_CFRelease_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFRelease_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFRelease_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDictionaryCreateMutable_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDictionaryCreateMutable_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionaryCreateMutable_trampoline<>(SB)
 
-TEXT _mkcgo_CFStringGetCStringPtr_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFStringGetCStringPtr(SB)
-GLOBL   ·_mkcgo_CFStringGetCStringPtr_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFStringGetCStringPtr_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFStringGetCStringPtr_trampoline<>(SB)
+TEXT _mkcgo_CFDictionarySetValue_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFDictionarySetValue(SB)
 
-TEXT _mkcgo_CFStringGetLength_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_CFStringGetLength(SB)
-GLOBL   ·_mkcgo_CFStringGetLength_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_CFStringGetLength_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFStringGetLength_trampoline<>(SB)
+GLOBL ·_mkcgo_CFDictionarySetValue_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFDictionarySetValue_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFDictionarySetValue_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCopyExternalRepresentation(SB)
-GLOBL   ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB)
+TEXT _mkcgo_CFErrorCopyDescription_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFErrorCopyDescription(SB)
 
-TEXT _mkcgo_SecKeyCopyKeyExchangeResult_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCopyKeyExchangeResult(SB)
-GLOBL   ·_mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCopyKeyExchangeResult_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyKeyExchangeResult_trampoline<>(SB)
+GLOBL ·_mkcgo_CFErrorCopyDescription_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFErrorCopyDescription_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFErrorCopyDescription_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyCopyPublicKey_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCopyPublicKey(SB)
-GLOBL   ·_mkcgo_SecKeyCopyPublicKey_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCopyPublicKey_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyPublicKey_trampoline<>(SB)
+TEXT _mkcgo_CFErrorGetCode_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFErrorGetCode(SB)
 
-TEXT _mkcgo_SecKeyCreateDecryptedData_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCreateDecryptedData(SB)
-GLOBL   ·_mkcgo_SecKeyCreateDecryptedData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCreateDecryptedData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateDecryptedData_trampoline<>(SB)
+GLOBL ·_mkcgo_CFErrorGetCode_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFErrorGetCode_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFErrorGetCode_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyCreateEncryptedData_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCreateEncryptedData(SB)
-GLOBL   ·_mkcgo_SecKeyCreateEncryptedData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCreateEncryptedData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateEncryptedData_trampoline<>(SB)
+TEXT _mkcgo_CFNumberCreate_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFNumberCreate(SB)
 
-TEXT _mkcgo_SecKeyCreateRandomKey_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCreateRandomKey(SB)
-GLOBL   ·_mkcgo_SecKeyCreateRandomKey_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCreateRandomKey_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateRandomKey_trampoline<>(SB)
+GLOBL ·_mkcgo_CFNumberCreate_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFNumberCreate_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFNumberCreate_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyCreateSignature_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCreateSignature(SB)
-GLOBL   ·_mkcgo_SecKeyCreateSignature_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCreateSignature_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateSignature_trampoline<>(SB)
+TEXT _mkcgo_CFRelease_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFRelease(SB)
 
-TEXT _mkcgo_SecKeyCreateWithData_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyCreateWithData(SB)
-GLOBL   ·_mkcgo_SecKeyCreateWithData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyCreateWithData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateWithData_trampoline<>(SB)
+GLOBL ·_mkcgo_CFRelease_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFRelease_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFRelease_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyGetBlockSize_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyGetBlockSize(SB)
-GLOBL   ·_mkcgo_SecKeyGetBlockSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyGetBlockSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyGetBlockSize_trampoline<>(SB)
+TEXT _mkcgo_CFStringGetCStringPtr_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFStringGetCStringPtr(SB)
 
-TEXT _mkcgo_SecKeyIsAlgorithmSupported_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyIsAlgorithmSupported(SB)
-GLOBL   ·_mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyIsAlgorithmSupported_trampoline<>(SB)
+GLOBL ·_mkcgo_CFStringGetCStringPtr_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFStringGetCStringPtr_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFStringGetCStringPtr_trampoline<>(SB)
 
-TEXT _mkcgo_SecKeyVerifySignature_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecKeyVerifySignature(SB)
-GLOBL   ·_mkcgo_SecKeyVerifySignature_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecKeyVerifySignature_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyVerifySignature_trampoline<>(SB)
+TEXT _mkcgo_CFStringGetLength_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_CFStringGetLength(SB)
 
-TEXT _mkcgo_SecRandomCopyBytes_trampoline<>(SB),NOSPLIT,$0-0
-    JMP _mkcgo_SecRandomCopyBytes(SB)
-GLOBL   ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB), RODATA, $_GOPTRSIZE
-DATA    ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecRandomCopyBytes_trampoline<>(SB)
+GLOBL ·_mkcgo_CFStringGetLength_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_CFStringGetLength_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_CFStringGetLength_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCopyExternalRepresentation(SB)
+
+GLOBL ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyExternalRepresentation_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCopyPublicKey_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCopyPublicKey(SB)
+
+GLOBL ·_mkcgo_SecKeyCopyPublicKey_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCopyPublicKey_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCopyPublicKey_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCreateDecryptedData_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCreateDecryptedData(SB)
+
+GLOBL ·_mkcgo_SecKeyCreateDecryptedData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCreateDecryptedData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateDecryptedData_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCreateEncryptedData_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCreateEncryptedData(SB)
+
+GLOBL ·_mkcgo_SecKeyCreateEncryptedData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCreateEncryptedData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateEncryptedData_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCreateRandomKey_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCreateRandomKey(SB)
+
+GLOBL ·_mkcgo_SecKeyCreateRandomKey_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCreateRandomKey_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateRandomKey_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCreateSignature_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCreateSignature(SB)
+
+GLOBL ·_mkcgo_SecKeyCreateSignature_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCreateSignature_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateSignature_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyCreateWithData_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyCreateWithData(SB)
+
+GLOBL ·_mkcgo_SecKeyCreateWithData_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyCreateWithData_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyCreateWithData_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyGetBlockSize_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyGetBlockSize(SB)
+
+GLOBL ·_mkcgo_SecKeyGetBlockSize_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyGetBlockSize_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyGetBlockSize_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyIsAlgorithmSupported_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyIsAlgorithmSupported(SB)
+
+GLOBL ·_mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyIsAlgorithmSupported_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyIsAlgorithmSupported_trampoline<>(SB)
+
+TEXT _mkcgo_SecKeyVerifySignature_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecKeyVerifySignature(SB)
+
+GLOBL ·_mkcgo_SecKeyVerifySignature_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecKeyVerifySignature_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecKeyVerifySignature_trampoline<>(SB)
+
+TEXT _mkcgo_SecRandomCopyBytes_trampoline<>(SB), NOSPLIT, $0-0
+	JMP _mkcgo_SecRandomCopyBytes(SB)
+
+GLOBL ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB), RODATA, $_GOPTRSIZE
+DATA ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecRandomCopyBytes_trampoline<>(SB)
 

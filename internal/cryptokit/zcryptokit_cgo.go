@@ -27,6 +27,10 @@ func SHA1(inputPointer []uint8, outputPointer []uint8) {
 	C._mkcgo_go_SHA1((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
+func SHA224(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA224((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+}
+
 func SHA256(inputPointer []uint8, outputPointer []uint8) {
 	C._mkcgo_go_SHA256((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }

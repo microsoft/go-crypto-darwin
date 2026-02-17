@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import CommonCrypto
 import CryptoKit
 import Foundation
 import XCTest
@@ -92,6 +93,35 @@ final class CryptoKitTests: XCTestCase {
 
         // Known SHA1 hash for empty string
         let emptyExpectedHex = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
+    }
+
+    // Test SHA224 hash function (Simple API)
+    func testSHA224_SimpleAPI() {  // Renamed
+        let input = Array(simpleTestString.utf8)
+        var output = [UInt8](repeating: 0, count: 28)  // SHA224 is 28 bytes
+
+        SHA224(
+            inputPointer: input,
+            inputLength: input.count,
+            outputPointer: &output
+        )
+
+        // Known SHA224 hash for the test string
+        let expectedHex = "730e109bd7a8a32b1cb9d9a09aa2325d2430587ddbc0c38bad911525"
+        XCTAssertEqual(Data(output).hexEncodedString(), expectedHex)
+
+        // Test empty string
+        let emptyInput = Array(emptyString.utf8)
+        var emptyOutput = [UInt8](repeating: 0, count: 28)
+        SHA224(
+            inputPointer: emptyInput,
+            inputLength: emptyInput.count,
+            outputPointer: &emptyOutput
+        )
+
+        // Known SHA224 hash for empty string
+        let emptyExpectedHex = "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f"
         XCTAssertEqual(Data(emptyOutput).hexEncodedString(), emptyExpectedHex)
     }
 
@@ -319,6 +349,21 @@ final class CryptoKitTests: XCTestCase {
                 expectedBlockSize: Insecure.SHA1.blockByteCount,
                 knownEmptyHashHex: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
                 knownTestStringHashHex: "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
+            ),
+            HashingFunctions(
+                name: "SHA224",
+                new: { hashNew(9) },
+                write: { ptr, data, length in hashWrite(9, ptr, data, length) },
+                sum: { ptr, out in hashSum(9, ptr, out) },
+                reset: { ptr in hashReset(9, ptr) },
+                copy: { ptr in hashCopy(9, ptr) },
+                free: { ptr in hashFree(9, ptr) },
+                size: { hashSize(9) },
+                blockSize: { hashBlockSize(9) },
+                expectedSize: Int(CC_SHA224_DIGEST_LENGTH),
+                expectedBlockSize: 64,
+                knownEmptyHashHex: "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",
+                knownTestStringHashHex: "2f05477fc24bb4faefd86517156dafdecec45b8ad3cf2522a563582b"
             ),
             HashingFunctions(
                 name: "SHA256",

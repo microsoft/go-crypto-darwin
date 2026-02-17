@@ -19,6 +19,7 @@ import (
 const (
 	md5     = 1
 	sha1    = 2
+	sha224  = 9
 	sha256  = 3
 	sha384  = 4
 	sha512  = 5
@@ -63,6 +64,10 @@ func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 		hash.id = sha1
 		hash.size = int(cryptokit.HashSize(sha1))
 		hash.blockSize = int(cryptokit.HashBlockSize(sha1))
+	case crypto.SHA224:
+		hash.id = sha224
+		hash.size = int(cryptokit.HashSize(sha224))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha224))
 	case crypto.SHA256:
 		hash.id = sha256
 		hash.size = int(cryptokit.HashSize(sha256))
@@ -287,6 +292,11 @@ func NewMD5() hash.Hash {
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
 	return newHash(crypto.SHA1)
+}
+
+// NewSHA224 initializes a new SHA224 hasher.
+func NewSHA224() hash.Hash {
+	return newHash(crypto.SHA224)
 }
 
 // NewSHA256 initializes a new SHA256 hasher.

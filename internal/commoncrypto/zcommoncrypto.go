@@ -12,6 +12,11 @@ const (
 
 const (
 	KCCModeCBC CCMode = 2
+	KCCModeCTR CCMode = 4
+)
+
+const (
+	KCCModeOptionCTR_BE = 2
 )
 
 const (

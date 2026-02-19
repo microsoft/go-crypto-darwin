@@ -19,12 +19,7 @@ typedef enum {
 
 typedef enum {
 	kCCModeCBC = 2,
-	kCCModeCTR = 4,
 } CCMode;
-
-enum {
-	kCCModeOptionCTR_BE = 2,
-};
 
 typedef enum {
 	KCCOptionECBMode = 2,

@@ -509,12 +509,15 @@ func TestHashStructAllocations(t *testing.T) {
 		sha1Hash.Reset()
 		sha256Hash.Reset()
 		sha512Hash.Reset()
-	}))
-	want := 12
+	}))n	want := 12
 	if compareCurrentVersion("go1.24") >= 0 {
 		// The go1.24 compiler is able to optimize the allocation away.
 		// See cgo_go124.go for more information.
 		want = 4
+	}
+	if compareCurrentVersion("go1.25") >= 0 {
+		// Go 1.25+ uses runtime.AddCleanup which has higher allocation overhead.
+		want = 12
 	}
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)

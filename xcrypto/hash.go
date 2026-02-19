@@ -126,6 +126,17 @@ func SupportsHash(h crypto.Hash) bool {
 	return loadHash(h, false) != nil
 }
 
+type hashInfo struct {
+	id  int32
+	ptr unsafe.Pointer
+}
+
+func hashCleanup(info hashInfo) {
+	if info.ptr != nil {
+		cryptokit.HashFree(info.id, info.ptr)
+	}
+}
+
 func newHash(ch crypto.Hash) *Hash {
 	alg := loadHash(ch, true)
 
@@ -134,16 +145,9 @@ func newHash(ch crypto.Hash) *Hash {
 		alg: alg,
 	}
 
-	runtime.SetFinalizer(h, (*Hash).finalize)
+	runtime.AddCleanup(h, hashCleanup, hashInfo{alg.id, h.ptr})
 
 	return h
-}
-
-func (h *Hash) finalize() {
-	if h.ptr != nil {
-		cryptokit.HashFree(h.alg.id, h.ptr)
-		h.ptr = nil
-	}
 }
 
 func (h *Hash) Clone() (HashCloner, error) {
@@ -156,7 +160,7 @@ func (h *Hash) Clone() (HashCloner, error) {
 		alg: h.alg,
 	}
 
-	runtime.SetFinalizer(newHash, (*Hash).finalize)
+	runtime.AddCleanup(newHash, hashCleanup, hashInfo{newHash.alg.id, newHash.ptr})
 
 	runtime.KeepAlive(h)
 

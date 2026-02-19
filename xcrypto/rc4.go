@@ -35,15 +35,8 @@ func NewRC4Cipher(key []byte) (*RC4Cipher, error) {
 		return nil, errors.New("failed to create RC4 cipher")
 	}
 	c := &RC4Cipher{ctx: ctx}
-	runtime.SetFinalizer(c, (*RC4Cipher).finalize)
+	runtime.AddCleanup(c, cryptorCleanup, ctx)
 	return c, nil
-}
-
-// finalize releases the RC4 cipher context when no longer needed.
-func (c *RC4Cipher) finalize() {
-	if c.ctx != nil {
-		commoncrypto.CCCryptorRelease(c.ctx)
-	}
 }
 
 // Reset zeros the key data and makes the cipher unusable.

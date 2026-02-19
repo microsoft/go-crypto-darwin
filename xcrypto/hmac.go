@@ -27,6 +27,15 @@ type cryptoKitHMAC struct {
 	size      int
 }
 
+type hmacInfo struct {
+	kind int32
+	ptr  unsafe.Pointer
+}
+
+func hmacCleanup(info hmacInfo) {
+	cryptokit.FreeHMAC(info.kind, info.ptr)
+}
+
 // NewHMAC returns a new HMAC using xcrypto.
 // The function h must return a hash implemented by
 // CommonCrypto (for example, h could be xcrypto.NewSHA256).
@@ -54,9 +63,7 @@ func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
 		size:      h.Size(),
 	}
 
-	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(h.kind, h.ptr)
-	})
+	runtime.AddCleanup(hmac, hmacCleanup, hmacInfo{kind, hmac.ptr})
 
 	return hmac
 }
@@ -87,9 +94,7 @@ func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
 
 	runtime.KeepAlive(h)
 
-	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(h.kind, h.ptr)
-	})
+	runtime.AddCleanup(hmac, hmacCleanup, hmacInfo{hmac.kind, hmac.ptr})
 
 	return hmac, nil
 }

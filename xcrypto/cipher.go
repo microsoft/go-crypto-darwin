@@ -47,15 +47,14 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 		panic("crypto/des: CCCryptorCreateWithMode failed")
 	}
 
-	runtime.SetFinalizer(x, (*cbcCipher).finalize)
+	runtime.AddCleanup(x, cryptorCleanup, x.cryptor)
 	return x
 
 }
 
-func (x *cbcCipher) finalize() {
-	if x.cryptor != nil {
-		commoncrypto.CCCryptorRelease(x.cryptor)
-		x.cryptor = nil
+func cryptorCleanup(cryptor commoncrypto.CCCryptorRef) {
+	if cryptor != nil {
+		commoncrypto.CCCryptorRelease(cryptor)
 	}
 }
 
@@ -122,15 +121,8 @@ func newCTR(kind commoncrypto.CCAlgorithm, key, iv []byte) *ctrStream {
 	if status != commoncrypto.KCCSuccess {
 		panic("crypto/cipher: CCCryptorCreateWithMode CTR failed")
 	}
-	runtime.SetFinalizer(x, (*ctrStream).finalize)
+	runtime.AddCleanup(x, cryptorCleanup, x.cryptor)
 	return x
-}
-
-func (x *ctrStream) finalize() {
-	if x.cryptor != nil {
-		commoncrypto.CCCryptorRelease(x.cryptor)
-		x.cryptor = nil
-	}
 }
 
 func (x *ctrStream) XORKeyStream(dst, src []byte) {

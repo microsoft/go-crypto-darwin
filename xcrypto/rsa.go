@@ -32,9 +32,9 @@ type PublicKeyRSA struct {
 	_pkey security.SecKeyRef
 }
 
-func (k *PublicKeyRSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
+func secKeyCleanup(pkey security.SecKeyRef) {
+	if pkey != nil {
+		security.CFRelease(security.CFTypeRef(pkey))
 	}
 }
 
@@ -46,7 +46,7 @@ func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
 	}
 
 	key := &PublicKeyRSA{_pkey: pubKeyRef}
-	runtime.SetFinalizer(key, (*PublicKeyRSA).finalize)
+	runtime.AddCleanup(key, secKeyCleanup, pubKeyRef)
 	return key, nil
 }
 
@@ -63,12 +63,6 @@ type PrivateKeyRSA struct {
 	_pkey security.SecKeyRef
 }
 
-func (k *PrivateKeyRSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
-	}
-}
-
 // NewPrivateKeyRSA creates a new RSA private key from ASN1 DER encoded data.
 func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 	privKeyRef, err := createSecKeyWithData(asn1Data, security.KSecAttrKeyTypeRSA, security.KSecAttrKeyClassPrivate)
@@ -77,7 +71,7 @@ func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 	}
 
 	key := &PrivateKeyRSA{_pkey: privKeyRef}
-	runtime.SetFinalizer(key, (*PrivateKeyRSA).finalize)
+	runtime.AddCleanup(key, secKeyCleanup, privKeyRef)
 	return key, nil
 }
 
@@ -88,7 +82,7 @@ func (k *PrivateKeyRSA) PublicKey() *PublicKeyRSA {
 		return nil
 	})
 	pubKey := &PublicKeyRSA{_pkey: pubKeyRef}
-	runtime.SetFinalizer(pubKey, (*PublicKeyRSA).finalize)
+	runtime.AddCleanup(pubKey, secKeyCleanup, pubKeyRef)
 	return pubKey
 }
 

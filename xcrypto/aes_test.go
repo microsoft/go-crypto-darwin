@@ -240,3 +240,63 @@ func TestAESCTR(t *testing.T) {
 		})
 	}
 }
+
+// TestAESCTROverflow verifies that the CTR counter correctly increments
+// the full 128-bit value. CommonCrypto's kCCModeCTR only increments the
+// low 64 bits; this test catches that bug by using an IV whose low 64
+// bits are near overflow and comparing the output against a reference
+// computed one block at a time with independent CTR instances.
+func TestAESCTROverflow(t *testing.T) {
+	key := make([]byte, 16) // AES-128, zero key for reproducibility
+
+	// IV with high=1 and low=0xFFFFFFFFFFFFFFFF — one increment away
+	// from needing a carry into the high 64 bits.
+	iv := []byte{
+		0, 0, 0, 0, 0, 0, 0, 1,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	}
+
+	block, err := xcrypto.NewAESCipher(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Produce 4 blocks (64 bytes) of keystream using a single CTR stream.
+	// Counters should be: 00..01 FF..FF, 00..02 00..00, 00..02 00..01, 00..02 00..02
+	zeros := make([]byte, 64)
+	got := make([]byte, 64)
+	ctr := cipher.NewCTR(block, iv)
+	ctr.XORKeyStream(got, zeros)
+
+	// Compute reference keystream one block at a time, each with its own
+	// CTR instance (so CommonCrypto's internal counter never needs to carry).
+	counters := [][16]byte{
+		{0, 0, 0, 0, 0, 0, 0, 1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+		{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1},
+		{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2},
+	}
+	want := make([]byte, 64)
+	for i, ctrVal := range counters {
+		b, err := xcrypto.NewAESCipher(key)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ref := cipher.NewCTR(b, ctrVal[:])
+		ref.XORKeyStream(want[i*16:(i+1)*16], zeros[:16])
+	}
+
+	if !bytes.Equal(got, want) {
+		t.Errorf("CTR 128-bit counter overflow produced wrong keystream\nhave %x\nwant %x", got, want)
+	}
+
+	// Also test split XORKeyStream calls across the overflow boundary.
+	block2, _ := xcrypto.NewAESCipher(key)
+	ctr2 := cipher.NewCTR(block2, iv)
+	got2 := make([]byte, 64)
+	ctr2.XORKeyStream(got2[:16], zeros[:16]) // consume counter FF..FF
+	ctr2.XORKeyStream(got2[16:], zeros[16:]) // next call must use 00..02 00..00
+	if !bytes.Equal(got2, want) {
+		t.Errorf("CTR split across overflow produced wrong keystream\nhave %x\nwant %x", got2, want)
+	}
+}

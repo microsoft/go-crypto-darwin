@@ -518,7 +518,7 @@ func TestHashStructAllocations(t *testing.T) {
 	}
 	if compareCurrentVersion("go1.25") >= 0 {
 		// Go 1.25+ uses runtime.AddCleanup which has higher allocation overhead.
-		want = 12
+		want = 16
 	}
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)

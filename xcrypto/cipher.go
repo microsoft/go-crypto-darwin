@@ -98,64 +98,6 @@ func (x *cbcCipher) SetIV(iv []byte) {
 	runtime.KeepAlive(x)
 }
 
-// ctrStream implements cipher.Stream using CommonCrypto's CTR mode.
-type ctrStream struct {
-	cryptor commoncrypto.CCCryptorRef
-}
-
-func newCTR(kind commoncrypto.CCAlgorithm, key, iv []byte) *ctrStream {
-	x := &ctrStream{}
-	// CTR mode: encryption and decryption are the same operation (XOR with keystream),
-	// so we always use KCCEncrypt.
-	status := commoncrypto.CCCryptorCreateWithMode(
-		commoncrypto.KCCEncrypt,
-		commoncrypto.KCCModeCTR,
-		commoncrypto.CCAlgorithm(kind),
-		commoncrypto.CcNoPadding,
-		iv,
-		key,
-		nil,
-		0,
-		commoncrypto.KCCModeOptionCTR_BE,
-		&x.cryptor,
-	)
-	if status != commoncrypto.KCCSuccess {
-		panic("crypto/cipher: CCCryptorCreateWithMode CTR failed")
-	}
-	runtime.SetFinalizer(x, (*ctrStream).finalize)
-	return x
-}
-
-func (x *ctrStream) finalize() {
-	if x.cryptor != nil {
-		commoncrypto.CCCryptorRelease(x.cryptor)
-		x.cryptor = nil
-	}
-}
-
-func (x *ctrStream) XORKeyStream(dst, src []byte) {
-	if len(dst) < len(src) {
-		panic("crypto/cipher: output smaller than input")
-	}
-	if inexactOverlap(dst[:len(src)], src) {
-		panic("crypto/cipher: invalid buffer overlap")
-	}
-	if len(src) == 0 {
-		return
-	}
-	var outLength int
-	status := commoncrypto.CCCryptorUpdate(
-		x.cryptor,
-		src,
-		dst,
-		&outLength,
-	)
-	if status != commoncrypto.KCCSuccess {
-		panic("crypto/cipher: CCCryptorUpdate CTR failed")
-	}
-	runtime.KeepAlive(x)
-}
-
 // The following two functions are a mirror of golang.org/x/crypto/internal/subtle.
 
 func anyOverlap(x, y []byte) bool {

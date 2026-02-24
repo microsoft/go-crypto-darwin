@@ -235,9 +235,13 @@ func (h *Hash) Size() int {
 	return h.alg.size
 }
 
-// FIPSApproved reports whether this hash algorithm is FIPS 140-3 approved.
-func (h *Hash) FIPSApproved() bool {
-	switch h.alg.ch {
+// FIPSApprovedHash reports whether this hash algorithm is FIPS 140-3 approved.
+func FIPSApprovedHash(h hash.Hash) bool {
+	xh, ok := h.(*Hash)
+	if !ok {
+		return false
+	}
+	switch xh.alg.ch {
 	case crypto.SHA256, crypto.SHA384, crypto.SHA512,
 		crypto.SHA3_256, crypto.SHA3_384, crypto.SHA3_512:
 		return true

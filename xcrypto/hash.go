@@ -34,6 +34,8 @@ type hashAlgorithm struct {
 	blockSize int
 }
 
+type HashCloner = hash.Cloner
+
 var cacheHash sync.Map // map[crypto.Hash]*hashAlgorithm
 
 // supportsSHA3 returns true if SHA-3 is available on this macOS version.

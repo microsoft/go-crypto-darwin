@@ -37,14 +37,14 @@ type CCAlgorithm int32
 var _mkcgo_CCCrypt_trampoline_addr uintptr
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
+	r0, _ := syscallN(0, _mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(dataIn)))), uintptr(len(dataIn)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(dataOut)))), uintptr(len(dataOut)), uintptr(escapePtr(unsafe.Pointer(dataOutMoved))))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
 
 func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, cryptorRef *CCCryptorRef) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(cryptorRef)))
+	r0, _ := syscallN(0, _mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(escapePtr(unsafe.Pointer(cryptorRef))))
 	return CCCryptorStatus(r0)
 }
 
@@ -55,7 +55,7 @@ func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, paddi
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
 		r0, _ = syscallN(0, _mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(tweak))), uintptr(len(tweak)), uintptr(numRounds)<<32|uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
 	} else {
-		r0, _ = syscallN(0, _mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(tweak))), uintptr(len(tweak)), uintptr(numRounds), uintptr(options), uintptr(unsafe.Pointer(cryptorRef)))
+		r0, _ = syscallN(0, _mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(tweak)))), uintptr(len(tweak)), uintptr(numRounds), uintptr(options), uintptr(escapePtr(unsafe.Pointer(cryptorRef))))
 	}
 	return CCCryptorStatus(r0)
 }
@@ -70,20 +70,20 @@ func CCCryptorRelease(cryptorRef CCCryptorRef) CCCryptorStatus {
 var _mkcgo_CCCryptorReset_trampoline_addr uintptr
 
 func CCCryptorReset(cryptorRef CCCryptorRef, iv []byte) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(unsafe.Pointer(unsafe.SliceData(iv))))
+	r0, _ := syscallN(0, _mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(iv)))))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCCryptorUpdate_trampoline_addr uintptr
 
 func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
+	r0, _ := syscallN(0, _mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(dataIn)))), uintptr(len(dataIn)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(dataOut)))), uintptr(len(dataOut)), uintptr(escapePtr(unsafe.Pointer(dataOutMoved))))
 	return CCCryptorStatus(r0)
 }
 
 var _mkcgo_CCKeyDerivationPBKDF_trampoline_addr uintptr
 
 func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password []byte, salt []uint8, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey []uint8) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(unsafe.Pointer(unsafe.SliceData(password))), uintptr(len(password)), uintptr(unsafe.Pointer(unsafe.SliceData(salt))), uintptr(len(salt)), uintptr(prf), uintptr(rounds), uintptr(unsafe.Pointer(unsafe.SliceData(derivedKey))), uintptr(len(derivedKey)))
+	r0, _ := syscallN(0, _mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(password)))), uintptr(len(password)), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(salt)))), uintptr(len(salt)), uintptr(prf), uintptr(rounds), uintptr(escapePtr(unsafe.Pointer(unsafe.SliceData(derivedKey)))), uintptr(len(derivedKey)))
 	return CCCryptorStatus(r0)
 }

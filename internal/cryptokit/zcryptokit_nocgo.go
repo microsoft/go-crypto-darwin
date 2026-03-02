@@ -14,6 +14,19 @@ import (
 
 var _ = runtime.GOOS
 
+var _mkcgoAlwaysFalse bool
+var _mkcgoEscapeSink unsafe.Pointer
+
+// escapePtr forces p to escape to the heap.
+// This implementation is also used in the standard library:
+// https://github.com/golang/go/blob/f71432d223eeb2139b460957817400750fd13655/src/internal/abi/escape.go#L24-L33
+func escapePtr(p unsafe.Pointer) unsafe.Pointer {
+	if _mkcgoAlwaysFalse {
+		_mkcgoEscapeSink = p
+	}
+	return p
+}
+
 //go:linkname go_MD5 go_MD5
 //go:linkname go_SHA1 go_SHA1
 //go:linkname go_SHA256 go_SHA256

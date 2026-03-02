@@ -18,7 +18,7 @@ func main() {
 	args := []string{
 		"go",
 		"run",
-		"github.com/golang-fips/openssl/v2/cmd/checkheader@aa77d7b17b0924ed16f70150849af1750cbaf007",
+		"github.com/golang-fips/openssl/v2/cmd/checkheader@83dbb5856a33212b567af37c34007d09bf2a579f",
 		"-shim", os.Args[1],
 	}
 	args = append(args, os.Args[1:]...)

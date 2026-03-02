@@ -6,4 +6,4 @@ package commoncrypto
 
 //go:generate go run ../../cmd/checkheader shims.h
 //go:generate go run ../../cmd/mkcgo -out zcommoncrypto.go -package commoncrypto --noerrors shims.h
-//go:generate go run ../../cmd/mkcgo -out zcommoncrypto.go -nocgo -escapeptr -package commoncrypto --noerrors shims.h
+//go:generate go run ../../cmd/mkcgo -out zcommoncrypto.go -nocgo -package commoncrypto --noerrors shims.h

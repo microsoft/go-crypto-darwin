@@ -177,12 +177,12 @@ func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) in
 }
 
 func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(data)))), uintptr(len(data)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(nonce)))), uintptr(len(nonce)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(aad)))), uintptr(len(aad)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(tag)))), uintptr(len(tag)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(out)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(outLength))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
 	return int64(r0)
 }
 
 func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptChaChaPoly)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(data)))), uintptr(len(data)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(nonce)))), uintptr(len(nonce)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(aad)))), uintptr(len(aad)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(tag)))), uintptr(len(tag)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(out)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(outLength))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
 	return int64(r0)
 }
 
@@ -222,22 +222,22 @@ func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8
 }
 
 func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(data)))), uintptr(len(data)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(nonce)))), uintptr(len(nonce)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(aad)))), uintptr(len(aad)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(cipherText)))), uintptr(len(cipherText)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(tag)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
 	return int64(r0)
 }
 
 func EncryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptChaChaPoly)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(data)))), uintptr(len(data)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(nonce)))), uintptr(len(nonce)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(aad)))), uintptr(len(aad)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(cipherText)))), uintptr(len(cipherText)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(tag)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
 	return int64(r0)
 }
 
 func ExpandHKDF(hashFunction int32, prk []uint8, info []uint8, okm []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(prk)))), uintptr(len(prk)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(info)))), uintptr(len(info)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(okm)))), uintptr(len(okm)))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)), uintptr(unsafe.Pointer(unsafe.SliceData(info))), uintptr(len(info)), uintptr(unsafe.Pointer(unsafe.SliceData(okm))), uintptr(len(okm)))
 	return int64(r0)
 }
 
 func ExtractHKDF(hashFunction int32, secret []uint8, salt []uint8, prk []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(secret)))), uintptr(len(secret)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(salt)))), uintptr(len(salt)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(prk)))), uintptr(len(prk)))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(secret))), uintptr(len(secret)), uintptr(unsafe.Pointer(unsafe.SliceData(salt))), uintptr(len(salt)), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)))
 	return int64(r0)
 }
 
@@ -260,7 +260,7 @@ func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
 }
 
 func GenerateKeyEd25519(key []uint8) {
-	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))))
+	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))))
 }
 
 func GenerateKeyMLKEM1024(seed []uint8) int64 {
@@ -310,17 +310,17 @@ func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data []uint8) {
 }
 
 func InitHMAC(hashFunction int32, key []uint8) unsafe.Pointer {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)))
 	return unsafe.Pointer(r0)
 }
 
 func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(seed)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(seed))))
 	return int64(r0)
 }
 
 func NewPublicKeyEd25519(key []uint8, pub []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(pub)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(pub))))
 	return int64(r0)
 }
 
@@ -330,7 +330,7 @@ func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uin
 }
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(privateKey)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(message)))), uintptr(len(message)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(sigBuffer)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sigBuffer))))
 	return int64(r0)
 }
 
@@ -359,6 +359,6 @@ func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(publicKey)))), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(message)))), uintptr(len(message)), uintptr(mkcgoEscapePtrCryptokit(unsafe.Pointer(unsafe.SliceData(sig)))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))))
 	return int64(r0)
 }

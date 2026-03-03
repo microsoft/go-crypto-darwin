@@ -21,7 +21,7 @@ func main() {
 		log.Fatalf("failed to write copyright file: %v", err)
 	}
 
-	args := []string{"go", "run", "github.com/golang-fips/openssl/v2/cmd/mkcgo@c0d27a96a1fcc67f43fa323330c228632cfb912e"}
+	args := []string{"go", "run", "github.com/golang-fips/openssl/v2/cmd/mkcgo@0cb9b49edfa384c9af615113fb59c5002e3728e2"}
 	args = append(args, "-copyright", tempFile.Name())
 	args = append(args, os.Args[1:]...)
 	cmd := exec.Command(args[0], args[1:]...)

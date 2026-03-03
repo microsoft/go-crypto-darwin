@@ -14,6 +14,19 @@ import (
 
 var _ = runtime.GOOS
 
+var _mkcgoAlwaysFalseSecurity bool
+var _mkcgoEscapeSinkSecurity unsafe.Pointer
+
+// mkcgoEscapePtrSecurity forces p to escape to the heap.
+// This implementation is also used in the standard library:
+// https://github.com/golang/go/blob/f71432d223eeb2139b460957817400750fd13655/src/internal/abi/escape.go#L24-L33
+func mkcgoEscapePtrSecurity(p unsafe.Pointer) unsafe.Pointer {
+	if _mkcgoAlwaysFalseSecurity {
+		_mkcgoEscapeSinkSecurity = p
+	}
+	return p
+}
+
 type Boolean = byte
 type SecRandomRef unsafe.Pointer
 type SecKeyRef unsafe.Pointer
@@ -296,7 +309,7 @@ var (
 var _mkcgo_CFDataCreate_trampoline_addr uintptr
 
 func CFDataCreate(allocator CFAllocatorRef, bytes []uint8) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_CFDataCreate_trampoline_addr, uintptr(allocator), uintptr(unsafe.Pointer(unsafe.SliceData(bytes))), uintptr(len(bytes)))
+	r0, _ := syscallN(0, _mkcgo_CFDataCreate_trampoline_addr, uintptr(allocator), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(unsafe.SliceData(bytes)))), uintptr(len(bytes)))
 	return CFDataRef(r0)
 }
 
@@ -317,14 +330,14 @@ func CFDataGetLength(data CFDataRef) CFIndex {
 var _mkcgo_CFDictionaryCreate_trampoline_addr uintptr
 
 func CFDictionaryCreate(allocator CFAllocatorRef, keys *unsafe.Pointer, values *unsafe.Pointer, numValues CFIndex, keyCallBacks *CFDictionaryKeyCallBacks, valueCallBacks *CFDictionaryValueCallBacks) CFDictionaryRef {
-	r0, _ := syscallN(0, _mkcgo_CFDictionaryCreate_trampoline_addr, uintptr(allocator), uintptr(unsafe.Pointer(keys)), uintptr(unsafe.Pointer(values)), uintptr(numValues), uintptr(unsafe.Pointer(keyCallBacks)), uintptr(unsafe.Pointer(valueCallBacks)))
+	r0, _ := syscallN(0, _mkcgo_CFDictionaryCreate_trampoline_addr, uintptr(allocator), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(keys))), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(values))), uintptr(numValues), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(keyCallBacks))), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(valueCallBacks))))
 	return CFDictionaryRef(r0)
 }
 
 var _mkcgo_CFDictionaryCreateMutable_trampoline_addr uintptr
 
 func CFDictionaryCreateMutable(allocator CFAllocatorRef, capacity CFIndex, keyCallBacks *CFDictionaryKeyCallBacks, valueCallBacks *CFDictionaryValueCallBacks) CFMutableDictionaryRef {
-	r0, _ := syscallN(0, _mkcgo_CFDictionaryCreateMutable_trampoline_addr, uintptr(allocator), uintptr(capacity), uintptr(unsafe.Pointer(keyCallBacks)), uintptr(unsafe.Pointer(valueCallBacks)))
+	r0, _ := syscallN(0, _mkcgo_CFDictionaryCreateMutable_trampoline_addr, uintptr(allocator), uintptr(capacity), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(keyCallBacks))), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(valueCallBacks))))
 	return CFMutableDictionaryRef(r0)
 }
 
@@ -378,7 +391,7 @@ func CFStringGetLength(str CFStringRef) CFIndex {
 var _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr uintptr
 
 func SecKeyCopyExternalRepresentation(key SecKeyRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr, uintptr(key), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr, uintptr(key), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return CFDataRef(r0)
 }
 
@@ -392,35 +405,35 @@ func SecKeyCopyPublicKey(key SecKeyRef) SecKeyRef {
 var _mkcgo_SecKeyCreateDecryptedData_trampoline_addr uintptr
 
 func SecKeyCreateDecryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, ciphertext CFDataRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateDecryptedData_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(ciphertext), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateDecryptedData_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(ciphertext), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return CFDataRef(r0)
 }
 
 var _mkcgo_SecKeyCreateEncryptedData_trampoline_addr uintptr
 
 func SecKeyCreateEncryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, plaintext CFDataRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateEncryptedData_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(plaintext), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateEncryptedData_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(plaintext), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return CFDataRef(r0)
 }
 
 var _mkcgo_SecKeyCreateRandomKey_trampoline_addr uintptr
 
 func SecKeyCreateRandomKey(parameters CFDictionaryRef, __error *CFErrorRef) SecKeyRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateRandomKey_trampoline_addr, uintptr(parameters), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateRandomKey_trampoline_addr, uintptr(parameters), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return SecKeyRef(r0)
 }
 
 var _mkcgo_SecKeyCreateSignature_trampoline_addr uintptr
 
 func SecKeyCreateSignature(key SecKeyRef, algorithm SecKeyAlgorithm, data CFDataRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateSignature_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(data), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateSignature_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(data), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return CFDataRef(r0)
 }
 
 var _mkcgo_SecKeyCreateWithData_trampoline_addr uintptr
 
 func SecKeyCreateWithData(keyData CFDataRef, attributes CFDictionaryRef, __error *CFErrorRef) SecKeyRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateWithData_trampoline_addr, uintptr(keyData), uintptr(attributes), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateWithData_trampoline_addr, uintptr(keyData), uintptr(attributes), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return SecKeyRef(r0)
 }
 
@@ -441,7 +454,7 @@ func SecKeyIsAlgorithmSupported(key SecKeyRef, operation SecKeyOperationType, al
 var _mkcgo_SecKeyVerifySignature_trampoline_addr uintptr
 
 func SecKeyVerifySignature(key SecKeyRef, algorithm SecKeyAlgorithm, signedData CFDataRef, signature CFDataRef, __error *CFErrorRef) Boolean {
-	r0, _ := syscallN(0, _mkcgo_SecKeyVerifySignature_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(signedData), uintptr(signature), uintptr(unsafe.Pointer(__error)))
+	r0, _ := syscallN(0, _mkcgo_SecKeyVerifySignature_trampoline_addr, uintptr(key), uintptr(algorithm), uintptr(signedData), uintptr(signature), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
 	return Boolean(r0)
 }
 

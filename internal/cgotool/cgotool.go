@@ -18,7 +18,11 @@ func openSSLVersion() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("finding module root: %w", err)
 	}
-	toolDir := filepath.Join(filepath.Dir(strings.TrimSpace(string(gomod))), "internal", "cgotool", "openssl")
+	gomodPath := strings.TrimSpace(string(gomod))
+	if gomodPath == "" || gomodPath == "/dev/null" {
+		return "", fmt.Errorf("finding module root: no go.mod found; run this command within the module")
+	}
+	toolDir := filepath.Join(filepath.Dir(gomodPath), "internal", "cgotool", "openssl")
 	out, err := exec.Command("go", "-C", toolDir, "list", "-m", "-f", "{{.Version}}", "github.com/golang-fips/openssl/v2").Output()
 	if err != nil {
 		return "", fmt.Errorf("getting openssl version: %w", err)

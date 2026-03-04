@@ -11,6 +11,8 @@ package security
 #cgo darwin LDFLAGS: -framework Security
 
 #include "zsecurity.h"
+#cgo noescape _mkcgo_SecRandomCopyBytes
+#cgo nocallback _mkcgo_SecRandomCopyBytes
 */
 import "C"
 import "unsafe"

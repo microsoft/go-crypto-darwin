@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Run Go Tests
-        run: CGO_ENABLED=${{ matrix.cgo }} go test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -v ./...
+        run: CGO_ENABLED=${{ matrix.cgo }} go test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -shuffle on -v ./...
 
       - name: Run Swift Tests
         working-directory: cryptokit

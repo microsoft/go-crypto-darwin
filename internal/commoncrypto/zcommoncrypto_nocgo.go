@@ -50,7 +50,7 @@ type CCAlgorithm int32
 var _mkcgo_CCCrypt_trampoline_addr uintptr
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(dataIn)))), uintptr(len(dataIn)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(dataOut)))), uintptr(len(dataOut)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(dataOutMoved))))
+	r0, _ := syscallN(0, _mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
 	return CCCryptorStatus(r0)
 }
 
@@ -90,7 +90,7 @@ func CCCryptorReset(cryptorRef CCCryptorRef, iv []byte) CCCryptorStatus {
 var _mkcgo_CCCryptorUpdate_trampoline_addr uintptr
 
 func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
-	r0, _ := syscallN(0, _mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(dataIn)))), uintptr(len(dataIn)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(dataOut)))), uintptr(len(dataOut)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(dataOutMoved))))
+	r0, _ := syscallN(0, _mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
 	return CCCryptorStatus(r0)
 }
 

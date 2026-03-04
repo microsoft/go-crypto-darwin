@@ -82,8 +82,8 @@ extern const CFStringRef kSecKeyAlgorithmECDSASignatureDigestX962 __attribute__(
 int SecRandomCopyBytes(SecRandomRef rnd, size_t count, void *bytes) __attribute__((framework(Security, A), noescape, nocallback, slice(bytes, count)));
 SecKeyRef SecKeyCopyPublicKey(SecKeyRef key) __attribute__((framework(Security, A)));
 SecKeyRef SecKeyCreateWithData(CFDataRef keyData, CFDictionaryRef attributes, CFErrorRef *error) __attribute__((framework(Security, A)));
-SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error) __attribute__((framework(Security, A)));
-CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef key, CFErrorRef *error) __attribute__((framework(Security, A)));
+SecKeyRef SecKeyCreateRandomKey(CFDictionaryRef parameters, CFErrorRef *error) __attribute__((noescape, nocallback, framework(Security, A)));
+CFDataRef SecKeyCopyExternalRepresentation(SecKeyRef key, CFErrorRef *error) __attribute__((noescape, nocallback, framework(Security, A)));
 CFDataRef SecKeyCreateDecryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef ciphertext, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCreateEncryptedData(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef plaintext, CFErrorRef *error) __attribute__((framework(Security, A)));
 CFDataRef SecKeyCreateSignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRef data, CFErrorRef *error) __attribute__((framework(Security, A)));
@@ -91,7 +91,7 @@ Boolean SecKeyVerifySignature(SecKeyRef key, SecKeyAlgorithm algorithm, CFDataRe
 Boolean SecKeyIsAlgorithmSupported(SecKeyRef key, SecKeyOperationType operation, SecKeyAlgorithm algorithm) __attribute__((framework(Security, A)));
 size_t SecKeyGetBlockSize(SecKeyRef key) __attribute__((framework(Security, A)));
 
-CFDataRef CFDataCreate(CFAllocatorRef allocator, const uint8_t *bytes, CFIndex length) __attribute__((framework(CoreFoundation, A), slice(bytes, length)));
+CFDataRef CFDataCreate(CFAllocatorRef allocator, const uint8_t *bytes, CFIndex length) __attribute__((noescape, nocallback, framework(CoreFoundation, A), slice(bytes, length)));
 CFDictionaryRef CFDictionaryCreate(CFAllocatorRef allocator, const void **keys, const void **values, CFIndex numValues, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks) __attribute__((framework(CoreFoundation, A)));
 CFMutableDictionaryRef CFDictionaryCreateMutable(CFAllocatorRef allocator, CFIndex capacity, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks) __attribute__((framework(CoreFoundation, A)));
 CFNumberRef CFNumberCreate(CFAllocatorRef allocator, CFNumberType theType, const void *valuePtr) __attribute__((framework(CoreFoundation, A)));

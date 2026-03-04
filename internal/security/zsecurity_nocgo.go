@@ -309,7 +309,7 @@ var (
 var _mkcgo_CFDataCreate_trampoline_addr uintptr
 
 func CFDataCreate(allocator CFAllocatorRef, bytes []uint8) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_CFDataCreate_trampoline_addr, uintptr(allocator), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(unsafe.SliceData(bytes)))), uintptr(len(bytes)))
+	r0, _ := syscallN(0, _mkcgo_CFDataCreate_trampoline_addr, uintptr(allocator), uintptr(unsafe.Pointer(unsafe.SliceData(bytes))), uintptr(len(bytes)))
 	return CFDataRef(r0)
 }
 
@@ -391,7 +391,7 @@ func CFStringGetLength(str CFStringRef) CFIndex {
 var _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr uintptr
 
 func SecKeyCopyExternalRepresentation(key SecKeyRef, __error *CFErrorRef) CFDataRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr, uintptr(key), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCopyExternalRepresentation_trampoline_addr, uintptr(key), uintptr(unsafe.Pointer(__error)))
 	return CFDataRef(r0)
 }
 
@@ -419,7 +419,7 @@ func SecKeyCreateEncryptedData(key SecKeyRef, algorithm SecKeyAlgorithm, plainte
 var _mkcgo_SecKeyCreateRandomKey_trampoline_addr uintptr
 
 func SecKeyCreateRandomKey(parameters CFDictionaryRef, __error *CFErrorRef) SecKeyRef {
-	r0, _ := syscallN(0, _mkcgo_SecKeyCreateRandomKey_trampoline_addr, uintptr(parameters), uintptr(mkcgoEscapePtrSecurity(unsafe.Pointer(__error))))
+	r0, _ := syscallN(0, _mkcgo_SecKeyCreateRandomKey_trampoline_addr, uintptr(parameters), uintptr(unsafe.Pointer(__error)))
 	return SecKeyRef(r0)
 }
 

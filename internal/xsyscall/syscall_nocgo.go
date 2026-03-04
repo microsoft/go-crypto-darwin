@@ -70,19 +70,3 @@ func SyscallN(errType uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
 func syscallN(errType uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
 	return SyscallN(errType, fn, args...)
 }
-
-// syscallNRaw performs a syscall with the given function and arguments,
-// without any error checking nor switching to the system stack.
-//
-//go:nosplit
-func syscallNRaw(fn uintptr, args ...uintptr) uintptr {
-	libcArgs := libcCallInfo{
-		fn: fn,
-		n:  uintptr(len(args)),
-	}
-	if libcArgs.n != 0 {
-		libcArgs.args = uintptr(noescape(unsafe.Pointer(&args[0])))
-	}
-	syscallNAsm(&libcArgs)
-	return libcArgs.r1
-}

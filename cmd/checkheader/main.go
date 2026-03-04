@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/microsoft/go-crypto-darwin/internal/cgotool"
 )
 
 func main() {
@@ -15,10 +17,14 @@ func main() {
 		// This tool only works on macOS
 		return
 	}
+	pkg, err := cgotool.CheckheaderPackage()
+	if err != nil {
+		log.Fatalf("failed to get checkheader package: %v", err)
+	}
 	args := []string{
 		"go",
 		"run",
-		"github.com/golang-fips/openssl/v2/cmd/checkheader@0cb9b49edfa384c9af615113fb59c5002e3728e2",
+		pkg,
 		"-shim", os.Args[1],
 	}
 	args = append(args, os.Args[1:]...)

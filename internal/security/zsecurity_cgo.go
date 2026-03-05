@@ -11,6 +11,24 @@ package security
 #cgo darwin LDFLAGS: -framework Security
 
 #include "zsecurity.h"
+#cgo noescape _mkcgo_CFDataCreate
+#cgo nocallback _mkcgo_CFDataCreate
+#cgo noescape _mkcgo_CFNumberCreate
+#cgo nocallback _mkcgo_CFNumberCreate
+#cgo noescape _mkcgo_SecKeyCopyExternalRepresentation
+#cgo nocallback _mkcgo_SecKeyCopyExternalRepresentation
+#cgo noescape _mkcgo_SecKeyCreateDecryptedData
+#cgo nocallback _mkcgo_SecKeyCreateDecryptedData
+#cgo noescape _mkcgo_SecKeyCreateEncryptedData
+#cgo nocallback _mkcgo_SecKeyCreateEncryptedData
+#cgo noescape _mkcgo_SecKeyCreateRandomKey
+#cgo nocallback _mkcgo_SecKeyCreateRandomKey
+#cgo noescape _mkcgo_SecKeyCreateSignature
+#cgo nocallback _mkcgo_SecKeyCreateSignature
+#cgo noescape _mkcgo_SecKeyCreateWithData
+#cgo nocallback _mkcgo_SecKeyCreateWithData
+#cgo noescape _mkcgo_SecKeyVerifySignature
+#cgo nocallback _mkcgo_SecKeyVerifySignature
 #cgo noescape _mkcgo_SecRandomCopyBytes
 #cgo nocallback _mkcgo_SecRandomCopyBytes
 */

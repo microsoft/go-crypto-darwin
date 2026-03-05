@@ -10,6 +10,10 @@ package commoncrypto
 #cgo darwin LDFLAGS: -framework System
 
 #include "zcommoncrypto.h"
+#cgo noescape _mkcgo_CCCrypt
+#cgo nocallback _mkcgo_CCCrypt
+#cgo noescape _mkcgo_CCCryptorUpdate
+#cgo nocallback _mkcgo_CCCryptorUpdate
 */
 import "C"
 import "unsafe"

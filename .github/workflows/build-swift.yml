@@ -37,6 +37,8 @@ jobs:
 
       - name: Run go generate
         run: go generate ./...
+        env:
+          MS_GO_NOSYSTEMCRYPTO: "1" # Don't use systemcryypto as it will detect duplicate symbols in the object files
 
       - name: Commit and Push Changes
         env:

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import CryptoKit
+import CryptoKitC
 import Foundation
 import XCTest
 
@@ -58,15 +59,15 @@ class HMACTests: XCTestCase {
         let messageData = message.data(using: .utf8)!
 
         let keyPointer = keyData.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) }
-        let hmacPointer = initHMAC(hashFunction, keyPointer, keyData.count)
-        defer { freeHMAC(hashFunction, hmacPointer) }
+        let hmacPointer = go_initHMAC(hashFunction, keyPointer, keyData.count)
+        defer { go_freeHMAC(hashFunction, hmacPointer) }
 
         let messagePointer = messageData.withUnsafeBytes { $0.baseAddress!.assumingMemoryBound(to: UInt8.self) }
-        updateHMAC(hashFunction, hmacPointer, messagePointer, messageData.count)
+        go_updateHMAC(hashFunction, hmacPointer, messagePointer, messageData.count)
 
         let outputSize = getHMACOutputSize(hashFunction)
         var output = [UInt8](repeating: 0, count: outputSize)
-        finalizeHMAC(hashFunction, hmacPointer, &output)
+        go_finalizeHMAC(hashFunction, hmacPointer, &output)
 
         XCTAssertFalse(output.allSatisfy { $0 == 0 }, "HMAC output should not be all zeros")
     }
@@ -82,76 +83,76 @@ class HMACTests: XCTestCase {
             HMACFunctions(
                 name: "HMAC-MD5",
                 hashFunction: 1,
-                initHMAC: { keyPtr, keyLen in initHMAC(1, keyPtr, keyLen) },
-                update: { ptr, data, length in updateHMAC(1, ptr, data, length) },
-                finalize: { ptr, out in finalizeHMAC(1, ptr, out) },
-                reset: { ptr, keyPtr, keyLen in resetHMAC(1, ptr, keyPtr, keyLen) },
-                copy: { ptr in copyHMAC(1, ptr) },
-                free: { ptr in freeHMAC(1, ptr) },
-                size: { hmacSize(1) },
+                initHMAC: { keyPtr, keyLen in go_initHMAC(1, keyPtr, keyLen) },
+                update: { ptr, data, length in go_updateHMAC(1, ptr, data, length) },
+                finalize: { ptr, out in go_finalizeHMAC(1, ptr, out) },
+                reset: { ptr, keyPtr, keyLen in go_resetHMAC(1, ptr, keyPtr, keyLen) },
+                copy: { ptr in go_copyHMAC(1, ptr) },
+                free: { ptr in go_freeHMAC(1, ptr) },
+                size: { go_hmacSize(1) },
                 expectedSize: Insecure.MD5.byteCount,
-                knownEmptyKeyHMACHex: "74e6f7298a9c2d168935f58c001bad88",  // HMAC-MD5("", "")
-                knownTestKeyMessageHMACHex: "ae92cf51adf91130130aefc2b39a7595"  // HMAC-MD5("key", "hello world") - Swift actual output
+                knownEmptyKeyHMACHex: "74e6f7298a9c2d168935f58c001bad88",  // HMAC-go_MD5("", "")
+                knownTestKeyMessageHMACHex: "ae92cf51adf91130130aefc2b39a7595"  // HMAC-go_MD5("key", "hello world") - Swift actual output
             ),
             HMACFunctions(
                 name: "HMAC-SHA1",
                 hashFunction: 2,
-                initHMAC: { keyPtr, keyLen in initHMAC(2, keyPtr, keyLen) },
-                update: { ptr, data, length in updateHMAC(2, ptr, data, length) },
-                finalize: { ptr, out in finalizeHMAC(2, ptr, out) },
-                reset: { ptr, keyPtr, keyLen in resetHMAC(2, ptr, keyPtr, keyLen) },
-                copy: { ptr in copyHMAC(2, ptr) },
-                free: { ptr in freeHMAC(2, ptr) },
-                size: { hmacSize(2) },
+                initHMAC: { keyPtr, keyLen in go_initHMAC(2, keyPtr, keyLen) },
+                update: { ptr, data, length in go_updateHMAC(2, ptr, data, length) },
+                finalize: { ptr, out in go_finalizeHMAC(2, ptr, out) },
+                reset: { ptr, keyPtr, keyLen in go_resetHMAC(2, ptr, keyPtr, keyLen) },
+                copy: { ptr in go_copyHMAC(2, ptr) },
+                free: { ptr in go_freeHMAC(2, ptr) },
+                size: { go_hmacSize(2) },
                 expectedSize: Insecure.SHA1.byteCount,
-                knownEmptyKeyHMACHex: "fbdb1d1b18aa6c08324b7d64b71fb76370690e1d",  // HMAC-SHA1("", "")
-                knownTestKeyMessageHMACHex: "34dd234b92683593560528f6193ea68c8005f615"  // HMAC-SHA1("key", "hello world") - Swift actual output
+                knownEmptyKeyHMACHex: "fbdb1d1b18aa6c08324b7d64b71fb76370690e1d",  // HMAC-go_SHA1("", "")
+                knownTestKeyMessageHMACHex: "34dd234b92683593560528f6193ea68c8005f615"  // HMAC-go_SHA1("key", "hello world") - Swift actual output
             ),
             HMACFunctions(
                 name: "HMAC-SHA256",
                 hashFunction: 3,
-                initHMAC: { keyPtr, keyLen in initHMAC(3, keyPtr, keyLen) },
-                update: { ptr, data, length in updateHMAC(3, ptr, data, length) },
-                finalize: { ptr, out in finalizeHMAC(3, ptr, out) },
-                reset: { ptr, keyPtr, keyLen in resetHMAC(3, ptr, keyPtr, keyLen) },
-                copy: { ptr in copyHMAC(3, ptr) },
-                free: { ptr in freeHMAC(3, ptr) },
-                size: { hmacSize(3) },
+                initHMAC: { keyPtr, keyLen in go_initHMAC(3, keyPtr, keyLen) },
+                update: { ptr, data, length in go_updateHMAC(3, ptr, data, length) },
+                finalize: { ptr, out in go_finalizeHMAC(3, ptr, out) },
+                reset: { ptr, keyPtr, keyLen in go_resetHMAC(3, ptr, keyPtr, keyLen) },
+                copy: { ptr in go_copyHMAC(3, ptr) },
+                free: { ptr in go_freeHMAC(3, ptr) },
+                size: { go_hmacSize(3) },
                 expectedSize: CryptoKit.SHA256.byteCount,
-                knownEmptyKeyHMACHex: "b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad",  // HMAC-SHA256("", "")
-                knownTestKeyMessageHMACHex: "0ba06f1f9a6300461e43454535dc3c4223e47b1d357073d7536eae90ec095be1"  // HMAC-SHA256("key", "hello world") - Swift actual output
+                knownEmptyKeyHMACHex: "b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad",  // HMAC-go_SHA256("", "")
+                knownTestKeyMessageHMACHex: "0ba06f1f9a6300461e43454535dc3c4223e47b1d357073d7536eae90ec095be1"  // HMAC-go_SHA256("key", "hello world") - Swift actual output
             ),
             HMACFunctions(
                 name: "HMAC-SHA384",
                 hashFunction: 4,
-                initHMAC: { keyPtr, keyLen in initHMAC(4, keyPtr, keyLen) },
-                update: { ptr, data, length in updateHMAC(4, ptr, data, length) },
-                finalize: { ptr, out in finalizeHMAC(4, ptr, out) },
-                reset: { ptr, keyPtr, keyLen in resetHMAC(4, ptr, keyPtr, keyLen) },
-                copy: { ptr in copyHMAC(4, ptr) },
-                free: { ptr in freeHMAC(4, ptr) },
-                size: { hmacSize(4) },
+                initHMAC: { keyPtr, keyLen in go_initHMAC(4, keyPtr, keyLen) },
+                update: { ptr, data, length in go_updateHMAC(4, ptr, data, length) },
+                finalize: { ptr, out in go_finalizeHMAC(4, ptr, out) },
+                reset: { ptr, keyPtr, keyLen in go_resetHMAC(4, ptr, keyPtr, keyLen) },
+                copy: { ptr in go_copyHMAC(4, ptr) },
+                free: { ptr in go_freeHMAC(4, ptr) },
+                size: { go_hmacSize(4) },
                 expectedSize: CryptoKit.SHA384.byteCount,
                 knownEmptyKeyHMACHex:
-                    "6c1f2ee938fad2e24bd91298474382ca218c75db3d83e114b3d4367776d14d3551289e75e8209cd4b792302840234adc",  // HMAC-SHA384("", "")
+                    "6c1f2ee938fad2e24bd91298474382ca218c75db3d83e114b3d4367776d14d3551289e75e8209cd4b792302840234adc",  // HMAC-go_SHA384("", "")
                 knownTestKeyMessageHMACHex:
-                    "b7e365fa38bb22d6553614a63095564a0411866e65aac7b835d02d0b24245f4dc48696c9d970ac20f24105be7dc60133"  // HMAC-SHA384("key", "hello world")
+                    "b7e365fa38bb22d6553614a63095564a0411866e65aac7b835d02d0b24245f4dc48696c9d970ac20f24105be7dc60133"  // HMAC-go_SHA384("key", "hello world")
             ),
             HMACFunctions(
                 name: "HMAC-SHA512",
                 hashFunction: 5,
-                initHMAC: { keyPtr, keyLen in initHMAC(5, keyPtr, keyLen) },
-                update: { ptr, data, length in updateHMAC(5, ptr, data, length) },
-                finalize: { ptr, out in finalizeHMAC(5, ptr, out) },
-                reset: { ptr, keyPtr, keyLen in resetHMAC(5, ptr, keyPtr, keyLen) },
-                copy: { ptr in copyHMAC(5, ptr) },
-                free: { ptr in freeHMAC(5, ptr) },
-                size: { hmacSize(5) },
+                initHMAC: { keyPtr, keyLen in go_initHMAC(5, keyPtr, keyLen) },
+                update: { ptr, data, length in go_updateHMAC(5, ptr, data, length) },
+                finalize: { ptr, out in go_finalizeHMAC(5, ptr, out) },
+                reset: { ptr, keyPtr, keyLen in go_resetHMAC(5, ptr, keyPtr, keyLen) },
+                copy: { ptr in go_copyHMAC(5, ptr) },
+                free: { ptr in go_freeHMAC(5, ptr) },
+                size: { go_hmacSize(5) },
                 expectedSize: CryptoKit.SHA512.byteCount,
                 knownEmptyKeyHMACHex:
-                    "b936cee86c9f87aa5d3c6f2e84cb5a4239a5fe50480a6ec66b70ab5b1f4ac6730c6c515421b327ec1d69402e53dfb49ad7381eb067b338fd7b0cb22247225d47",  // HMAC-SHA512("", "")
+                    "b936cee86c9f87aa5d3c6f2e84cb5a4239a5fe50480a6ec66b70ab5b1f4ac6730c6c515421b327ec1d69402e53dfb49ad7381eb067b338fd7b0cb22247225d47",  // HMAC-go_SHA512("", "")
                 knownTestKeyMessageHMACHex:
-                    "ea0625a5ff1cd1653a327f8a4ae2f478fc51405c73ddac3a8a05a7a810310a6a14d7c8b4d284013493a6016ecadc772cfd98ed6cbe745949c5e6119fafb63b54"  // HMAC-SHA512("key", "hello world")
+                    "ea0625a5ff1cd1653a327f8a4ae2f478fc51405c73ddac3a8a05a7a810310a6a14d7c8b4d284013493a6016ecadc772cfd98ed6cbe745949c5e6119fafb63b54"  // HMAC-go_SHA512("key", "hello world")
             ),
         ]
 

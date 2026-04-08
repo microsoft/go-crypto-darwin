@@ -27,6 +27,9 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
 
+      - name: Select Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
+
       - name: Build Swift
         run: bash gen-swift-bindings.sh
 

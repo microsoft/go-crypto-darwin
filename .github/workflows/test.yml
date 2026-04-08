@@ -47,7 +47,12 @@ jobs:
       - name: Run Go Tests
         run: CGO_ENABLED=${{ matrix.cgo }} go test -gcflags=all=-d=checkptr -ldflags=-linkmode=${{ matrix.linkmode }} -count 10 -shuffle on -v ./...
 
+      - name: Select Xcode 26.4
+        if: matrix.macos-version == 'macos-26'
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
+
       - name: Run Swift Tests
+        if: matrix.macos-version == 'macos-26'
         working-directory: cryptokit
         run: swift test
 
@@ -55,6 +60,9 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Select Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
 
       - name: Backup existing object files
         run: |

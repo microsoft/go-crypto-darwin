@@ -12,14 +12,14 @@
 
 uintptr_t mkcgo_err_retrieve();
 
-void _mkcgo_go_MD5(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA1(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA256(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA384(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA3_256(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA3_384(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA3_512(const uint8_t*, size_t, const uint8_t*);
-void _mkcgo_go_SHA512(const uint8_t*, size_t, const uint8_t*);
+void _mkcgo_go_MD5(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA1(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA256(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA384(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA3_256(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA3_384(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA3_512(const uint8_t*, size_t, uint8_t*);
+void _mkcgo_go_SHA512(const uint8_t*, size_t, uint8_t*);
 void* _mkcgo_go_copyHMAC(int32_t, void*);
 int64_t _mkcgo_go_decapsulateMLKEM1024(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);
 int64_t _mkcgo_go_decapsulateMLKEM768(const uint8_t*, int64_t, const uint8_t*, int64_t, uint8_t*, int64_t);

@@ -13,6 +13,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// When compiled by clang (e.g. via Swift bridging header), assume all
+// pointers are nonnull. mkcgo parses this file as text, not via clang,
+// so the #ifdef ensures mkcgo never sees these pragmas.
+#ifdef __clang__
+#pragma clang assume_nonnull begin
+#endif
+
 // AES GCM encryption and decryption
 int64_t go_encryptAESGCM(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, uint8_t *cipherText, size_t cipherTextLength, uint8_t *tag) __attribute__((noescape, nocallback, static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(cipherText, cipherTextLength), slice(tag)));
 int64_t go_decryptAESGCM(const uint8_t *key, size_t keyLength, const uint8_t *data, size_t dataLength, const uint8_t *nonce, size_t nonceLength, const uint8_t *aad, size_t aadLength, const uint8_t *tag, size_t tagLength, uint8_t *out, size_t *outLength) __attribute__((noescape, nocallback, static, slice(key, keyLength), slice(data, dataLength), slice(nonce, nonceLength), slice(aad, aadLength), slice(tag, tagLength), slice(out)));
@@ -39,15 +46,15 @@ void go_updateHMAC(int32_t hashFunction, void *ptr, const uint8_t *data, int64_t
 void go_finalizeHMAC(int32_t hashFunction, void *ptr, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(outputPointer)));
 void *go_copyHMAC(int32_t hashAlgorithm, void *ptr) __attribute__((noescape, nocallback, static));
 
-void go_MD5(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA1(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA256(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA384(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA512(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_MD5(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA1(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA256(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA384(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA512(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 int64_t go_supportsSHA3() __attribute__((noescape, nocallback, static));
-void go_SHA3_256(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA3_384(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
-void go_SHA3_512(const uint8_t *inputPointer, size_t inputLength, const uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA3_256(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA3_384(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA3_512(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 
 void *go_hashNew(int32_t hashAlgorithm) __attribute__((noescape, nocallback, static));
 void go_hashWrite(int32_t hashAlgorithm, void *ptr, const uint8_t *data, int64_t length) __attribute__((noescape, nocallback, static, slice(data, length)));
@@ -80,5 +87,9 @@ int64_t go_validatePublicKeyECDH(int32_t curveID, const uint8_t *publicKey, int6
 int64_t go_generateKeyECDSA(int32_t curveID, uint8_t *x, int64_t xLen, uint8_t *y, int64_t yLen, uint8_t *d, int64_t dLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(d, dLen)));
 int64_t go_ecdsaSign(int32_t curveID, const uint8_t *d, int64_t dLen, const uint8_t *message, int64_t messageLen, uint8_t *signature, int64_t *signatureLen) __attribute__((noescape, nocallback, static, slice(d, dLen), slice(message, messageLen), slice(signature)));
 int64_t go_ecdsaVerify(int32_t curveID, const uint8_t *x, int64_t xLen, const uint8_t *y, int64_t yLen, const uint8_t *message, int64_t messageLen, const uint8_t *signature, int64_t signatureLen) __attribute__((noescape, nocallback, static, slice(x, xLen), slice(y, yLen), slice(message, messageLen), slice(signature, signatureLen)));
+
+#ifdef __clang__
+#pragma clang assume_nonnull end
+#endif
 
 #endif // _GO_CRYPTOKIT_SHIMS_H

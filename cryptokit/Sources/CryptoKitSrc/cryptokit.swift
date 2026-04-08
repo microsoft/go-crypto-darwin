@@ -4,9 +4,13 @@
 import CryptoKit
 import Foundation
 
+#if canImport(CryptoKitC)
+import CryptoKitC
+#endif
+
 // Runtime feature detection for SHA3 (available on macOS 26+ only)
-@_cdecl("go_supportsSHA3")
-public func supportsSHA3() -> Int {
+@implementation @c
+public func go_supportsSHA3() -> Int {
     if #available(macOS 26.0, *) {
         // SHA3 symbols are lazily bound, so if this returns true,
         // the runtime can safely call SHA3_* functions.
@@ -15,19 +19,19 @@ public func supportsSHA3() -> Int {
     return 0
 }
 
-@_cdecl("go_encryptAESGCM")
-public func encryptAESGCM(
-    keyPointer: UnsafePointer<UInt8>,
-    keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>,
-    dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>,
-    nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>,
-    aadLength: Int,
-    cipherTextPointer: UnsafeMutablePointer<UInt8>,
-    cipherTextLength: Int,
-    tagPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_encryptAESGCM(
+    _ keyPointer: UnsafePointer<UInt8>,
+    _ keyLength: Int,
+    _ dataPointer: UnsafePointer<UInt8>,
+    _ dataLength: Int,
+    _ noncePointer: UnsafePointer<UInt8>,
+    _ nonceLength: Int,
+    _ aadPointer: UnsafePointer<UInt8>,
+    _ aadLength: Int,
+    _ cipherTextPointer: UnsafeMutablePointer<UInt8>,
+    _ cipherTextLength: Int,
+    _ tagPointer: UnsafeMutablePointer<UInt8>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let data = Data(bytes: dataPointer, count: dataLength)
@@ -53,20 +57,20 @@ public func encryptAESGCM(
     }
 }
 
-@_cdecl("go_decryptAESGCM")
-public func decryptAESGCM(
-    keyPointer: UnsafePointer<UInt8>,
-    keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>,
-    dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>,
-    nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>,
-    aadLength: Int,
-    tagPointer: UnsafePointer<UInt8>,
-    tagLength: Int,
-    outPointer: UnsafeMutablePointer<UInt8>,
-    outLength: UnsafeMutablePointer<Int>
+@implementation @c
+public func go_decryptAESGCM(
+    _ keyPointer: UnsafePointer<UInt8>,
+    _ keyLength: Int,
+    _ dataPointer: UnsafePointer<UInt8>,
+    _ dataLength: Int,
+    _ noncePointer: UnsafePointer<UInt8>,
+    _ nonceLength: Int,
+    _ aadPointer: UnsafePointer<UInt8>,
+    _ aadLength: Int,
+    _ tagPointer: UnsafePointer<UInt8>,
+    _ tagLength: Int,
+    _ outPointer: UnsafeMutablePointer<UInt8>,
+    _ outLength: UnsafeMutablePointer<Int>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let nonceData = Data(bytes: noncePointer, count: nonceLength)
@@ -88,19 +92,19 @@ public func decryptAESGCM(
     }
 }
 
-@_cdecl("go_encryptChaChaPoly")
-public func encryptChaChaPoly(
-    keyPointer: UnsafePointer<UInt8>,
-    keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>,
-    dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>,
-    nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>,
-    aadLength: Int,
-    cipherTextPointer: UnsafeMutablePointer<UInt8>,
-    cipherTextLength: Int,
-    tagPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_encryptChaChaPoly(
+    _ keyPointer: UnsafePointer<UInt8>,
+    _ keyLength: Int,
+    _ dataPointer: UnsafePointer<UInt8>,
+    _ dataLength: Int,
+    _ noncePointer: UnsafePointer<UInt8>,
+    _ nonceLength: Int,
+    _ aadPointer: UnsafePointer<UInt8>,
+    _ aadLength: Int,
+    _ cipherTextPointer: UnsafeMutablePointer<UInt8>,
+    _ cipherTextLength: Int,
+    _ tagPointer: UnsafeMutablePointer<UInt8>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let data = Data(bytes: dataPointer, count: dataLength)
@@ -126,20 +130,20 @@ public func encryptChaChaPoly(
     }
 }
 
-@_cdecl("go_decryptChaChaPoly")
-public func decryptChaChaPoly(
-    keyPointer: UnsafePointer<UInt8>,
-    keyLength: Int,
-    dataPointer: UnsafePointer<UInt8>,
-    dataLength: Int,
-    noncePointer: UnsafePointer<UInt8>,
-    nonceLength: Int,
-    aadPointer: UnsafePointer<UInt8>,
-    aadLength: Int,
-    tagPointer: UnsafePointer<UInt8>,
-    tagLength: Int,
-    outPointer: UnsafeMutablePointer<UInt8>,
-    outLength: UnsafeMutablePointer<Int>
+@implementation @c
+public func go_decryptChaChaPoly(
+    _ keyPointer: UnsafePointer<UInt8>,
+    _ keyLength: Int,
+    _ dataPointer: UnsafePointer<UInt8>,
+    _ dataLength: Int,
+    _ noncePointer: UnsafePointer<UInt8>,
+    _ nonceLength: Int,
+    _ aadPointer: UnsafePointer<UInt8>,
+    _ aadLength: Int,
+    _ tagPointer: UnsafePointer<UInt8>,
+    _ tagLength: Int,
+    _ outPointer: UnsafeMutablePointer<UInt8>,
+    _ outLength: UnsafeMutablePointer<Int>
 ) -> Int {
     let keyData = Data(bytes: keyPointer, count: keyLength)
     let nonceData = Data(bytes: noncePointer, count: nonceLength)
@@ -165,8 +169,8 @@ var publicKeySizeEd25519 = 32
 var signatureSizeEd25519 = 64
 var seedSizeEd25519 = 32
 
-@_cdecl("go_generateKeyEd25519")
-public func generateKeyEd25519(keyPointer: UnsafeMutablePointer<UInt8>) -> Void {
+@implementation @c
+public func go_generateKeyEd25519(_ keyPointer: UnsafeMutablePointer<UInt8>) -> Void {
     // Generate a private key using CryptoKit
     let privateKey = Curve25519.Signing.PrivateKey()
 
@@ -178,10 +182,10 @@ public func generateKeyEd25519(keyPointer: UnsafeMutablePointer<UInt8>) -> Void 
     privateKey.publicKey.rawRepresentation.copyBytes(to: keyPointer + publicKeySizeEd25519, count: publicKeySizeEd25519)
 }
 
-@_cdecl("go_newPrivateKeyEd25519FromSeed")
-public func newPrivateKeyEd25519FromSeed(
-    keyPointer: UnsafeMutablePointer<UInt8>,
-    seedPointer: UnsafePointer<UInt8>
+@implementation @c
+public func go_newPrivateKeyEd25519FromSeed(
+    _ keyPointer: UnsafeMutablePointer<UInt8>,
+    _ seedPointer: UnsafePointer<UInt8>
 ) -> Int {
     // Copy the seed into a Data object
     let seedData = Data(bytes: seedPointer, count: seedSizeEd25519)
@@ -204,10 +208,10 @@ public func newPrivateKeyEd25519FromSeed(
     return 0
 }
 
-@_cdecl("go_newPublicKeyEd25519")
-public func newPublicKeyEd25519(
-    keyPointer: UnsafeMutablePointer<UInt8>,
-    pubPointer: UnsafePointer<UInt8>
+@implementation @c
+public func go_newPublicKeyEd25519(
+    _ keyPointer: UnsafeMutablePointer<UInt8>,
+    _ pubPointer: UnsafePointer<UInt8>
 ) -> Int {
     // Copy the public key bytes into a Data object
     let pubData = Data(bytes: pubPointer, count: seedSizeEd25519)
@@ -225,17 +229,13 @@ public func newPublicKeyEd25519(
     }
 }
 
-@_cdecl("go_signEd25519")
-public func signEd25519(
-    privateKeyPointer: UnsafePointer<UInt8>,
-    messagePointer: UnsafePointer<UInt8>?,
-    messageLength: Int,
-    sigBuffer: UnsafeMutablePointer<UInt8>?
+@implementation @c
+public func go_signEd25519(
+    _ privateKeyPointer: UnsafePointer<UInt8>,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLength: Int,
+    _ sigBuffer: UnsafeMutablePointer<UInt8>
 ) -> Int {
-    guard let sigBuffer = sigBuffer else {
-        return -1  // Invalid inputs
-    }
-
     // Convert the raw private key back to the seed (32 bytes)
     let privateKeySeed = Data(bytes: privateKeyPointer, count: seedSizeEd25519)
 
@@ -249,7 +249,7 @@ public func signEd25519(
 
     // Convert the message to Data
     let messageData: Data
-    if let messagePointer = messagePointer, messageLength > 0 {
+    if messageLength > 0 {
         messageData = Data(bytes: messagePointer, count: messageLength)
     } else {
         messageData = Data()  // Empty message
@@ -274,17 +274,13 @@ public func signEd25519(
     return signature.count  // Return the number of bytes written
 }
 
-@_cdecl("go_verifyEd25519")
-public func verifyEd25519(
-    publicKeyPointer: UnsafePointer<UInt8>,
-    messagePointer: UnsafePointer<UInt8>?,
-    messageLength: Int,
-    sigPointer: UnsafePointer<UInt8>?
+@implementation @c
+public func go_verifyEd25519(
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLength: Int,
+    _ sigPointer: UnsafePointer<UInt8>
 ) -> Int {
-    guard let sigPointer = sigPointer else {
-        return -1  // Invalid inputs
-    }
-
     // Convert the raw public key back to a Data object
     let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeySizeEd25519)
 
@@ -295,7 +291,7 @@ public func verifyEd25519(
 
     // Convert the message and signature to Data
     let rawMessage: Data
-    if let messagePointer = messagePointer, messageLength > 0 {
+    if messageLength > 0 {
         rawMessage = Data(bytes: messagePointer, count: messageLength)
     } else {
         rawMessage = Data()  // Empty message
@@ -312,8 +308,7 @@ public func verifyEd25519(
 // ECDH for P-256, P-384, P-521 using CryptoKit
 
 // Helper function to determine key size based on curve
-@_cdecl("go_getECDHKeySizeForCurve")
-public func getECDHKeySizeForCurve(_ curveID: Int32) -> Int {
+public func go_getECDHKeySizeForCurve(_ curveID: Int32) -> Int {
     switch curveID {
     case 0:  // X25519
         return 32
@@ -328,15 +323,15 @@ public func getECDHKeySizeForCurve(_ curveID: Int32) -> Int {
     }
 }
 
-@_cdecl("go_generateKeyECDH")
-public func generateKeyECDH(
-    curveID: Int32,
-    privateKeyPointer: UnsafeMutablePointer<UInt8>,
-    privateKeyLen: Int,
-    publicKeyPointer: UnsafeMutablePointer<UInt8>,
-    publicKeyLen: Int
+@implementation @c
+public func go_generateKeyECDH(
+    _ curveID: Int32,
+    _ privateKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ privateKeyLen: Int,
+    _ publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ publicKeyLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0 else { return -1 }
 
     if curveID == 0 {
@@ -390,15 +385,15 @@ public func generateKeyECDH(
     }
 }
 
-@_cdecl("go_publicKeyFromPrivateECDH")
-public func publicKeyFromPrivateECDH(
-    curveID: Int32,
-    privateKeyPointer: UnsafePointer<UInt8>,
-    privateKeyLen: Int,
-    publicKeyPointer: UnsafeMutablePointer<UInt8>,
-    publicKeyLen: Int
+@implementation @c
+public func go_publicKeyFromPrivateECDH(
+    _ curveID: Int32,
+    _ privateKeyPointer: UnsafePointer<UInt8>,
+    _ privateKeyLen: Int,
+    _ publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ publicKeyLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0 else { return -1 }
 
     if curveID == 0 {
@@ -449,17 +444,17 @@ public func publicKeyFromPrivateECDH(
     }
 }
 
-@_cdecl("go_ecdhSharedSecret")
-public func ecdhSharedSecret(
-    curveID: Int32,
-    privateKeyPointer: UnsafePointer<UInt8>,
-    privateKeyLen: Int,
-    publicKeyPointer: UnsafePointer<UInt8>,
-    publicKeyLen: Int,
-    sharedSecretPointer: UnsafeMutablePointer<UInt8>,
-    sharedSecretLen: Int
+@implementation @c
+public func go_ecdhSharedSecret(
+    _ curveID: Int32,
+    _ privateKeyPointer: UnsafePointer<UInt8>,
+    _ privateKeyLen: Int,
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int,
+    _ sharedSecretPointer: UnsafeMutablePointer<UInt8>,
+    _ sharedSecretLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0 else { return -1 }
 
     if curveID == 0 {
@@ -529,17 +524,17 @@ public func ecdhSharedSecret(
 
 // ECDSA for P-256, P-384, P-521 using CryptoKit
 
-@_cdecl("go_generateKeyECDSA")
-public func generateKeyECDSA(
-    curveID: Int32,
-    xPointer: UnsafeMutablePointer<UInt8>,
-    xLen: Int,
-    yPointer: UnsafeMutablePointer<UInt8>,
-    yLen: Int,
-    dPointer: UnsafeMutablePointer<UInt8>,
-    dLen: Int
+@implementation @c
+public func go_generateKeyECDSA(
+    _ curveID: Int32,
+    _ xPointer: UnsafeMutablePointer<UInt8>,
+    _ xLen: Int,
+    _ yPointer: UnsafeMutablePointer<UInt8>,
+    _ yLen: Int,
+    _ dPointer: UnsafeMutablePointer<UInt8>,
+    _ dLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0, xLen == keySize, yLen == keySize, dLen == keySize else {
         return -1  // Invalid key sizes
     }
@@ -600,17 +595,17 @@ func castToDigest<D: Digest>(_ data: Data, to type: D.Type) -> D {
     return digestBytes.withUnsafeBytes { $0.load(as: D.self) }
 }
 
-@_cdecl("go_ecdsaSign")
-public func ecdsaSign(
-    curveID: Int32,
-    dPointer: UnsafePointer<UInt8>,
-    dLen: Int,
-    messagePointer: UnsafePointer<UInt8>,
-    messageLen: Int,
-    signaturePointer: UnsafeMutablePointer<UInt8>,
-    signatureLen: UnsafeMutablePointer<Int>
+@implementation @c
+public func go_ecdsaSign(
+    _ curveID: Int32,
+    _ dPointer: UnsafePointer<UInt8>,
+    _ dLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ signaturePointer: UnsafeMutablePointer<UInt8>,
+    _ signatureLen: UnsafeMutablePointer<Int>
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0, dLen == keySize else {
         return -1  // Invalid key size
     }
@@ -661,19 +656,19 @@ public func ecdsaSign(
     }
 }
 
-@_cdecl("go_ecdsaVerify")
-public func ecdsaVerify(
-    curveID: Int32,
-    xPointer: UnsafePointer<UInt8>,
-    xLen: Int,
-    yPointer: UnsafePointer<UInt8>,
-    yLen: Int,
-    messagePointer: UnsafePointer<UInt8>,
-    messageLen: Int,
-    signaturePointer: UnsafePointer<UInt8>,
-    signatureLen: Int
+@implementation @c
+public func go_ecdsaVerify(
+    _ curveID: Int32,
+    _ xPointer: UnsafePointer<UInt8>,
+    _ xLen: Int,
+    _ yPointer: UnsafePointer<UInt8>,
+    _ yLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ signaturePointer: UnsafePointer<UInt8>,
+    _ signatureLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0, xLen == keySize, yLen == keySize else {
         return -1  // Invalid key sizes
     }
@@ -720,11 +715,11 @@ public func ecdsaVerify(
     }
 }
 
-@_cdecl("go_MD5")
-public func MD5(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_MD5(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = Insecure.MD5.hash(data: inputData)
@@ -733,11 +728,11 @@ public func MD5(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("go_SHA1")
-public func SHA1(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA1(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = Insecure.SHA1.hash(data: inputData)
@@ -746,11 +741,11 @@ public func SHA1(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("go_SHA256")
-public func SHA256(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA256(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA256.hash(data: inputData)
@@ -759,11 +754,11 @@ public func SHA256(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("go_SHA384")
-public func SHA384(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA384(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA384.hash(data: inputData)
@@ -772,11 +767,11 @@ public func SHA384(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("go_SHA512")
-public func SHA512(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA512(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA512.hash(data: inputData)
@@ -788,11 +783,11 @@ public func SHA512(
 // SHA3 functions are only available when compiling with macOS 26.0+ SDK
 #if compiler(>=6.2)
 @available(macOS 26.0, *)
-@_cdecl("go_SHA3_256")
-public func SHA3_256(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA3_256(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_256.hash(data: inputData)
@@ -801,11 +796,11 @@ public func SHA3_256(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_SHA3_384")
-public func SHA3_384(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA3_384(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_384.hash(data: inputData)
@@ -814,11 +809,11 @@ public func SHA3_384(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_SHA3_512")
-public func SHA3_512(
-    inputPointer: UnsafePointer<UInt8>,
-    inputLength: Int,
-    outputPointer: UnsafeMutablePointer<UInt8>
+@implementation @c
+public func go_SHA3_512(
+    _ inputPointer: UnsafePointer<UInt8>,
+    _ inputLength: Int,
+    _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
     let inputData = Data(bytes: inputPointer, count: inputLength)
     let hash = CryptoKit.SHA3_512.hash(data: inputData)
@@ -827,8 +822,8 @@ public func SHA3_512(
 }
 #endif
 
-@_cdecl("go_hashNew")
-public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
+@implementation @c
+public func go_hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
         let hasher = UnsafeMutablePointer<Insecure.MD5>.allocate(capacity: 1)
@@ -891,8 +886,8 @@ public func hashNew(_ hashAlgorithm: Int32) -> UnsafeMutableRawPointer {
     }
 }
 
-@_cdecl("go_hashWrite")
-public func hashWrite(
+@implementation @c
+public func go_hashWrite(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ data: UnsafePointer<UInt8>,
@@ -956,8 +951,8 @@ public func hashWrite(
         fatalError("Unsupported hash function")
     }
 }
-@_cdecl("go_hashSum")
-public func hashSum(
+@implementation @c
+public func go_hashSum(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ outputPointer: UnsafeMutablePointer<UInt8>
@@ -1045,8 +1040,8 @@ public func hashSum(
     }
 }
 
-@_cdecl("go_hashReset")
-public func hashReset(
+@implementation @c
+public func go_hashReset(
     _ hashAlgorithm: Int32,
     _ ptr: UnsafeMutableRawPointer
 ) {
@@ -1101,8 +1096,8 @@ public func hashReset(
     }
 }
 
-@_cdecl("go_hashSize")
-public func hashSize(_ hashAlgorithm: Int32) -> Int {
+@implementation @c
+public func go_hashSize(_ hashAlgorithm: Int32) -> Int {
     switch hashAlgorithm {
     case 1:
         return Insecure.MD5.byteCount
@@ -1146,8 +1141,8 @@ public func hashSize(_ hashAlgorithm: Int32) -> Int {
     }
 }
 
-@_cdecl("go_hashBlockSize")
-public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
+@implementation @c
+public func go_hashBlockSize(_ hashAlgorithm: Int32) -> Int {
     switch hashAlgorithm {
     case 1:
         return Insecure.MD5.blockByteCount
@@ -1191,8 +1186,8 @@ public func hashBlockSize(_ hashAlgorithm: Int32) -> Int {
     }
 }
 
-@_cdecl("go_hashCopy")
-public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+@implementation @c
+public func go_hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
         let hasher = ptr.assumingMemoryBound(to: Insecure.MD5.self)
@@ -1288,8 +1283,8 @@ public func hashCopy(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> 
     }
 }
 
-@_cdecl("go_hashFree")
-public func hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) {
+@implementation @c
+public func go_hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) {
     switch hashAlgorithm {
     case 1:
         let hasher = ptr.assumingMemoryBound(to: Insecure.MD5.self)
@@ -1341,15 +1336,15 @@ public func hashFree(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) {
     }
 }
 
-@_cdecl("go_extractHKDF")
-public func extractHKDF(
-    hashFunction: Int32,
-    secretPointer: UnsafePointer<UInt8>,
-    secretLength: Int,
-    saltPointer: UnsafePointer<UInt8>,
-    saltLength: Int,
-    prkPointer: UnsafeMutablePointer<UInt8>,
-    prkLength: Int
+@implementation @c
+public func go_extractHKDF(
+    _ hashFunction: Int32,
+    _ secretPointer: UnsafePointer<UInt8>,
+    _ secretLength: Int,
+    _ saltPointer: UnsafePointer<UInt8>,
+    _ saltLength: Int,
+    _ prkPointer: UnsafeMutablePointer<UInt8>,
+    _ prkLength: Int
 ) -> Int {
     // Convert input pointers to Data
     let secretData: SymmetricKey = SymmetricKey(data: Data(bytes: secretPointer, count: secretLength))
@@ -1390,15 +1385,15 @@ public func extractHKDF(
     return 0
 }
 
-@_cdecl("go_expandHKDF")
-public func expandHKDF(
-    hashFunction: Int32,
-    prkPointer: UnsafePointer<UInt8>,
-    prkLength: Int,
-    infoPointer: UnsafePointer<UInt8>,
-    infoLength: Int,
-    derivedKeyPointer: UnsafeMutablePointer<UInt8>,
-    derivedKeyLength: Int
+@implementation @c
+public func go_expandHKDF(
+    _ hashFunction: Int32,
+    _ prkPointer: UnsafePointer<UInt8>,
+    _ prkLength: Int,
+    _ infoPointer: UnsafePointer<UInt8>,
+    _ infoLength: Int,
+    _ derivedKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ derivedKeyLength: Int
 ) -> Int {
     // Convert input pointers to Data
     let prkData: SymmetricKey = SymmetricKey(data: Data(bytes: prkPointer, count: prkLength))
@@ -1443,8 +1438,8 @@ public func expandHKDF(
     return 0
 }
 
-@_cdecl("go_initHMAC")
-public func initHMAC(
+@implementation @c
+public func go_initHMAC(
     _ hashFunction: Int32,
     _ keyPointer: UnsafePointer<UInt8>,
     _ keyLength: Int
@@ -1481,8 +1476,8 @@ public func initHMAC(
     }
 }
 
-@_cdecl("go_freeHMAC")
-public func freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
+@implementation @c
+public func go_freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     switch hashFunction {
     case 1:
         let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.MD5>.self)
@@ -1504,8 +1499,8 @@ public func freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     }
 }
 
-@_cdecl("go_updateHMAC")
-public func updateHMAC(
+@implementation @c
+public func go_updateHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ data: UnsafePointer<UInt8>,
@@ -1534,8 +1529,8 @@ public func updateHMAC(
     }
 }
 
-@_cdecl("go_copyHMAC")
-public func copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+@implementation @c
+public func go_copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     switch hashAlgorithm {
     case 1:
         let hmac = ptr.assumingMemoryBound(to: HMAC<Insecure.MD5>.self)
@@ -1577,8 +1572,8 @@ public func copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) -> 
     }
 }
 
-@_cdecl("go_finalizeHMAC")
-public func finalizeHMAC(
+@implementation @c
+public func go_finalizeHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ outputPointer: UnsafeMutablePointer<UInt8>
@@ -1609,8 +1604,7 @@ public func finalizeHMAC(
     }
 }
 
-@_cdecl("go_hmacSize")
-public func hmacSize(_ hashFunction: Int32) -> Int {
+public func go_hmacSize(_ hashFunction: Int32) -> Int {
     switch hashFunction {
     case 1:
         return Insecure.MD5.byteCount
@@ -1627,8 +1621,7 @@ public func hmacSize(_ hashFunction: Int32) -> Int {
     }
 }
 
-@_cdecl("go_resetHMAC")
-public func resetHMAC(
+public func go_resetHMAC(
     _ hashFunction: Int32,
     _ ptr: UnsafeMutableRawPointer,
     _ keyPointer: UnsafePointer<UInt8>,
@@ -1658,8 +1651,8 @@ public func resetHMAC(
 
 // ML-KEM (Post-quantum key encapsulation mechanism)
 // Runtime feature detection for ML-KEM (available on macOS 26+ only)
-@_cdecl("go_supportsMLKEM")
-public func supportsMLKEM() -> Int {
+@implementation @c
+public func go_supportsMLKEM() -> Int {
     if #available(macOS 26.0, *) {
         // ML-KEM symbols are lazily bound, so if this returns true,
         // the runtime can safely call ML-KEM functions.
@@ -1671,8 +1664,8 @@ public func supportsMLKEM() -> Int {
 // ML-KEM-768 functions
 #if compiler(>=6.2)
 @available(macOS 26.0, *)
-@_cdecl("go_generateKeyMLKEM768")
-public func generateKeyMLKEM768(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
+@implementation @c
+public func go_generateKeyMLKEM768(_ seedPointer: UnsafeMutablePointer<UInt8>, _ seedLen: Int) -> Int {
     do {
         let privateKey = try MLKEM768.PrivateKey()
         let seedData = privateKey.seedRepresentation
@@ -1686,12 +1679,12 @@ public func generateKeyMLKEM768(seedPointer: UnsafeMutablePointer<UInt8>, seedLe
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_deriveEncapsulationKeyMLKEM768")
-public func deriveEncapsulationKeyMLKEM768(
-    seedPointer: UnsafePointer<UInt8>,
-    seedLen: Int,
-    encapKeyPointer: UnsafeMutablePointer<UInt8>,
-    encapKeyLen: Int
+@implementation @c
+public func go_deriveEncapsulationKeyMLKEM768(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ encapKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ encapKeyLen: Int
 ) -> Int {
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
@@ -1709,14 +1702,14 @@ public func deriveEncapsulationKeyMLKEM768(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_encapsulateMLKEM768")
-public func encapsulateMLKEM768(
-    encapKeyPointer: UnsafePointer<UInt8>,
-    encapKeyLen: Int,
-    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
-    sharedKeyLen: Int,
-    ciphertextPointer: UnsafeMutablePointer<UInt8>,
-    ciphertextLen: Int
+@implementation @c
+public func go_encapsulateMLKEM768(
+    _ encapKeyPointer: UnsafePointer<UInt8>,
+    _ encapKeyLen: Int,
+    _ sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ sharedKeyLen: Int,
+    _ ciphertextPointer: UnsafeMutablePointer<UInt8>,
+    _ ciphertextLen: Int
 ) -> Int {
     do {
         let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
@@ -1740,14 +1733,14 @@ public func encapsulateMLKEM768(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_decapsulateMLKEM768")
-public func decapsulateMLKEM768(
-    seedPointer: UnsafePointer<UInt8>,
-    seedLen: Int,
-    ciphertextPointer: UnsafePointer<UInt8>,
-    ciphertextLen: Int,
-    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
-    sharedKeyLen: Int
+@implementation @c
+public func go_decapsulateMLKEM768(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ ciphertextPointer: UnsafePointer<UInt8>,
+    _ ciphertextLen: Int,
+    _ sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ sharedKeyLen: Int
 ) -> Int {
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
@@ -1768,8 +1761,8 @@ public func decapsulateMLKEM768(
 
 // ML-KEM-1024 functions
 @available(macOS 26.0, *)
-@_cdecl("go_generateKeyMLKEM1024")
-public func generateKeyMLKEM1024(seedPointer: UnsafeMutablePointer<UInt8>, seedLen: Int) -> Int {
+@implementation @c
+public func go_generateKeyMLKEM1024(_ seedPointer: UnsafeMutablePointer<UInt8>, _ seedLen: Int) -> Int {
     do {
         let privateKey = try MLKEM1024.PrivateKey()
         let seedData = privateKey.seedRepresentation
@@ -1783,12 +1776,12 @@ public func generateKeyMLKEM1024(seedPointer: UnsafeMutablePointer<UInt8>, seedL
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_deriveEncapsulationKeyMLKEM1024")
-public func deriveEncapsulationKeyMLKEM1024(
-    seedPointer: UnsafePointer<UInt8>,
-    seedLen: Int,
-    encapKeyPointer: UnsafeMutablePointer<UInt8>,
-    encapKeyLen: Int
+@implementation @c
+public func go_deriveEncapsulationKeyMLKEM1024(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ encapKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ encapKeyLen: Int
 ) -> Int {
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
@@ -1806,14 +1799,14 @@ public func deriveEncapsulationKeyMLKEM1024(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_encapsulateMLKEM1024")
-public func encapsulateMLKEM1024(
-    encapKeyPointer: UnsafePointer<UInt8>,
-    encapKeyLen: Int,
-    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
-    sharedKeyLen: Int,
-    ciphertextPointer: UnsafeMutablePointer<UInt8>,
-    ciphertextLen: Int
+@implementation @c
+public func go_encapsulateMLKEM1024(
+    _ encapKeyPointer: UnsafePointer<UInt8>,
+    _ encapKeyLen: Int,
+    _ sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ sharedKeyLen: Int,
+    _ ciphertextPointer: UnsafeMutablePointer<UInt8>,
+    _ ciphertextLen: Int
 ) -> Int {
     do {
         let publicKeyData = Data(bytes: encapKeyPointer, count: encapKeyLen)
@@ -1837,14 +1830,14 @@ public func encapsulateMLKEM1024(
 }
 
 @available(macOS 26.0, *)
-@_cdecl("go_decapsulateMLKEM1024")
-public func decapsulateMLKEM1024(
-    seedPointer: UnsafePointer<UInt8>,
-    seedLen: Int,
-    ciphertextPointer: UnsafePointer<UInt8>,
-    ciphertextLen: Int,
-    sharedKeyPointer: UnsafeMutablePointer<UInt8>,
-    sharedKeyLen: Int
+@implementation @c
+public func go_decapsulateMLKEM1024(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ ciphertextPointer: UnsafePointer<UInt8>,
+    _ ciphertextLen: Int,
+    _ sharedKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ sharedKeyLen: Int
 ) -> Int {
     do {
         let seedData = Data(bytes: seedPointer, count: seedLen)
@@ -1865,13 +1858,13 @@ public func decapsulateMLKEM1024(
 #endif
 
 // ECDH Key Validation
-@_cdecl("go_validatePrivateKeyECDH")
-public func validatePrivateKeyECDH(
-    curveID: Int32,
-    privateKeyPointer: UnsafePointer<UInt8>,
-    privateKeyLen: Int
+@implementation @c
+public func go_validatePrivateKeyECDH(
+    _ curveID: Int32,
+    _ privateKeyPointer: UnsafePointer<UInt8>,
+    _ privateKeyLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0, privateKeyLen == keySize else {
         return -1  // Invalid key size
     }
@@ -1900,13 +1893,13 @@ public func validatePrivateKeyECDH(
     }
 }
 
-@_cdecl("go_validatePublicKeyECDH")
-public func validatePublicKeyECDH(
-    curveID: Int32,
-    publicKeyPointer: UnsafePointer<UInt8>,
-    publicKeyLen: Int
+@implementation @c
+public func go_validatePublicKeyECDH(
+    _ curveID: Int32,
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int
 ) -> Int {
-    let keySize = getECDHKeySizeForCurve(curveID)
+    let keySize = go_getECDHKeySizeForCurve(curveID)
     guard keySize > 0 else { return -1 }
 
     if curveID == 0 {

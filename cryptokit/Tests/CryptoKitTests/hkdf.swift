@@ -4,6 +4,7 @@
 import XCTest
 
 @testable import CryptoKitSrc
+import CryptoKitC
 
 final class HKDFTests: XCTestCase {
     func testExtractHKDF_SHA256() {
@@ -11,14 +12,14 @@ final class HKDFTests: XCTestCase {
         let salt = "TestSalt".data(using: .utf8)!
         var prk = [UInt8](repeating: 0, count: 32)  // Expected size for SHA256 PRK
 
-        let result = extractHKDF(
-            hashFunction: 2,  // SHA256
-            secretPointer: Array(secret),
-            secretLength: secret.count,
-            saltPointer: Array(salt),
-            saltLength: salt.count,
-            prkPointer: &prk,
-            prkLength: prk.count
+        let result = go_extractHKDF(
+            2,  // SHA256
+            Array(secret),
+            secret.count,
+            Array(salt),
+            salt.count,
+            &prk,
+            prk.count
         )
 
         XCTAssertEqual(result, 0, "extractHKDF failed with SHA256")
@@ -30,14 +31,14 @@ final class HKDFTests: XCTestCase {
         let salt = "TestSalt".data(using: .utf8)!
         var prk = [UInt8](repeating: 0, count: 32)
 
-        let result = extractHKDF(
-            hashFunction: 0,  // Unsupported hash function
-            secretPointer: Array(secret),
-            secretLength: secret.count,
-            saltPointer: Array(salt),
-            saltLength: salt.count,
-            prkPointer: &prk,
-            prkLength: prk.count
+        let result = go_extractHKDF(
+            0,  // Unsupported hash function
+            Array(secret),
+            secret.count,
+            Array(salt),
+            salt.count,
+            &prk,
+            prk.count
         )
 
         XCTAssertEqual(result, -1, "extractHKDF should fail for unsupported hash function")
@@ -48,14 +49,14 @@ final class HKDFTests: XCTestCase {
         let info = "TestInfo".data(using: .utf8)!
         var derivedKey = [UInt8](repeating: 0, count: 64)  // Derived key size
 
-        let result = expandHKDF(
-            hashFunction: 4,  // SHA512
-            prkPointer: Array(prk),
-            prkLength: prk.count,
-            infoPointer: Array(info),
-            infoLength: info.count,
-            derivedKeyPointer: &derivedKey,
-            derivedKeyLength: derivedKey.count
+        let result = go_expandHKDF(
+            4,  // SHA512
+            Array(prk),
+            prk.count,
+            Array(info),
+            info.count,
+            &derivedKey,
+            derivedKey.count
         )
 
         XCTAssertEqual(result, 0, "expandHKDF failed with SHA512")
@@ -67,14 +68,14 @@ final class HKDFTests: XCTestCase {
         let info = "TestInfo".data(using: .utf8)!
         var derivedKey = [UInt8](repeating: 0, count: 32)
 
-        let result = expandHKDF(
-            hashFunction: 0,  // Unsupported hash function
-            prkPointer: Array(prk),
-            prkLength: prk.count,
-            infoPointer: Array(info),
-            infoLength: info.count,
-            derivedKeyPointer: &derivedKey,
-            derivedKeyLength: derivedKey.count
+        let result = go_expandHKDF(
+            0,  // Unsupported hash function
+            Array(prk),
+            prk.count,
+            Array(info),
+            info.count,
+            &derivedKey,
+            derivedKey.count
         )
 
         XCTAssertEqual(result, -1, "expandHKDF should fail for unsupported hash function")

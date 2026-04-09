@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import CryptoKitC
 import XCTest
 
 @testable import CryptoKitSrc
@@ -25,14 +26,14 @@ final class ECDSACryptoTests: XCTestCase {
         var y = [UInt8](repeating: 0, count: keySize)
         var d = [UInt8](repeating: 0, count: keySize)
 
-        let genResult = generateKeyECDSA(
-            curveID: curveID,
-            xPointer: &x,
-            xLen: keySize,
-            yPointer: &y,
-            yLen: keySize,
-            dPointer: &d,
-            dLen: keySize
+        let genResult = go_generateKeyECDSA(
+            curveID,
+            &x,
+            keySize,
+            &y,
+            keySize,
+            &d,
+            keySize
         )
         XCTAssertEqual(genResult, 0, "GenerateKeyECDSA failed for curve \(curveID)")
 
@@ -42,14 +43,14 @@ final class ECDSACryptoTests: XCTestCase {
         var signatureLen = 0
 
         let signResult = message.withUnsafeBytes { messagePointer in
-            ecdsaSign(
-                curveID: curveID,
-                dPointer: &d,
-                dLen: keySize,
-                messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                messageLen: message.count,
-                signaturePointer: &signature,
-                signatureLen: &signatureLen
+            go_ecdsaSign(
+                curveID,
+                &d,
+                keySize,
+                messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                message.count,
+                &signature,
+                &signatureLen
             )
         }
         XCTAssertEqual(signResult, 0, "ECDSASign failed for curve \(curveID)")
@@ -57,16 +58,16 @@ final class ECDSACryptoTests: XCTestCase {
 
         // 3. Verify
         let verifyResult = message.withUnsafeBytes { messagePointer in
-            ecdsaVerify(
-                curveID: curveID,
-                xPointer: &x,
-                xLen: keySize,
-                yPointer: &y,
-                yLen: keySize,
-                messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                messageLen: message.count,
-                signaturePointer: &signature,
-                signatureLen: signatureLen
+            go_ecdsaVerify(
+                curveID,
+                &x,
+                keySize,
+                &y,
+                keySize,
+                messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                message.count,
+                &signature,
+                signatureLen
             )
         }
         XCTAssertEqual(verifyResult, 1, "ECDSAVerify failed for curve \(curveID)")
@@ -74,16 +75,16 @@ final class ECDSACryptoTests: XCTestCase {
         // 4. Verify with wrong message
         let wrongMessage = "Wrong message".data(using: .utf8)!
         let verifyWrongResult = wrongMessage.withUnsafeBytes { messagePointer in
-            ecdsaVerify(
-                curveID: curveID,
-                xPointer: &x,
-                xLen: keySize,
-                yPointer: &y,
-                yLen: keySize,
-                messagePointer: messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                messageLen: wrongMessage.count,
-                signaturePointer: &signature,
-                signatureLen: signatureLen
+            go_ecdsaVerify(
+                curveID,
+                &x,
+                keySize,
+                &y,
+                keySize,
+                messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                wrongMessage.count,
+                &signature,
+                signatureLen
             )
         }
         XCTAssertEqual(verifyWrongResult, 0, "ECDSAVerify should fail for wrong message")

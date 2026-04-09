@@ -16,7 +16,7 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners
     # Consider using larger runners for possible analysis time improvements.
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 360
     permissions:
       security-events: write
@@ -43,6 +43,10 @@ jobs:
         uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           languages: ${{ matrix.language }}
+
+      - name: Select Xcode 26.4
+        if: matrix.language == 'swift'
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
 
       - name: Autobuild
         if: matrix.language != 'cpp'

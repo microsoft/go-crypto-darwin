@@ -4,6 +4,7 @@
 import XCTest
 
 @testable import CryptoKitSrc
+import CryptoKitC
 
 final class GCMTests: XCTestCase {
     func testEncryptAESGCM() {
@@ -15,18 +16,18 @@ final class GCMTests: XCTestCase {
         var cipherText = [UInt8](repeating: 0, count: data.count)
         var tag = [UInt8](repeating: 0, count: 16)
 
-        let result = encryptAESGCM(
-            keyPointer: (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
-            keyLength: key.count,
-            dataPointer: (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count),
-            dataLength: data.count,
-            noncePointer: (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
-            nonceLength: nonce.count,
-            aadPointer: (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
-            aadLength: aad.count,
-            cipherTextPointer: &cipherText,
-            cipherTextLength: cipherText.count,
-            tagPointer: &tag
+        let result = go_encryptAESGCM(
+            (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
+            key.count,
+            (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count),
+            data.count,
+            (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
+            nonce.count,
+            (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
+            aad.count,
+            &cipherText,
+            cipherText.count,
+            &tag
         )
 
         XCTAssertEqual(result, 0)
@@ -43,18 +44,18 @@ final class GCMTests: XCTestCase {
         var cipherText = [UInt8](repeating: 0, count: data.count)
         var tag = [UInt8](repeating: 0, count: 16)
 
-        let encryptResult = encryptAESGCM(
-            keyPointer: (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
-            keyLength: key.count,
-            dataPointer: (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count),
-            dataLength: data.count,
-            noncePointer: (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
-            nonceLength: nonce.count,
-            aadPointer: (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
-            aadLength: aad.count,
-            cipherTextPointer: &cipherText,
-            cipherTextLength: cipherText.count,
-            tagPointer: &tag
+        let encryptResult = go_encryptAESGCM(
+            (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
+            key.count,
+            (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count),
+            data.count,
+            (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
+            nonce.count,
+            (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
+            aad.count,
+            &cipherText,
+            cipherText.count,
+            &tag
         )
 
         XCTAssertEqual(encryptResult, 0)
@@ -62,19 +63,19 @@ final class GCMTests: XCTestCase {
         var decryptedData = [UInt8](repeating: 0, count: data.count)
         var decryptedDataLength = data.count
 
-        let decryptResult = decryptAESGCM(
-            keyPointer: (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
-            keyLength: key.count,
-            dataPointer: &cipherText,
-            dataLength: cipherText.count,
-            noncePointer: (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
-            nonceLength: nonce.count,
-            aadPointer: (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
-            aadLength: aad.count,
-            tagPointer: &tag,
-            tagLength: tag.count,
-            outPointer: &decryptedData,
-            outLength: &decryptedDataLength
+        let decryptResult = go_decryptAESGCM(
+            (key as NSData).bytes.bindMemory(to: UInt8.self, capacity: key.count),
+            key.count,
+            &cipherText,
+            cipherText.count,
+            (nonce as NSData).bytes.bindMemory(to: UInt8.self, capacity: nonce.count),
+            nonce.count,
+            (aad as NSData).bytes.bindMemory(to: UInt8.self, capacity: aad.count),
+            aad.count,
+            &tag,
+            tag.count,
+            &decryptedData,
+            &decryptedDataLength
         )
 
         XCTAssertEqual(decryptResult, 0)

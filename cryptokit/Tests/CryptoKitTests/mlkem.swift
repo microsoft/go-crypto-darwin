@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import CryptoKit
+import CryptoKitC
 import Foundation
 import XCTest
 
@@ -14,7 +15,7 @@ final class MLKEMTests: XCTestCase {
     #if compiler(>=6.2)
     @available(macOS 26.0, *)
     func testMLKEMSupportDetection() {
-        let isSupported = supportsMLKEM()
+        let isSupported = go_supportsMLKEM()
         XCTAssertEqual(isSupported, 1, "ML-KEM should be supported on macOS 26.0+")
     }
     #endif
@@ -26,7 +27,7 @@ final class MLKEMTests: XCTestCase {
     func testMLKEM768KeyGeneration() throws {
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
-        let result = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
+        let result = go_generateKeyMLKEM768(&seed, 64)
 
         XCTAssertEqual(result, 0, "Key generation should succeed")
 
@@ -40,16 +41,16 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
+        let genResult = go_generateKeyMLKEM768(&seed, 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         // Derive the encapsulation key
         var encapKey = [UInt8](repeating: 0, count: 1184)  // EncapsulationKeySize768 = 1184
-        let deriveResult = deriveEncapsulationKeyMLKEM768(
-            seedPointer: seed,
-            seedLen: 64,
-            encapKeyPointer: &encapKey,
-            encapKeyLen: 1184
+        let deriveResult = go_deriveEncapsulationKeyMLKEM768(
+            seed,
+            64,
+            &encapKey,
+            1184
         )
 
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
@@ -64,40 +65,40 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM768(seedPointer: &seed, seedLen: 64)
+        let genResult = go_generateKeyMLKEM768(&seed, 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         var encapKey = [UInt8](repeating: 0, count: 1184)
-        let deriveResult = deriveEncapsulationKeyMLKEM768(
-            seedPointer: seed,
-            seedLen: 64,
-            encapKeyPointer: &encapKey,
-            encapKeyLen: 1184
+        let deriveResult = go_deriveEncapsulationKeyMLKEM768(
+            seed,
+            64,
+            &encapKey,
+            1184
         )
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
 
         // Encapsulate
         var sharedKey1 = [UInt8](repeating: 0, count: 32)  // SharedKeySize = 32
         var ciphertext = [UInt8](repeating: 0, count: 1088)  // CiphertextSize768 = 1088
-        let encapResult = encapsulateMLKEM768(
-            encapKeyPointer: encapKey,
-            encapKeyLen: 1184,
-            sharedKeyPointer: &sharedKey1,
-            sharedKeyLen: 32,
-            ciphertextPointer: &ciphertext,
-            ciphertextLen: 1088
+        let encapResult = go_encapsulateMLKEM768(
+            encapKey,
+            1184,
+            &sharedKey1,
+            32,
+            &ciphertext,
+            1088
         )
         XCTAssertEqual(encapResult, 0, "Encapsulation should succeed")
 
         // Decapsulate
         var sharedKey2 = [UInt8](repeating: 0, count: 32)
-        let decapResult = decapsulateMLKEM768(
-            seedPointer: seed,
-            seedLen: 64,
-            ciphertextPointer: ciphertext,
-            ciphertextLen: 1088,
-            sharedKeyPointer: &sharedKey2,
-            sharedKeyLen: 32
+        let decapResult = go_decapsulateMLKEM768(
+            seed,
+            64,
+            ciphertext,
+            1088,
+            &sharedKey2,
+            32
         )
         XCTAssertEqual(decapResult, 0, "Decapsulation should succeed")
 
@@ -115,7 +116,7 @@ final class MLKEMTests: XCTestCase {
     func testMLKEM1024KeyGeneration() throws {
 
         var seed = [UInt8](repeating: 0, count: 64)  // SeedSize = 64
-        let result = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
+        let result = go_generateKeyMLKEM1024(&seed, 64)
 
         XCTAssertEqual(result, 0, "Key generation should succeed")
 
@@ -129,16 +130,16 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a seed first
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
+        let genResult = go_generateKeyMLKEM1024(&seed, 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         // Derive the encapsulation key
         var encapKey = [UInt8](repeating: 0, count: 1568)  // EncapsulationKeySize1024 = 1568
-        let deriveResult = deriveEncapsulationKeyMLKEM1024(
-            seedPointer: seed,
-            seedLen: 64,
-            encapKeyPointer: &encapKey,
-            encapKeyLen: 1568
+        let deriveResult = go_deriveEncapsulationKeyMLKEM1024(
+            seed,
+            64,
+            &encapKey,
+            1568
         )
 
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
@@ -153,40 +154,40 @@ final class MLKEMTests: XCTestCase {
 
         // Generate a key pair
         var seed = [UInt8](repeating: 0, count: 64)
-        let genResult = generateKeyMLKEM1024(seedPointer: &seed, seedLen: 64)
+        let genResult = go_generateKeyMLKEM1024(&seed, 64)
         XCTAssertEqual(genResult, 0, "Key generation should succeed")
 
         var encapKey = [UInt8](repeating: 0, count: 1568)
-        let deriveResult = deriveEncapsulationKeyMLKEM1024(
-            seedPointer: seed,
-            seedLen: 64,
-            encapKeyPointer: &encapKey,
-            encapKeyLen: 1568
+        let deriveResult = go_deriveEncapsulationKeyMLKEM1024(
+            seed,
+            64,
+            &encapKey,
+            1568
         )
         XCTAssertEqual(deriveResult, 0, "Encapsulation key derivation should succeed")
 
         // Encapsulate
         var sharedKey1 = [UInt8](repeating: 0, count: 32)  // SharedKeySize = 32
         var ciphertext = [UInt8](repeating: 0, count: 1568)  // CiphertextSize1024 = 1568
-        let encapResult = encapsulateMLKEM1024(
-            encapKeyPointer: encapKey,
-            encapKeyLen: 1568,
-            sharedKeyPointer: &sharedKey1,
-            sharedKeyLen: 32,
-            ciphertextPointer: &ciphertext,
-            ciphertextLen: 1568
+        let encapResult = go_encapsulateMLKEM1024(
+            encapKey,
+            1568,
+            &sharedKey1,
+            32,
+            &ciphertext,
+            1568
         )
         XCTAssertEqual(encapResult, 0, "Encapsulation should succeed")
 
         // Decapsulate
         var sharedKey2 = [UInt8](repeating: 0, count: 32)
-        let decapResult = decapsulateMLKEM1024(
-            seedPointer: seed,
-            seedLen: 64,
-            ciphertextPointer: ciphertext,
-            ciphertextLen: 1568,
-            sharedKeyPointer: &sharedKey2,
-            sharedKeyLen: 32
+        let decapResult = go_decapsulateMLKEM1024(
+            seed,
+            64,
+            ciphertext,
+            1568,
+            &sharedKey2,
+            32
         )
         XCTAssertEqual(decapResult, 0, "Decapsulation should succeed")
 
@@ -208,13 +209,13 @@ final class MLKEMTests: XCTestCase {
         let invalidCiphertext = [UInt8](repeating: 0, count: 1088)
         var sharedKey = [UInt8](repeating: 0, count: 32)
 
-        let result = decapsulateMLKEM768(
-            seedPointer: seed,
-            seedLen: 64,
-            ciphertextPointer: invalidCiphertext,
-            ciphertextLen: 1088,
-            sharedKeyPointer: &sharedKey,
-            sharedKeyLen: 32
+        let result = go_decapsulateMLKEM768(
+            seed,
+            64,
+            invalidCiphertext,
+            1088,
+            &sharedKey,
+            32
         )
 
         // Note: This might succeed depending on CryptoKit implementation

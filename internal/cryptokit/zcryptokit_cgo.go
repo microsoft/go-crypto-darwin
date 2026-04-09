@@ -156,11 +156,11 @@ func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 }
 
 func DecapsulateMLKEM1024(seed []uint8, ciphertext []uint8, sharedKey []uint8) int64 {
-	return int64(C._mkcgo_go_decapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int64_t(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int64_t(len(sharedKey))))
+	return int64(C._mkcgo_go_decapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.long(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.long(len(sharedKey))))
 }
 
 func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) int64 {
-	return int64(C._mkcgo_go_decapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int64_t(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int64_t(len(sharedKey))))
+	return int64(C._mkcgo_go_decapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.long(len(ciphertext)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.long(len(sharedKey))))
 }
 
 func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
@@ -172,31 +172,31 @@ func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, ta
 }
 
 func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int64 {
-	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int64_t(len(encapKey))))
+	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.long(len(encapKey))))
 }
 
 func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int64 {
-	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int64_t(len(encapKey))))
+	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.long(len(encapKey))))
 }
 
 func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int64 {
-	return int64(C._mkcgo_go_ecdhSharedSecret(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int64_t(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.int64_t(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedSecret))), C.int64_t(len(sharedSecret))))
+	return int64(C._mkcgo_go_ecdhSharedSecret(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.long(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedSecret))), C.long(len(sharedSecret))))
 }
 
 func EcdsaSign(curveID int32, d []uint8, message []uint8, signature []uint8, signatureLen *int64) int64 {
-	return int64(C._mkcgo_go_ecdsaSign(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(d))), C.int64_t(len(d)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.int64_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), (*C.int64_t)(unsafe.Pointer(signatureLen))))
+	return int64(C._mkcgo_go_ecdsaSign(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(d))), C.long(len(d)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), (*C.long)(unsafe.Pointer(signatureLen))))
 }
 
 func EcdsaVerify(curveID int32, x []uint8, y []uint8, message []uint8, signature []uint8) int64 {
-	return int64(C._mkcgo_go_ecdsaVerify(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(x))), C.int64_t(len(x)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(y))), C.int64_t(len(y)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.int64_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), C.int64_t(len(signature))))
+	return int64(C._mkcgo_go_ecdsaVerify(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(x))), C.long(len(x)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(y))), C.long(len(y)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), C.long(len(signature))))
 }
 
 func EncapsulateMLKEM1024(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int64 {
-	return int64(C._mkcgo_go_encapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int64_t(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int64_t(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int64_t(len(ciphertext))))
+	return int64(C._mkcgo_go_encapsulateMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.long(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.long(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.long(len(ciphertext))))
 }
 
 func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int64 {
-	return int64(C._mkcgo_go_encapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.int64_t(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.int64_t(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.int64_t(len(ciphertext))))
+	return int64(C._mkcgo_go_encapsulateMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.long(len(encapKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedKey))), C.long(len(sharedKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(ciphertext))), C.long(len(ciphertext))))
 }
 
 func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
@@ -224,11 +224,11 @@ func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 }
 
 func GenerateKeyECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
-	return int64(C._mkcgo_go_generateKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int64_t(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.int64_t(len(publicKey))))
+	return int64(C._mkcgo_go_generateKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.long(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
 }
 
 func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
-	return int64(C._mkcgo_go_generateKeyECDSA(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(x))), C.int64_t(len(x)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(y))), C.int64_t(len(y)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(d))), C.int64_t(len(d))))
+	return int64(C._mkcgo_go_generateKeyECDSA(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(x))), C.long(len(x)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(y))), C.long(len(y)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(d))), C.long(len(d))))
 }
 
 func GenerateKeyEd25519(key []uint8) {
@@ -236,11 +236,11 @@ func GenerateKeyEd25519(key []uint8) {
 }
 
 func GenerateKeyMLKEM1024(seed []uint8) int64 {
-	return int64(C._mkcgo_go_generateKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed))))
+	return int64(C._mkcgo_go_generateKeyMLKEM1024((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed))))
 }
 
 func GenerateKeyMLKEM768(seed []uint8) int64 {
-	return int64(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.int64_t(len(seed))))
+	return int64(C._mkcgo_go_generateKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed))))
 }
 
 func HashBlockSize(hashAlgorithm int32) int64 {
@@ -272,11 +272,11 @@ func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer []uint8) {
 }
 
 func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data []uint8) {
-	C._mkcgo_go_hashWrite(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.int64_t(len(data)))
+	C._mkcgo_go_hashWrite(C.int32_t(hashAlgorithm), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.long(len(data)))
 }
 
 func InitHMAC(hashFunction int32, key []uint8) unsafe.Pointer {
-	return C._mkcgo_go_initHMAC(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.int64_t(len(key)))
+	return C._mkcgo_go_initHMAC(C.int32_t(hashFunction), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))), C.long(len(key)))
 }
 
 func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int64 {
@@ -288,7 +288,7 @@ func NewPublicKeyEd25519(key []uint8, pub []uint8) int64 {
 }
 
 func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
-	return int64(C._mkcgo_go_publicKeyFromPrivateECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int64_t(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.int64_t(len(publicKey))))
+	return int64(C._mkcgo_go_publicKeyFromPrivateECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.long(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
 }
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
@@ -304,15 +304,15 @@ func SupportsSHA3() int64 {
 }
 
 func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
-	C._mkcgo_go_updateHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.int64_t(len(data)))
+	C._mkcgo_go_updateHMAC(C.int32_t(hashFunction), ptr, (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(data))), C.long(len(data)))
 }
 
 func ValidatePrivateKeyECDH(curveID int32, privateKey []uint8) int64 {
-	return int64(C._mkcgo_go_validatePrivateKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.int64_t(len(privateKey))))
+	return int64(C._mkcgo_go_validatePrivateKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.long(len(privateKey))))
 }
 
 func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
-	return int64(C._mkcgo_go_validatePublicKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.int64_t(len(publicKey))))
+	return int64(C._mkcgo_go_validatePublicKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {

@@ -14,11 +14,17 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "CryptoKitSrc"
+            name: "CryptoKitC",
+            path: "Sources/CryptoKitC",
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "CryptoKitSrc",
+            dependencies: ["CryptoKitC"]
         ),
         .testTarget(
             name: "CryptoKitTests",
-            dependencies: ["CryptoKitSrc"]
+            dependencies: ["CryptoKitSrc", "CryptoKitC"]
         ),
     ]
 )

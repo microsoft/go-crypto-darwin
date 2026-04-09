@@ -6,6 +6,7 @@ import Foundation
 import XCTest
 
 @testable import CryptoKitSrc
+import CryptoKitC
 
 // MARK: - Hash Function Configuration Structure (for C-Style Wrappers)
 // Placed outside the class for better organization, or could be nested inside.
@@ -42,10 +43,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 16)  // MD5 is 16 bytes
 
-        MD5(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_MD5(
+            input,
+            input.count,
+            &output
         )
 
         // Known MD5 hash for the test string (as hex)
@@ -55,10 +56,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 16)  // Re-declare for clarity
-        MD5(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_MD5(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known MD5 hash for empty string
@@ -71,10 +72,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 20)  // SHA1 is 20 bytes
 
-        SHA1(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA1(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA1 hash for the test string
@@ -84,10 +85,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 20)
-        SHA1(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA1(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA1 hash for empty string
@@ -100,10 +101,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 32)  // SHA256 is 32 bytes
 
-        SHA256(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA256(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA256 hash for the test string
@@ -113,10 +114,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 32)
-        SHA256(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA256(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA256 hash for empty string
@@ -129,10 +130,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 48)  // SHA384 is 48 bytes
 
-        SHA384(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA384(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA384 hash for the test string
@@ -143,10 +144,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 48)
-        SHA384(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA384(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA384 hash for empty string
@@ -161,10 +162,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 64)  // SHA512 is 64 bytes
 
-        SHA512(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA512(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA512 hash for the test string
@@ -175,10 +176,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 64)
-        SHA512(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA512(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA512 hash for empty string
@@ -196,10 +197,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 32)  // SHA3-256 is 32 bytes
 
-        SHA3_256(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA3_256(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA3-256 hash for "The quick brown fox jumps over the lazy dog"
@@ -209,10 +210,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 32)
-        SHA3_256(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA3_256(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA3-256 hash for empty string
@@ -226,10 +227,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 48)  // SHA3-384 is 48 bytes
 
-        SHA3_384(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA3_384(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA3-384 hash for "The quick brown fox jumps over the lazy dog"
@@ -240,10 +241,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 48)
-        SHA3_384(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA3_384(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA3-384 hash for empty string
@@ -258,10 +259,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 64)  // SHA3-512 is 64 bytes
 
-        SHA3_512(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA3_512(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA3-512 hash for "The quick brown fox jumps over the lazy dog"
@@ -272,10 +273,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 64)
-        SHA3_512(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA3_512(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA3-512 hash for empty string
@@ -292,14 +293,14 @@ final class CryptoKitTests: XCTestCase {
         let functionsList: [HashingFunctions] = [
             HashingFunctions(
                 name: "MD5",
-                new: { hashNew(1) },
-                write: { ptr, data, length in hashWrite(1, ptr, data, length) },
-                sum: { ptr, out in hashSum(1, ptr, out) },
-                reset: { ptr in hashReset(1, ptr) },
-                copy: { ptr in hashCopy(1, ptr) },
-                free: { ptr in hashFree(1, ptr) },
-                size: { hashSize(1) },
-                blockSize: { hashBlockSize(1) },
+                new: { go_hashNew(1) },
+                write: { ptr, data, length in go_hashWrite(1, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(1, ptr, out) },
+                reset: { ptr in go_hashReset(1, ptr) },
+                copy: { ptr in go_hashCopy(1, ptr) },
+                free: { ptr in go_hashFree(1, ptr) },
+                size: { go_hashSize(1) },
+                blockSize: { go_hashBlockSize(1) },
                 expectedSize: Insecure.MD5.byteCount,
                 expectedBlockSize: Insecure.MD5.blockByteCount,
                 knownEmptyHashHex: "d41d8cd98f00b204e9800998ecf8427e",
@@ -307,14 +308,14 @@ final class CryptoKitTests: XCTestCase {
             ),
             HashingFunctions(
                 name: "SHA1",
-                new: { hashNew(2) },
-                write: { ptr, data, length in hashWrite(2, ptr, data, length) },
-                sum: { ptr, out in hashSum(2, ptr, out) },
-                reset: { ptr in hashReset(2, ptr) },
-                copy: { ptr in hashCopy(2, ptr) },
-                free: { ptr in hashFree(2, ptr) },
-                size: { hashSize(2) },
-                blockSize: { hashBlockSize(2) },
+                new: { go_hashNew(2) },
+                write: { ptr, data, length in go_hashWrite(2, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(2, ptr, out) },
+                reset: { ptr in go_hashReset(2, ptr) },
+                copy: { ptr in go_hashCopy(2, ptr) },
+                free: { ptr in go_hashFree(2, ptr) },
+                size: { go_hashSize(2) },
+                blockSize: { go_hashBlockSize(2) },
                 expectedSize: Insecure.SHA1.byteCount,
                 expectedBlockSize: Insecure.SHA1.blockByteCount,
                 knownEmptyHashHex: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
@@ -322,14 +323,14 @@ final class CryptoKitTests: XCTestCase {
             ),
             HashingFunctions(
                 name: "SHA256",
-                new: { hashNew(3) },
-                write: { ptr, data, length in hashWrite(3, ptr, data, length) },
-                sum: { ptr, out in hashSum(3, ptr, out) },
-                reset: { ptr in hashReset(3, ptr) },
-                copy: { ptr in hashCopy(3, ptr) },
-                free: { ptr in hashFree(3, ptr) },
-                size: { hashSize(3) },
-                blockSize: { hashBlockSize(3) },
+                new: { go_hashNew(3) },
+                write: { ptr, data, length in go_hashWrite(3, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(3, ptr, out) },
+                reset: { ptr in go_hashReset(3, ptr) },
+                copy: { ptr in go_hashCopy(3, ptr) },
+                free: { ptr in go_hashFree(3, ptr) },
+                size: { go_hashSize(3) },
+                blockSize: { go_hashBlockSize(3) },
                 expectedSize: CryptoKit.SHA256.byteCount,
                 expectedBlockSize: CryptoKit.SHA256.blockByteCount,
                 knownEmptyHashHex: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -337,14 +338,14 @@ final class CryptoKitTests: XCTestCase {
             ),
             HashingFunctions(
                 name: "SHA384",
-                new: { hashNew(4) },
-                write: { ptr, data, length in hashWrite(4, ptr, data, length) },
-                sum: { ptr, out in hashSum(4, ptr, out) },
-                reset: { ptr in hashReset(4, ptr) },
-                copy: { ptr in hashCopy(4, ptr) },
-                free: { ptr in hashFree(4, ptr) },
-                size: { hashSize(4) },
-                blockSize: { hashBlockSize(4) },
+                new: { go_hashNew(4) },
+                write: { ptr, data, length in go_hashWrite(4, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(4, ptr, out) },
+                reset: { ptr in go_hashReset(4, ptr) },
+                copy: { ptr in go_hashCopy(4, ptr) },
+                free: { ptr in go_hashFree(4, ptr) },
+                size: { go_hashSize(4) },
+                blockSize: { go_hashBlockSize(4) },
                 expectedSize: CryptoKit.SHA384.byteCount,
                 expectedBlockSize: CryptoKit.SHA384.blockByteCount,
                 knownEmptyHashHex:
@@ -354,14 +355,14 @@ final class CryptoKitTests: XCTestCase {
             ),
             HashingFunctions(
                 name: "SHA512",
-                new: { hashNew(5) },
-                write: { ptr, data, length in hashWrite(5, ptr, data, length) },
-                sum: { ptr, out in hashSum(5, ptr, out) },
-                reset: { ptr in hashReset(5, ptr) },
-                copy: { ptr in hashCopy(5, ptr) },
-                free: { ptr in hashFree(5, ptr) },
-                size: { hashSize(5) },
-                blockSize: { hashBlockSize(5) },
+                new: { go_hashNew(5) },
+                write: { ptr, data, length in go_hashWrite(5, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(5, ptr, out) },
+                reset: { ptr in go_hashReset(5, ptr) },
+                copy: { ptr in go_hashCopy(5, ptr) },
+                free: { ptr in go_hashFree(5, ptr) },
+                size: { go_hashSize(5) },
+                blockSize: { go_hashBlockSize(5) },
                 expectedSize: CryptoKit.SHA512.byteCount,
                 expectedBlockSize: CryptoKit.SHA512.blockByteCount,
                 knownEmptyHashHex:
@@ -379,14 +380,14 @@ final class CryptoKitTests: XCTestCase {
             sha3FunctionsList = [
                 HashingFunctions(
                     name: "SHA3-256",
-                    new: { hashNew(6) },
-                    write: { ptr, data, length in hashWrite(6, ptr, data, length) },
-                    sum: { ptr, out in hashSum(6, ptr, out) },
-                    reset: { ptr in hashReset(6, ptr) },
-                    copy: { ptr in hashCopy(6, ptr) },
-                    free: { ptr in hashFree(6, ptr) },
-                    size: { hashSize(6) },
-                    blockSize: { hashBlockSize(6) },
+                    new: { go_hashNew(6) },
+                    write: { ptr, data, length in go_hashWrite(6, ptr, data, length) },
+                    sum: { ptr, out in go_hashSum(6, ptr, out) },
+                    reset: { ptr in go_hashReset(6, ptr) },
+                    copy: { ptr in go_hashCopy(6, ptr) },
+                    free: { ptr in go_hashFree(6, ptr) },
+                    size: { go_hashSize(6) },
+                    blockSize: { go_hashBlockSize(6) },
                     expectedSize: 32,  // SHA3-256 output size
                     expectedBlockSize: 136,  // SHA3-256 block size
                     knownEmptyHashHex: "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a",
@@ -394,14 +395,14 @@ final class CryptoKitTests: XCTestCase {
                 ),
                 HashingFunctions(
                     name: "SHA3-384",
-                    new: { hashNew(7) },
-                    write: { ptr, data, length in hashWrite(7, ptr, data, length) },
-                    sum: { ptr, out in hashSum(7, ptr, out) },
-                    reset: { ptr in hashReset(7, ptr) },
-                    copy: { ptr in hashCopy(7, ptr) },
-                    free: { ptr in hashFree(7, ptr) },
-                    size: { hashSize(7) },
-                    blockSize: { hashBlockSize(7) },
+                    new: { go_hashNew(7) },
+                    write: { ptr, data, length in go_hashWrite(7, ptr, data, length) },
+                    sum: { ptr, out in go_hashSum(7, ptr, out) },
+                    reset: { ptr in go_hashReset(7, ptr) },
+                    copy: { ptr in go_hashCopy(7, ptr) },
+                    free: { ptr in go_hashFree(7, ptr) },
+                    size: { go_hashSize(7) },
+                    blockSize: { go_hashBlockSize(7) },
                     expectedSize: 48,  // SHA3-384 output size
                     expectedBlockSize: 104,  // SHA3-384 block size
                     knownEmptyHashHex:
@@ -411,14 +412,14 @@ final class CryptoKitTests: XCTestCase {
                 ),
                 HashingFunctions(
                     name: "SHA3-512",
-                    new: { hashNew(8) },
-                    write: { ptr, data, length in hashWrite(8, ptr, data, length) },
-                    sum: { ptr, out in hashSum(8, ptr, out) },
-                    reset: { ptr in hashReset(8, ptr) },
-                    copy: { ptr in hashCopy(8, ptr) },
-                    free: { ptr in hashFree(8, ptr) },
-                    size: { hashSize(8) },
-                    blockSize: { hashBlockSize(8) },
+                    new: { go_hashNew(8) },
+                    write: { ptr, data, length in go_hashWrite(8, ptr, data, length) },
+                    sum: { ptr, out in go_hashSum(8, ptr, out) },
+                    reset: { ptr in go_hashReset(8, ptr) },
+                    copy: { ptr in go_hashCopy(8, ptr) },
+                    free: { ptr in go_hashFree(8, ptr) },
+                    size: { go_hashSize(8) },
+                    blockSize: { go_hashBlockSize(8) },
                     expectedSize: 64,  // SHA3-512 output size
                     expectedBlockSize: 72,  // SHA3-512 block size
                     knownEmptyHashHex:

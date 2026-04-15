@@ -9,6 +9,7 @@ import (
 	"crypto"
 	"errors"
 	"hash"
+	"math"
 	"slices"
 	"strconv"
 	"unsafe"
@@ -308,7 +309,12 @@ func createSecKeyRandom(keyType security.CFStringRef, keySize int) ([]byte, secu
 		unsafe.Pointer(keyType),
 	)
 
-	cfNum := security.CFNumberCreate(security.KCFAllocatorDefault, security.KCFNumberIntType, unsafe.Pointer(&keySize))
+	// kCFNumberIntType reads a C int (4 bytes). Use an int32 to match.
+	if keySize < 0 || keySize > math.MaxInt32 {
+		return nil, nil, errors.New("xcrypto: key size out of int32 range")
+	}
+	keySizeInt32 := int32(keySize)
+	cfNum := security.CFNumberCreate(security.KCFAllocatorDefault, security.KCFNumberIntType, unsafe.Pointer(&keySizeInt32))
 	defer security.CFRelease(security.CFTypeRef(cfNum))
 
 	security.CFDictionarySetValue(

@@ -9,6 +9,7 @@ import (
 	"crypto"
 	"errors"
 	"hash"
+	"math"
 
 	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
@@ -28,6 +29,10 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 
 	// Allocate output buffer for the derived key
 	derivedKey := make([]byte, keyLen)
+
+	if iter <= 0 || iter > math.MaxUint32 {
+		return nil, errors.New("PBKDF2: invalid iteration count")
+	}
 
 	// Call CommonCrypto's PBKDF2 implementation
 	status := commoncrypto.CCKeyDerivationPBKDF(

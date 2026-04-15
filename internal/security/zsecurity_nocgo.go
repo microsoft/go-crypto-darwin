@@ -40,7 +40,7 @@ type CFErrorRef unsafe.Pointer
 type CFAllocatorRef unsafe.Pointer
 type CFDictionaryKeyCallBacks unsafe.Pointer
 type CFDictionaryValueCallBacks unsafe.Pointer
-type CFIndex = int32
+type CFIndex = int64
 type SecKeyAlgorithm = CFStringRef
 
 type SecKeyOperationType int32

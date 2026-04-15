@@ -28,7 +28,7 @@ typedef void *CFErrorRef;
 typedef void *CFAllocatorRef;
 typedef void *CFDictionaryKeyCallBacks;
 typedef void *CFDictionaryValueCallBacks;
-typedef int32_t CFIndex;
+typedef long CFIndex;
 typedef CFStringRef SecKeyAlgorithm;
 
 typedef enum {

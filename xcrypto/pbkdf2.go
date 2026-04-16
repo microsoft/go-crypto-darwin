@@ -15,6 +15,13 @@ import (
 )
 
 func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
+	// CommonCrypto's CCKeyDerivationPBKDF takes an unsigned 32-bit iteration
+	// count, so reject values that would overflow or wrap. In practice the
+	// recommended iteration count is around 300,000.
+	if iter <= 0 || iter > math.MaxUint32 {
+		return nil, errors.New("PBKDF2: invalid iteration count")
+	}
+
 	// Map Go hash function to CommonCrypto hash constant
 	ccDigest, err := hashToCCDigestPBKDF2(fh())
 	if err != nil {
@@ -29,10 +36,6 @@ func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byt
 
 	// Allocate output buffer for the derived key
 	derivedKey := make([]byte, keyLen)
-
-	if iter <= 0 || iter > math.MaxUint32 {
-		return nil, errors.New("PBKDF2: invalid iteration count")
-	}
 
 	// Call CommonCrypto's PBKDF2 implementation
 	status := commoncrypto.CCKeyDerivationPBKDF(

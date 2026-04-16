@@ -66,7 +66,7 @@ typedef enum {
 } CFStringEncoding;
 
 typedef enum {
-	kCFNumberIntType = 9,
+	kCFNumberLongType = 10,
 } CFNumberType;
 
 uintptr_t mkcgo_err_retrieve();

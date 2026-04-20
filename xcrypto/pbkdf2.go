@@ -9,11 +9,19 @@ import (
 	"crypto"
 	"errors"
 	"hash"
+	"math"
 
 	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
 func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
+	// CommonCrypto's CCKeyDerivationPBKDF takes an unsigned 32-bit iteration
+	// count, so reject values that would overflow or wrap. In practice the
+	// recommended iteration count is around 300,000.
+	if iter <= 0 || iter > math.MaxUint32 {
+		return nil, errors.New("PBKDF2: invalid iteration count")
+	}
+
 	// Map Go hash function to CommonCrypto hash constant
 	ccDigest, err := hashToCCDigestPBKDF2(fh())
 	if err != nil {

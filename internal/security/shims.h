@@ -28,7 +28,7 @@ typedef void *CFErrorRef;
 typedef void *CFAllocatorRef;
 typedef void *CFDictionaryKeyCallBacks;
 typedef void *CFDictionaryValueCallBacks;
-typedef int32_t CFIndex;
+typedef long CFIndex;
 typedef CFStringRef SecKeyAlgorithm;
 
 typedef enum {
@@ -43,7 +43,7 @@ typedef enum {
 } CFStringEncoding;
 
 typedef enum {
-  kCFNumberIntType = 9
+  kCFNumberLongType = 10
 } CFNumberType;
 
 extern const CFAllocatorRef kCFAllocatorDefault __attribute__((framework(CoreFoundation, A)));

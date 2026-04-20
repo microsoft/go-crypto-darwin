@@ -23,7 +23,7 @@ typedef void* CFErrorRef;
 typedef void* CFAllocatorRef;
 typedef void* CFDictionaryKeyCallBacks;
 typedef void* CFDictionaryValueCallBacks;
-typedef int32_t CFIndex;
+typedef long CFIndex;
 typedef CFStringRef SecKeyAlgorithm;
 
 extern const CFAllocatorRef kCFAllocatorDefault;
@@ -66,7 +66,7 @@ typedef enum {
 } CFStringEncoding;
 
 typedef enum {
-	kCFNumberIntType = 9,
+	kCFNumberLongType = 10,
 } CFNumberType;
 
 uintptr_t mkcgo_err_retrieve();

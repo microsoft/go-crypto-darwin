@@ -17,5 +17,5 @@ const (
 )
 
 const (
-	KCFNumberIntType CFNumberType = 9
+	KCFNumberLongType CFNumberType = 10
 )

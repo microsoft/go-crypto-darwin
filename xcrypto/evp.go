@@ -308,7 +308,7 @@ func createSecKeyRandom(keyType security.CFStringRef, keySize int) ([]byte, secu
 		unsafe.Pointer(keyType),
 	)
 
-	cfNum := security.CFNumberCreate(security.KCFAllocatorDefault, security.KCFNumberIntType, unsafe.Pointer(&keySize))
+	cfNum := security.CFNumberCreate(security.KCFAllocatorDefault, security.KCFNumberLongType, unsafe.Pointer(&keySize))
 	defer security.CFRelease(security.CFTypeRef(cfNum))
 
 	security.CFDictionarySetValue(

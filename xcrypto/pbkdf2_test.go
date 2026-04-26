@@ -5,8 +5,6 @@ package xcrypto_test
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"crypto/sha256"
 	"hash"
 	"testing"
 
@@ -193,9 +191,9 @@ func benchmark(b *testing.B, h func() hash.Hash) {
 }
 
 func BenchmarkPBKDF2HMACSHA1(b *testing.B) {
-	benchmark(b, sha1.New)
+	benchmark(b, xcrypto.NewSHA1)
 }
 
 func BenchmarkPBKDF2HMACSHA256(b *testing.B) {
-	benchmark(b, sha256.New)
+	benchmark(b, xcrypto.NewSHA256)
 }

@@ -9,6 +9,9 @@ cd cryptokit
 # remove any existing per-arch syso files
 rm -f ../internal/cryptokit/CryptoKit_*.syso
 
+# Record the Xcode version used for this build.
+xcodebuild -version > ../internal/cryptokit/xcodebuild_version.txt
+
 echo "Building Swift bindings with swiftc..."
 
 for arch in arm64 x86_64; do

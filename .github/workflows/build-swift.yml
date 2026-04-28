@@ -4,7 +4,7 @@
 on:
   workflow_dispatch:
   pull_request:
-    types: [labeled]
+    types: [ labeled ]
   push:
     branches:
       - main
@@ -16,7 +16,8 @@ on:
 name: Build Swift
 jobs:
   build:
-    if: github.event_name != 'pull_request' || github.event.label.name == 'generate-bindings'
+    if: github.event_name != 'pull_request' || github.event.label.name ==
+      'generate-bindings'
     permissions:
       contents: write
       pull-requests: write
@@ -25,7 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+          ref: ${{ github.event_name == 'pull_request' &&
+            github.event.pull_request.head.ref || '' }}
 
       - name: Select Xcode 26.4
         run: sudo xcode-select -s /Applications/Xcode_26.4.app
@@ -52,6 +54,7 @@ jobs:
 
           git add internal/cryptokit/CryptoKit*.syso
           git add internal/cryptokit/zcryptokit_swift_*.go
+          git add internal/cryptokit/xcodebuild_version.txt
 
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git add internal/cryptokit/zcryptokit.h

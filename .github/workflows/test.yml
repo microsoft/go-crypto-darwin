@@ -60,6 +60,53 @@ jobs:
         working-directory: cryptokit
         run: swift test
 
+  verify-reproducible-build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Select Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
+
+      - name: Backup existing object files
+        run: |
+          mkdir -p backup
+          cp -f internal/cryptokit/CryptoKit_*.syso backup/ 2>/dev/null || true
+          cp -f internal/cryptokit/xcodebuild_version.txt backup/ 2>/dev/null || true
+
+      - name: Rebuild object files
+        run: ./gen-swift-bindings.sh
+
+      - name: Verify Xcode version matches
+        run: |
+          if ! diff -q backup/xcodebuild_version.txt internal/cryptokit/xcodebuild_version.txt >/dev/null 2>&1; then
+            echo "⚠️  WARNING: Xcode version has changed since the last build"
+            echo "Checked-in version:"
+            cat backup/xcodebuild_version.txt
+            echo "Current version:"
+            cat internal/cryptokit/xcodebuild_version.txt
+            echo ""
+            echo "Please re-trigger the build-swift workflow to regenerate bindings with the updated Xcode version."
+            exit 1
+          fi
+          echo "✅ Xcode version matches the checked-in version"
+
+      - name: Verify object files are reproducible
+        run: |
+          if ! diff -q backup/CryptoKit_amd64.syso internal/cryptokit/CryptoKit_amd64.syso >/dev/null 2>&1; then
+            echo "ERROR: CryptoKit_amd64.syso is not reproducible - the checked-in version differs from the rebuilt version"
+            echo "This indicates the object file in the repository is out of sync with the source code"
+            echo "Please rebuild using: ./gen-swift-bindings.sh"
+            exit 1
+          fi
+          if ! diff -q backup/CryptoKit_arm64.syso internal/cryptokit/CryptoKit_arm64.syso >/dev/null 2>&1; then
+            echo "ERROR: CryptoKit_arm64.syso is not reproducible - the checked-in version differs from the rebuilt version"
+            echo "This indicates the object file in the repository is out of sync with the source code"
+            echo "Please rebuild using: ./gen-swift-bindings.sh"
+            exit 1
+          fi
+          echo "✅ Object files are reproducible and match the source code"
+
   linux-x64:
     runs-on: ubuntu-latest
     steps:

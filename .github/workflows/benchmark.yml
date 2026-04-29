@@ -23,14 +23,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-env:
-  MS_GO_NOSYSTEMCRYPTO: "1"
-
 # Pinned to the SHA of the add-benchcheck-and-benchmark-workflows branch in
 # microsoft/go-infra. Repin to the merge-commit SHA before merging this PR.
 jobs:
   setup:
-    uses: microsoft/go-infra/.github/workflows/benchmark-setup.yml@4e55a96cf2ae064aab767674b96bf0512db7a5d8
+    uses: microsoft/go-infra/.github/workflows/benchmark-setup.yml@ac07251bf61c20b3ec1f090f519c546a7f9807ff
     with:
       default-base-ref: main
       dispatch-base-ref: ${{ inputs.base-ref }}
@@ -44,56 +41,21 @@ jobs:
         macos-version: [macos-14, macos-15, macos-15-intel, macos-26]
         cgo: [1]
     name: bench (${{ matrix.macos-version }}, cgo${{ matrix.cgo }}, go${{ matrix.go-version }})
-    runs-on: ${{ matrix.macos-version }}
-    steps:
-      - name: Initialize status
-        run: echo '{"regression":false,"test_failures":false,"benchmark_error":true}' > status.json
-
-      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version: ${{ matrix.go-version }}
-          go-download-base-url: "https://aka.ms/golang/release/latest"
-
-      - name: Checkout HEAD
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ needs.setup.outputs.head-ref }}
-          path: head
-
-      - name: Checkout BASE
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ needs.setup.outputs.base-ref }}
-          path: base
-
-      - name: Select Xcode 26.4
-        if: matrix.macos-version == 'macos-26'
-        run: sudo xcode-select -s /Applications/Xcode_26.4.app
-
-      - name: Run benchmarks (base)
-        working-directory: base
-        env:
-          CGO_ENABLED: ${{ matrix.cgo }}
-        run: |
-          go test -run='^$' -bench=. -count=10 -benchmem -timeout 60m ./... 2>&1 | tee ../base.txt || true
-
-      - name: Run benchmarks (head)
-        working-directory: head
-        env:
-          CGO_ENABLED: ${{ matrix.cgo }}
-        run: |
-          go test -run='^$' -bench=. -count=10 -benchmem -timeout 60m ./... 2>&1 | tee ../head.txt || true
-
-      - name: "Compare and check"
-        uses: microsoft/go-infra/.github/actions/benchcheck-compare@4e55a96cf2ae064aab767674b96bf0512db7a5d8
-        with:
-          artifact-name: benchstat-${{ matrix.macos-version }}-cgo${{ matrix.cgo }}-go${{ matrix.go-version }}
-          infra-ref: 4e55a96cf2ae064aab767674b96bf0512db7a5d8
+    uses: microsoft/go-infra/.github/workflows/benchmark-run.yml@ac07251bf61c20b3ec1f090f519c546a7f9807ff
+    with:
+      runs-on: ${{ matrix.macos-version }}
+      go-version: ${{ matrix.go-version }}
+      head-ref: ${{ needs.setup.outputs.head-ref }}
+      base-ref: ${{ needs.setup.outputs.base-ref }}
+      artifact-name: benchstat-${{ matrix.macos-version }}-cgo${{ matrix.cgo }}-go${{ matrix.go-version }}
+      infra-ref: ac07251bf61c20b3ec1f090f519c546a7f9807ff
+      cgo-enabled: ${{ matrix.cgo }}
+      xcode-version: ${{ matrix.macos-version == 'macos-26' && '26.4' || '' }}
 
   conclusion:
     needs: [setup, bench]
     if: always() && needs.setup.result == 'success'
-    uses: microsoft/go-infra/.github/workflows/benchmark-conclusion.yml@4e55a96cf2ae064aab767674b96bf0512db7a5d8
+    uses: microsoft/go-infra/.github/workflows/benchmark-conclusion.yml@ac07251bf61c20b3ec1f090f519c546a7f9807ff
     permissions:
       actions: read
       contents: read
@@ -102,4 +64,4 @@ jobs:
       head-ref: ${{ needs.setup.outputs.head-ref }}
       pr-number: ${{ needs.setup.outputs.pr-number }}
       bench-result: ${{ needs.bench.result }}
-      infra-ref: 4e55a96cf2ae064aab767674b96bf0512db7a5d8
+      infra-ref: ac07251bf61c20b3ec1f090f519c546a7f9807ff

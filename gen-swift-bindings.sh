@@ -9,8 +9,23 @@ cd cryptokit
 # remove any existing per-arch syso files
 rm -f ../internal/cryptokit/CryptoKit_*.syso
 
+# Check if the Xcode version matches the one used for the previous build.
+version_file="../internal/cryptokit/xcodebuild_version.txt"
+if [ -f "${version_file}" ]; then
+    current_version="$(xcodebuild -version)"
+    previous_version="$(cat "${version_file}")"
+    if [ "${current_version}" != "${previous_version}" ]; then
+        echo "WARNING: Xcode version has changed since the last build." >&2
+        echo "  Previous:" >&2
+        printf '%s\n' "${previous_version}" >&2
+        echo "  Current:" >&2
+        printf '%s\n' "${current_version}" >&2
+        echo "  See docs/swift-bindings.md for details on reproducibility." >&2
+    fi
+fi
+
 # Record the Xcode version used for this build.
-xcodebuild -version > ../internal/cryptokit/xcodebuild_version.txt
+xcodebuild -version > "${version_file}"
 
 echo "Building Swift bindings with swiftc..."
 

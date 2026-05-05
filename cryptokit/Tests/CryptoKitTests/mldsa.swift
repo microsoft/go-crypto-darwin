@@ -418,8 +418,16 @@ final class MLDSATests: XCTestCase {
         XCTAssertLessThan(1952, 2592, "ML-DSA-65 public key should be smaller than ML-DSA-87")
         XCTAssertLessThan(3309, 4627, "ML-DSA-65 signature should be smaller than ML-DSA-87")
 
-        // Both should have same seed size
-        XCTAssertEqual(32, 32, "Both variants should have same seed size")
+        // Both variants should generate seeds of the same size
+        var seed65 = [UInt8](repeating: 0, count: 32)
+        let gen65 = go_generateKeyMLDSA65(&seed65, 32)
+        XCTAssertEqual(gen65, 0, "ML-DSA-65 seed generation should succeed")
+
+        var seed87 = [UInt8](repeating: 0, count: 32)
+        let gen87 = go_generateKeyMLDSA87(&seed87, 32)
+        XCTAssertEqual(gen87, 0, "ML-DSA-87 seed generation should succeed")
+
+        XCTAssertEqual(seed65.count, seed87.count, "Both variants should have same seed size")
     }
 
     // MARK: - Cross-Key Verification Tests

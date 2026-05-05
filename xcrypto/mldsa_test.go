@@ -17,6 +17,13 @@ type mldsaTestCase struct {
 	msg  string
 }
 
+type mldsaExternalMuTestCase struct {
+	name   string
+	params xcrypto.MLDSAParameters
+	seed   string
+	mu     string
+}
+
 var mldsaParameterTests = []struct {
 	name   string
 	params xcrypto.MLDSAParameters
@@ -47,6 +54,11 @@ var mldsaACVPTestCases = []mldsaTestCase{
 	{"Count/ML-DSA-87/64b", "151F80886D6CE8C3B428964FE02C40CA0C8EFFA100EE089E54D785344FCCF719", "C628CE94D2AA99AA50CF15B147D4F9A9C62A3D4612152DE0A502C377F472D614"},
 	{"Count/ML-DSA-87/64c", "48BEFFB4C97E59E474E1906F39888BE5AE62F6A011C05EF6A6B8D1E54F2171B7", "D2756A8FB4E47F796AF704ED0FC8C6E573D42DFAB443B329F00F8DB2FF12C465"},
 	{"Count/ML-DSA-87/69", "FE2DA9DD93A077FCB6452AC88D0A5762EB896BAAAC6CE7D01CB1370BA8322390", "A86B29ADF2300D2636E21D4A350CD18E55A254379C3659A7A95D8734CEC1F005"},
+}
+
+var mldsaExternalMuTestCases = []mldsaExternalMuTestCase{
+	// From crypto/internal/fips140/mldsa/mldsa_test.go BenchmarkCAST.
+	{"CAST/ML-DSA-65", xcrypto.MLDSA65(), "F215BA2280D86F142012FC05FFC04F2C7D22FF5DD7D69AA0EFB081E3A53E9318", "35cdb7dddbed44af4641bac659f46598ed769ea9693fd4ed2152b84c45811d2e66eded1eb20cde1c1f4b82642a330d8e86ac432a2aefaa56cd9b2b5f4affd450"},
 }
 
 func TestMLDSARoundTrip(t *testing.T) {
@@ -159,6 +171,40 @@ func TestMLDSABadLengths(t *testing.T) {
 				t.Skip("ML-DSA not supported on this platform")
 			}
 			testMLDSABadLengths(t, test.params)
+		})
+	}
+}
+
+func TestMLDSAExternalMuCASTVectors(t *testing.T) {
+	t.Parallel()
+	for _, test := range mldsaExternalMuTestCases {
+		t.Run(test.name, func(t *testing.T) {
+			if !xcrypto.SupportsMLDSA(test.params) {
+				t.Skip("ML-DSA not supported on this platform")
+			}
+			t.Parallel()
+			privateKey, err := xcrypto.NewPrivateKeyMLDSA(test.params, mldsaFromHexBytes(test.seed))
+			if err != nil {
+				t.Fatalf("NewPrivateKey: %v", err)
+			}
+			publicKey := privateKey.PublicKey()
+			mu := mldsaFromHexBytes(test.mu)
+
+			signature, err := privateKey.SignExternalMu(mu)
+			if err != nil {
+				t.Skipf("SignExternalMu: %v", err)
+			}
+			if len(signature) != test.params.SignatureSize() {
+				t.Fatalf("signature length = %d, want %d", len(signature), test.params.SignatureSize())
+			}
+			if err := publicKey.VerifyExternalMu(mu, signature); err != nil {
+				t.Fatalf("VerifyExternalMu: %v", err)
+			}
+			wrongMu := append([]byte(nil), mu...)
+			wrongMu[0] ^= 0x80
+			if err := publicKey.VerifyExternalMu(wrongMu, signature); err == nil {
+				t.Error("VerifyExternalMu passed on wrong message")
+			}
 		})
 	}
 }

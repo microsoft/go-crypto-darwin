@@ -24,6 +24,8 @@ long go_decryptAESGCM(const uint8_t*, size_t, const uint8_t*, size_t, const uint
 long go_decryptChaChaPoly(const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t*);
 long go_deriveEncapsulationKeyMLKEM1024(const uint8_t*, long, uint8_t*, long);
 long go_deriveEncapsulationKeyMLKEM768(const uint8_t*, long, uint8_t*, long);
+long go_derivePublicKeyMLDSA65(const uint8_t*, long, uint8_t*, long);
+long go_derivePublicKeyMLDSA87(const uint8_t*, long, uint8_t*, long);
 long go_ecdhSharedSecret(int32_t, const uint8_t*, long, const uint8_t*, long, uint8_t*, long);
 long go_ecdsaSign(int32_t, const uint8_t*, long, const uint8_t*, long, uint8_t*, long*);
 long go_ecdsaVerify(int32_t, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
@@ -38,6 +40,8 @@ void go_freeHMAC(int32_t, void*);
 long go_generateKeyECDH(int32_t, uint8_t*, long, uint8_t*, long);
 long go_generateKeyECDSA(int32_t, uint8_t*, long, uint8_t*, long, uint8_t*, long);
 void go_generateKeyEd25519(uint8_t*);
+long go_generateKeyMLDSA65(uint8_t*, long);
+long go_generateKeyMLDSA87(uint8_t*, long);
 long go_generateKeyMLKEM1024(uint8_t*, long);
 long go_generateKeyMLKEM768(uint8_t*, long);
 long go_hashBlockSize(int32_t);
@@ -53,12 +57,19 @@ long go_newPrivateKeyEd25519FromSeed(uint8_t*, const uint8_t*);
 long go_newPublicKeyEd25519(uint8_t*, const uint8_t*);
 long go_publicKeyFromPrivateECDH(int32_t, const uint8_t*, long, uint8_t*, long);
 long go_signEd25519(const uint8_t*, const uint8_t*, size_t, uint8_t*);
+long go_signMLDSA65(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, uint8_t*, long*);
+long go_signMLDSA87(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, uint8_t*, long*);
+long go_supportsMLDSA(void);
 long go_supportsMLKEM(void);
 long go_supportsSHA3(void);
 void go_updateHMAC(int32_t, void*, const uint8_t*, long);
 long go_validatePrivateKeyECDH(int32_t, const uint8_t*, long);
 long go_validatePublicKeyECDH(int32_t, const uint8_t*, long);
+long go_validatePublicKeyMLDSA65(const uint8_t*, long);
+long go_validatePublicKeyMLDSA87(const uint8_t*, long);
 long go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
+long go_verifyMLDSA65(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
+long go_verifyMLDSA87(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
 
 void _mkcgo_go_MD5(const uint8_t* _arg0, size_t _arg1, uint8_t* _arg2) {
 	go_MD5(_arg0, _arg1, _arg2);
@@ -120,6 +131,14 @@ long _mkcgo_go_deriveEncapsulationKeyMLKEM768(const uint8_t* _arg0, long _arg1, 
 	return go_deriveEncapsulationKeyMLKEM768(_arg0, _arg1, _arg2, _arg3);
 }
 
+long _mkcgo_go_derivePublicKeyMLDSA65(const uint8_t* _arg0, long _arg1, uint8_t* _arg2, long _arg3) {
+	return go_derivePublicKeyMLDSA65(_arg0, _arg1, _arg2, _arg3);
+}
+
+long _mkcgo_go_derivePublicKeyMLDSA87(const uint8_t* _arg0, long _arg1, uint8_t* _arg2, long _arg3) {
+	return go_derivePublicKeyMLDSA87(_arg0, _arg1, _arg2, _arg3);
+}
+
 long _mkcgo_go_ecdhSharedSecret(int32_t _arg0, const uint8_t* _arg1, long _arg2, const uint8_t* _arg3, long _arg4, uint8_t* _arg5, long _arg6) {
 	return go_ecdhSharedSecret(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6);
 }
@@ -174,6 +193,14 @@ long _mkcgo_go_generateKeyECDSA(int32_t _arg0, uint8_t* _arg1, long _arg2, uint8
 
 void _mkcgo_go_generateKeyEd25519(uint8_t* _arg0) {
 	go_generateKeyEd25519(_arg0);
+}
+
+long _mkcgo_go_generateKeyMLDSA65(uint8_t* _arg0, long _arg1) {
+	return go_generateKeyMLDSA65(_arg0, _arg1);
+}
+
+long _mkcgo_go_generateKeyMLDSA87(uint8_t* _arg0, long _arg1) {
+	return go_generateKeyMLDSA87(_arg0, _arg1);
 }
 
 long _mkcgo_go_generateKeyMLKEM1024(uint8_t* _arg0, long _arg1) {
@@ -236,6 +263,18 @@ long _mkcgo_go_signEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _a
 	return go_signEd25519(_arg0, _arg1, _arg2, _arg3);
 }
 
+long _mkcgo_go_signMLDSA65(const uint8_t* _arg0, long _arg1, const uint8_t* _arg2, long _arg3, const uint8_t* _arg4, long _arg5, uint8_t* _arg6, long* _arg7) {
+	return go_signMLDSA65(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7);
+}
+
+long _mkcgo_go_signMLDSA87(const uint8_t* _arg0, long _arg1, const uint8_t* _arg2, long _arg3, const uint8_t* _arg4, long _arg5, uint8_t* _arg6, long* _arg7) {
+	return go_signMLDSA87(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7);
+}
+
+long _mkcgo_go_supportsMLDSA(void) {
+	return go_supportsMLDSA();
+}
+
 long _mkcgo_go_supportsMLKEM(void) {
 	return go_supportsMLKEM();
 }
@@ -256,7 +295,23 @@ long _mkcgo_go_validatePublicKeyECDH(int32_t _arg0, const uint8_t* _arg1, long _
 	return go_validatePublicKeyECDH(_arg0, _arg1, _arg2);
 }
 
+long _mkcgo_go_validatePublicKeyMLDSA65(const uint8_t* _arg0, long _arg1) {
+	return go_validatePublicKeyMLDSA65(_arg0, _arg1);
+}
+
+long _mkcgo_go_validatePublicKeyMLDSA87(const uint8_t* _arg0, long _arg1) {
+	return go_validatePublicKeyMLDSA87(_arg0, _arg1);
+}
+
 long _mkcgo_go_verifyEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, const uint8_t* _arg3) {
 	return go_verifyEd25519(_arg0, _arg1, _arg2, _arg3);
+}
+
+long _mkcgo_go_verifyMLDSA65(const uint8_t* _arg0, long _arg1, const uint8_t* _arg2, long _arg3, const uint8_t* _arg4, long _arg5, const uint8_t* _arg6, long _arg7) {
+	return go_verifyMLDSA65(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7);
+}
+
+long _mkcgo_go_verifyMLDSA87(const uint8_t* _arg0, long _arg1, const uint8_t* _arg2, long _arg3, const uint8_t* _arg4, long _arg5, const uint8_t* _arg6, long _arg7) {
+	return go_verifyMLDSA87(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7);
 }
 

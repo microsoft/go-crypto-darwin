@@ -39,6 +39,10 @@ package cryptokit
 #cgo nocallback _mkcgo_go_deriveEncapsulationKeyMLKEM1024
 #cgo noescape _mkcgo_go_deriveEncapsulationKeyMLKEM768
 #cgo nocallback _mkcgo_go_deriveEncapsulationKeyMLKEM768
+#cgo noescape _mkcgo_go_derivePublicKeyMLDSA65
+#cgo nocallback _mkcgo_go_derivePublicKeyMLDSA65
+#cgo noescape _mkcgo_go_derivePublicKeyMLDSA87
+#cgo nocallback _mkcgo_go_derivePublicKeyMLDSA87
 #cgo noescape _mkcgo_go_ecdhSharedSecret
 #cgo nocallback _mkcgo_go_ecdhSharedSecret
 #cgo noescape _mkcgo_go_ecdsaSign
@@ -67,6 +71,10 @@ package cryptokit
 #cgo nocallback _mkcgo_go_generateKeyECDSA
 #cgo noescape _mkcgo_go_generateKeyEd25519
 #cgo nocallback _mkcgo_go_generateKeyEd25519
+#cgo noescape _mkcgo_go_generateKeyMLDSA65
+#cgo nocallback _mkcgo_go_generateKeyMLDSA65
+#cgo noescape _mkcgo_go_generateKeyMLDSA87
+#cgo nocallback _mkcgo_go_generateKeyMLDSA87
 #cgo noescape _mkcgo_go_generateKeyMLKEM1024
 #cgo nocallback _mkcgo_go_generateKeyMLKEM1024
 #cgo noescape _mkcgo_go_generateKeyMLKEM768
@@ -97,6 +105,12 @@ package cryptokit
 #cgo nocallback _mkcgo_go_publicKeyFromPrivateECDH
 #cgo noescape _mkcgo_go_signEd25519
 #cgo nocallback _mkcgo_go_signEd25519
+#cgo noescape _mkcgo_go_signMLDSA65
+#cgo nocallback _mkcgo_go_signMLDSA65
+#cgo noescape _mkcgo_go_signMLDSA87
+#cgo nocallback _mkcgo_go_signMLDSA87
+#cgo noescape _mkcgo_go_supportsMLDSA
+#cgo nocallback _mkcgo_go_supportsMLDSA
 #cgo noescape _mkcgo_go_supportsMLKEM
 #cgo nocallback _mkcgo_go_supportsMLKEM
 #cgo noescape _mkcgo_go_supportsSHA3
@@ -107,8 +121,16 @@ package cryptokit
 #cgo nocallback _mkcgo_go_validatePrivateKeyECDH
 #cgo noescape _mkcgo_go_validatePublicKeyECDH
 #cgo nocallback _mkcgo_go_validatePublicKeyECDH
+#cgo noescape _mkcgo_go_validatePublicKeyMLDSA65
+#cgo nocallback _mkcgo_go_validatePublicKeyMLDSA65
+#cgo noescape _mkcgo_go_validatePublicKeyMLDSA87
+#cgo nocallback _mkcgo_go_validatePublicKeyMLDSA87
 #cgo noescape _mkcgo_go_verifyEd25519
 #cgo nocallback _mkcgo_go_verifyEd25519
+#cgo noescape _mkcgo_go_verifyMLDSA65
+#cgo nocallback _mkcgo_go_verifyMLDSA65
+#cgo noescape _mkcgo_go_verifyMLDSA87
+#cgo nocallback _mkcgo_go_verifyMLDSA87
 */
 import "C"
 import "unsafe"
@@ -179,6 +201,14 @@ func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int64 {
 	return int64(C._mkcgo_go_deriveEncapsulationKeyMLKEM768((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(encapKey))), C.long(len(encapKey))))
 }
 
+func DerivePublicKeyMLDSA65(seed []uint8, publicKey []uint8) int64 {
+	return int64(C._mkcgo_go_derivePublicKeyMLDSA65((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
+}
+
+func DerivePublicKeyMLDSA87(seed []uint8, publicKey []uint8) int64 {
+	return int64(C._mkcgo_go_derivePublicKeyMLDSA87((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
+}
+
 func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int64 {
 	return int64(C._mkcgo_go_ecdhSharedSecret(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), C.long(len(privateKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sharedSecret))), C.long(len(sharedSecret))))
 }
@@ -233,6 +263,14 @@ func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
 
 func GenerateKeyEd25519(key []uint8) {
 	C._mkcgo_go_generateKeyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(key))))
+}
+
+func GenerateKeyMLDSA65(seed []uint8) int64 {
+	return int64(C._mkcgo_go_generateKeyMLDSA65((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed))))
+}
+
+func GenerateKeyMLDSA87(seed []uint8) int64 {
+	return int64(C._mkcgo_go_generateKeyMLDSA87((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed))))
 }
 
 func GenerateKeyMLKEM1024(seed []uint8) int64 {
@@ -295,6 +333,18 @@ func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
 	return int64(C._mkcgo_go_signEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(privateKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sigBuffer)))))
 }
 
+func SignMLDSA65(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	return int64(C._mkcgo_go_signMLDSA65((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(context))), C.long(len(context)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), (*C.long)(unsafe.Pointer(signatureLen))))
+}
+
+func SignMLDSA87(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	return int64(C._mkcgo_go_signMLDSA87((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(seed))), C.long(len(seed)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(context))), C.long(len(context)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), (*C.long)(unsafe.Pointer(signatureLen))))
+}
+
+func SupportsMLDSA() int64 {
+	return int64(C._mkcgo_go_supportsMLDSA())
+}
+
 func SupportsMLKEM() int64 {
 	return int64(C._mkcgo_go_supportsMLKEM())
 }
@@ -315,6 +365,22 @@ func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
 	return int64(C._mkcgo_go_validatePublicKeyECDH(C.int32_t(curveID), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
 }
 
+func ValidatePublicKeyMLDSA65(publicKey []uint8) int64 {
+	return int64(C._mkcgo_go_validatePublicKeyMLDSA65((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
+}
+
+func ValidatePublicKeyMLDSA87(publicKey []uint8) int64 {
+	return int64(C._mkcgo_go_validatePublicKeyMLDSA87((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey))))
+}
+
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
 	return int64(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sig)))))
+}
+
+func VerifyMLDSA65(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
+	return int64(C._mkcgo_go_verifyMLDSA65((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(context))), C.long(len(context)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), C.long(len(signature))))
+}
+
+func VerifyMLDSA87(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
+	return int64(C._mkcgo_go_verifyMLDSA87((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), C.long(len(publicKey)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.long(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(context))), C.long(len(context)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(signature))), C.long(len(signature))))
 }

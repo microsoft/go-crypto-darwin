@@ -95,6 +95,19 @@ long go_encapsulateMLKEM1024(const uint8_t *encapKey, long encapKeyLen, uint8_t 
 long go_decapsulateMLKEM768(const uint8_t *seed, long seedLen, const uint8_t *ciphertext, long ciphertextLen, uint8_t *sharedKey, long sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 long go_decapsulateMLKEM1024(const uint8_t *seed, long seedLen, const uint8_t *ciphertext, long ciphertextLen, uint8_t *sharedKey, long sharedKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(ciphertext, ciphertextLen), slice(sharedKey, sharedKeyLen)));
 
+// ML-DSA (Post-quantum digital signature algorithm)
+long go_supportsMLDSA() __attribute__((noescape, nocallback, static));
+long go_generateKeyMLDSA65(uint8_t *seed, long seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+long go_generateKeyMLDSA87(uint8_t *seed, long seedLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen)));
+long go_derivePublicKeyMLDSA65(const uint8_t *seed, long seedLen, uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(publicKey, publicKeyLen)));
+long go_derivePublicKeyMLDSA87(const uint8_t *seed, long seedLen, uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(publicKey, publicKeyLen)));
+long go_signMLDSA65(const uint8_t *seed, long seedLen, const uint8_t *message, long messageLen, const uint8_t *context, long contextLen, uint8_t *signature, long *signatureLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(message, messageLen), slice(context, contextLen), slice(signature)));
+long go_signMLDSA87(const uint8_t *seed, long seedLen, const uint8_t *message, long messageLen, const uint8_t *context, long contextLen, uint8_t *signature, long *signatureLen) __attribute__((noescape, nocallback, static, slice(seed, seedLen), slice(message, messageLen), slice(context, contextLen), slice(signature)));
+long go_verifyMLDSA65(const uint8_t *publicKey, long publicKeyLen, const uint8_t *message, long messageLen, const uint8_t *context, long contextLen, const uint8_t *signature, long signatureLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen), slice(message, messageLen), slice(context, contextLen), slice(signature, signatureLen)));
+long go_verifyMLDSA87(const uint8_t *publicKey, long publicKeyLen, const uint8_t *message, long messageLen, const uint8_t *context, long contextLen, const uint8_t *signature, long signatureLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen), slice(message, messageLen), slice(context, contextLen), slice(signature, signatureLen)));
+long go_validatePublicKeyMLDSA65(const uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen)));
+long go_validatePublicKeyMLDSA87(const uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(publicKey, publicKeyLen)));
+
 // ECDH
 long go_generateKeyECDH(int32_t curveID, uint8_t *privateKey, long privateKeyLen, uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));
 long go_publicKeyFromPrivateECDH(int32_t curveID, const uint8_t *privateKey, long privateKeyLen, uint8_t *publicKey, long publicKeyLen) __attribute__((noescape, nocallback, static, slice(privateKey, privateKeyLen), slice(publicKey, publicKeyLen)));

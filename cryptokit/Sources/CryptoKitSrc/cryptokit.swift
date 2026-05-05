@@ -1857,6 +1857,248 @@ public func go_decapsulateMLKEM1024(
 }
 #endif
 
+// ML-DSA (Post-quantum digital signature algorithm)
+// Runtime feature detection for ML-DSA (available on macOS 26+ only)
+@implementation @c
+public func go_supportsMLDSA() -> Int {
+    if #available(macOS 26.0, *) {
+        return 1
+    }
+    return 0
+}
+
+// ML-DSA-65 functions
+#if compiler(>=6.2)
+@available(macOS 26.0, *)
+@implementation @c
+public func go_generateKeyMLDSA65(_ seedPointer: UnsafeMutablePointer<UInt8>, _ seedLen: Int) -> Int {
+    do {
+        let privateKey = try MLDSA65.PrivateKey()
+        let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
+        seedData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_derivePublicKeyMLDSA65(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ publicKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLDSA65.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        let publicKeyData = privateKey.publicKey.rawRepresentation
+        guard publicKeyLen == publicKeyData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: publicKeyPointer, count: publicKeyLen)
+        publicKeyData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_signMLDSA65(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ contextPointer: UnsafePointer<UInt8>,
+    _ contextLen: Int,
+    _ signaturePointer: UnsafeMutablePointer<UInt8>,
+    _ signatureLen: UnsafeMutablePointer<Int>
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLDSA65.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let signatureData: Data
+        if contextLen > 0 {
+            let contextData = Data(bytes: contextPointer, count: contextLen)
+            signatureData = try privateKey.signature(for: messageData, context: contextData)
+        } else {
+            signatureData = try privateKey.signature(for: messageData)
+        }
+        guard signatureLen.pointee >= signatureData.count else { return 1 }
+        signatureLen.pointee = signatureData.count
+        let buffer = UnsafeMutableRawBufferPointer(start: signaturePointer, count: signatureData.count)
+        signatureData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_verifyMLDSA65(
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ contextPointer: UnsafePointer<UInt8>,
+    _ contextLen: Int,
+    _ signaturePointer: UnsafePointer<UInt8>,
+    _ signatureLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+        let publicKey = try MLDSA65.PublicKey(rawRepresentation: publicKeyData)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let signatureData = Data(bytes: signaturePointer, count: signatureLen)
+        let valid: Bool
+        if contextLen > 0 {
+            let contextData = Data(bytes: contextPointer, count: contextLen)
+            valid = publicKey.isValidSignature(signatureData, for: messageData, context: contextData)
+        } else {
+            valid = publicKey.isValidSignature(signatureData, for: messageData)
+        }
+        return valid ? 0 : 1
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_validatePublicKeyMLDSA65(
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+        _ = try MLDSA65.PublicKey(rawRepresentation: publicKeyData)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+// ML-DSA-87 functions
+@available(macOS 26.0, *)
+@implementation @c
+public func go_generateKeyMLDSA87(_ seedPointer: UnsafeMutablePointer<UInt8>, _ seedLen: Int) -> Int {
+    do {
+        let privateKey = try MLDSA87.PrivateKey()
+        let seedData = privateKey.seedRepresentation
+        guard seedLen == seedData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: seedPointer, count: seedLen)
+        seedData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_derivePublicKeyMLDSA87(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ publicKeyPointer: UnsafeMutablePointer<UInt8>,
+    _ publicKeyLen: Int
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLDSA87.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        let publicKeyData = privateKey.publicKey.rawRepresentation
+        guard publicKeyLen == publicKeyData.count else { return 1 }
+        let buffer = UnsafeMutableRawBufferPointer(start: publicKeyPointer, count: publicKeyLen)
+        publicKeyData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_signMLDSA87(
+    _ seedPointer: UnsafePointer<UInt8>,
+    _ seedLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ contextPointer: UnsafePointer<UInt8>,
+    _ contextLen: Int,
+    _ signaturePointer: UnsafeMutablePointer<UInt8>,
+    _ signatureLen: UnsafeMutablePointer<Int>
+) -> Int {
+    do {
+        let seedData = Data(bytes: seedPointer, count: seedLen)
+        let privateKey = try MLDSA87.PrivateKey(seedRepresentation: seedData, publicKey: nil)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let signatureData: Data
+        if contextLen > 0 {
+            let contextData = Data(bytes: contextPointer, count: contextLen)
+            signatureData = try privateKey.signature(for: messageData, context: contextData)
+        } else {
+            signatureData = try privateKey.signature(for: messageData)
+        }
+        guard signatureLen.pointee >= signatureData.count else { return 1 }
+        signatureLen.pointee = signatureData.count
+        let buffer = UnsafeMutableRawBufferPointer(start: signaturePointer, count: signatureData.count)
+        signatureData.copyBytes(to: buffer)
+        return 0
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_verifyMLDSA87(
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int,
+    _ messagePointer: UnsafePointer<UInt8>,
+    _ messageLen: Int,
+    _ contextPointer: UnsafePointer<UInt8>,
+    _ contextLen: Int,
+    _ signaturePointer: UnsafePointer<UInt8>,
+    _ signatureLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+        let publicKey = try MLDSA87.PublicKey(rawRepresentation: publicKeyData)
+        let messageData = Data(bytes: messagePointer, count: messageLen)
+        let signatureData = Data(bytes: signaturePointer, count: signatureLen)
+        let valid: Bool
+        if contextLen > 0 {
+            let contextData = Data(bytes: contextPointer, count: contextLen)
+            valid = publicKey.isValidSignature(signatureData, for: messageData, context: contextData)
+        } else {
+            valid = publicKey.isValidSignature(signatureData, for: messageData)
+        }
+        return valid ? 0 : 1
+    } catch {
+        return 1
+    }
+}
+
+@available(macOS 26.0, *)
+@implementation @c
+public func go_validatePublicKeyMLDSA87(
+    _ publicKeyPointer: UnsafePointer<UInt8>,
+    _ publicKeyLen: Int
+) -> Int {
+    do {
+        let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeyLen)
+        _ = try MLDSA87.PublicKey(rawRepresentation: publicKeyData)
+        return 0
+    } catch {
+        return 1
+    }
+}
+#endif
+
 // ECDH Key Validation
 @implementation @c
 public func go_validatePrivateKeyECDH(

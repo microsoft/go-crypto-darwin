@@ -42,6 +42,8 @@ func mkcgoEscapePtrCryptokit(p unsafe.Pointer) unsafe.Pointer {
 //go:linkname go_decryptChaChaPoly go_decryptChaChaPoly
 //go:linkname go_deriveEncapsulationKeyMLKEM1024 go_deriveEncapsulationKeyMLKEM1024
 //go:linkname go_deriveEncapsulationKeyMLKEM768 go_deriveEncapsulationKeyMLKEM768
+//go:linkname go_derivePublicKeyMLDSA65 go_derivePublicKeyMLDSA65
+//go:linkname go_derivePublicKeyMLDSA87 go_derivePublicKeyMLDSA87
 //go:linkname go_ecdhSharedSecret go_ecdhSharedSecret
 //go:linkname go_ecdsaSign go_ecdsaSign
 //go:linkname go_ecdsaVerify go_ecdsaVerify
@@ -56,6 +58,8 @@ func mkcgoEscapePtrCryptokit(p unsafe.Pointer) unsafe.Pointer {
 //go:linkname go_generateKeyECDH go_generateKeyECDH
 //go:linkname go_generateKeyECDSA go_generateKeyECDSA
 //go:linkname go_generateKeyEd25519 go_generateKeyEd25519
+//go:linkname go_generateKeyMLDSA65 go_generateKeyMLDSA65
+//go:linkname go_generateKeyMLDSA87 go_generateKeyMLDSA87
 //go:linkname go_generateKeyMLKEM1024 go_generateKeyMLKEM1024
 //go:linkname go_generateKeyMLKEM768 go_generateKeyMLKEM768
 //go:linkname go_hashBlockSize go_hashBlockSize
@@ -71,12 +75,19 @@ func mkcgoEscapePtrCryptokit(p unsafe.Pointer) unsafe.Pointer {
 //go:linkname go_newPublicKeyEd25519 go_newPublicKeyEd25519
 //go:linkname go_publicKeyFromPrivateECDH go_publicKeyFromPrivateECDH
 //go:linkname go_signEd25519 go_signEd25519
+//go:linkname go_signMLDSA65 go_signMLDSA65
+//go:linkname go_signMLDSA87 go_signMLDSA87
+//go:linkname go_supportsMLDSA go_supportsMLDSA
 //go:linkname go_supportsMLKEM go_supportsMLKEM
 //go:linkname go_supportsSHA3 go_supportsSHA3
 //go:linkname go_updateHMAC go_updateHMAC
 //go:linkname go_validatePrivateKeyECDH go_validatePrivateKeyECDH
 //go:linkname go_validatePublicKeyECDH go_validatePublicKeyECDH
+//go:linkname go_validatePublicKeyMLDSA65 go_validatePublicKeyMLDSA65
+//go:linkname go_validatePublicKeyMLDSA87 go_validatePublicKeyMLDSA87
 //go:linkname go_verifyEd25519 go_verifyEd25519
+//go:linkname go_verifyMLDSA65 go_verifyMLDSA65
+//go:linkname go_verifyMLDSA87 go_verifyMLDSA87
 
 var go_MD5 byte
 var go_SHA1 byte
@@ -93,6 +104,8 @@ var go_decryptAESGCM byte
 var go_decryptChaChaPoly byte
 var go_deriveEncapsulationKeyMLKEM1024 byte
 var go_deriveEncapsulationKeyMLKEM768 byte
+var go_derivePublicKeyMLDSA65 byte
+var go_derivePublicKeyMLDSA87 byte
 var go_ecdhSharedSecret byte
 var go_ecdsaSign byte
 var go_ecdsaVerify byte
@@ -107,6 +120,8 @@ var go_freeHMAC byte
 var go_generateKeyECDH byte
 var go_generateKeyECDSA byte
 var go_generateKeyEd25519 byte
+var go_generateKeyMLDSA65 byte
+var go_generateKeyMLDSA87 byte
 var go_generateKeyMLKEM1024 byte
 var go_generateKeyMLKEM768 byte
 var go_hashBlockSize byte
@@ -122,12 +137,19 @@ var go_newPrivateKeyEd25519FromSeed byte
 var go_newPublicKeyEd25519 byte
 var go_publicKeyFromPrivateECDH byte
 var go_signEd25519 byte
+var go_signMLDSA65 byte
+var go_signMLDSA87 byte
+var go_supportsMLDSA byte
 var go_supportsMLKEM byte
 var go_supportsSHA3 byte
 var go_updateHMAC byte
 var go_validatePrivateKeyECDH byte
 var go_validatePublicKeyECDH byte
+var go_validatePublicKeyMLDSA65 byte
+var go_validatePublicKeyMLDSA87 byte
 var go_verifyEd25519 byte
+var go_verifyMLDSA65 byte
+var go_verifyMLDSA87 byte
 
 func MD5(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
@@ -196,6 +218,16 @@ func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int64 {
 	return int64(r0)
 }
 
+func DerivePublicKeyMLDSA65(seed []uint8, publicKey []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_derivePublicKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	return int64(r0)
+}
+
+func DerivePublicKeyMLDSA87(seed []uint8, publicKey []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_derivePublicKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	return int64(r0)
+}
+
 func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdhSharedSecret)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedSecret))), uintptr(len(sharedSecret)))
 	return int64(r0)
@@ -261,6 +293,16 @@ func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
 
 func GenerateKeyEd25519(key []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))))
+}
+
+func GenerateKeyMLDSA65(seed []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	return int64(r0)
+}
+
+func GenerateKeyMLDSA87(seed []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	return int64(r0)
 }
 
 func GenerateKeyMLKEM1024(seed []uint8) int64 {
@@ -334,6 +376,21 @@ func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
 	return int64(r0)
 }
 
+func SignMLDSA65(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
+	return int64(r0)
+}
+
+func SignMLDSA87(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
+	return int64(r0)
+}
+
+func SupportsMLDSA() int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_supportsMLDSA)))
+	return int64(r0)
+}
+
 func SupportsMLKEM() int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_supportsMLKEM)))
 	return int64(r0)
@@ -358,7 +415,27 @@ func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
 	return int64(r0)
 }
 
+func ValidatePublicKeyMLDSA65(publicKey []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	return int64(r0)
+}
+
+func ValidatePublicKeyMLDSA87(publicKey []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	return int64(r0)
+}
+
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))))
+	return int64(r0)
+}
+
+func VerifyMLDSA65(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
+	return int64(r0)
+}
+
+func VerifyMLDSA87(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
 	return int64(r0)
 }

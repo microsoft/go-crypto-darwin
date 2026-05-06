@@ -1,0 +1,35 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+on:
+    delete:
+
+name: Close autogen issue on branch deletion
+jobs:
+    close-issue:
+        if: github.event.ref_type == 'branch' && startsWith(github.event.ref,
+            'autogen/')
+        permissions:
+            issues: write
+        runs-on: ubuntu-latest
+        steps:
+            - name: Close matching issue
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH: ${{ github.event.ref }}
+              run: |
+                  ISSUE_NUMBER=$(gh issue list \
+                    --repo "${{ github.repository }}" \
+                    --state open \
+                    --label automated \
+                    --search "Update CryptoKit Object files (${BRANCH})" \
+                    --json number --jq '.[0].number')
+
+                  if [ -n "$ISSUE_NUMBER" ]; then
+                    gh issue close "$ISSUE_NUMBER" \
+                      --repo "${{ github.repository }}" \
+                      --comment "Branch \`${BRANCH}\` has been deleted (likely merged). Closing this issue."
+                    echo "Closed issue #${ISSUE_NUMBER}"
+                  else
+                    echo "No matching open issue found for branch ${BRANCH}"
+                  fi

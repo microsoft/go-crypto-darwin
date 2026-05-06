@@ -21,6 +21,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
       actions: write
     runs-on: macos-26
     steps:
@@ -78,5 +79,27 @@ jobs:
             BRANCH=autogen/update-cryptokit-obj-$(date +%s)
             git checkout -b $BRANCH
             git push origin $BRANCH
-            gh pr create --fill --base main --head $BRANCH
+
+            REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+            ENCODED_BRANCH=$(printf '%s' "$BRANCH" | sed 's/\//%2F/g')
+            PR_URL="${REPO_URL}/compare/main...${ENCODED_BRANCH}?expand=1&title=Update%20CryptoKit%20Object%20files"
+
+            ISSUE_BODY=$(cat <<EOF
+          CryptoKit object files have been updated and pushed to branch \`${BRANCH}\`.
+
+          **[Click here to create the PR](${PR_URL})**
+
+          This issue will be closed automatically when the PR is merged.
+
+          ---
+          _Automated by the Build Swift workflow, run [#${{ github.run_number }}](${REPO_URL}/actions/runs/${{ github.run_id }})._
+          EOF
+            )
+
+            ISSUE_URL=$(gh issue create \
+              --title "Update CryptoKit Object files (${BRANCH})" \
+              --body "$ISSUE_BODY" \
+              --label "automated")
+
+            echo "Created issue: $ISSUE_URL"
           fi

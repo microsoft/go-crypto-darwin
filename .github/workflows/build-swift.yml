@@ -81,7 +81,8 @@ jobs:
             git push origin $BRANCH
 
             REPO_URL="${{ github.server_url }}/${{ github.repository }}"
-            PR_URL="${REPO_URL}/compare/main...${BRANCH}?expand=1&title=Update%20CryptoKit%20Object%20files"
+            ENCODED_BRANCH=$(printf '%s' "$BRANCH" | sed 's/\//%2F/g')
+            PR_URL="${REPO_URL}/compare/main...${ENCODED_BRANCH}?expand=1&title=Update%20CryptoKit%20Object%20files"
 
             ISSUE_BODY=$(cat <<EOF
           CryptoKit object files have been updated and pushed to branch \`${BRANCH}\`.

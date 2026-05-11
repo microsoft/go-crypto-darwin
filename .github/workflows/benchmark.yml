@@ -34,14 +34,13 @@ jobs:
       default-base-ref: main
       dispatch-base-ref: ${{ inputs.base-ref }}
       # Cross product of runs-on × go-version, all with cgo enabled. macos-26
-      # cells additionally select Xcode 26.4 via the `include`.
+      # entries additionally select Xcode 26.4 via the `include`.
       matrix: |
         {
           "runs-on": ["macos-14", "macos-15", "macos-15-intel", "macos-26"],
           "go-version": ["1.25", "1.26"],
           "cgo-enabled": ["1"],
           "include": [
-            { "runs-on": "macos-26", "go-version": "1.25", "cgo-enabled": "1", "xcode-version": "26.4" },
-            { "runs-on": "macos-26", "go-version": "1.26", "cgo-enabled": "1", "xcode-version": "26.4" }
+            { "runs-on": "macos-26", "xcode-version": "26.4" }
           ]
         }

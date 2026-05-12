@@ -44,10 +44,6 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      - name: Select Xcode 26.4
-        if: matrix.language == 'swift'
-        run: sudo xcode-select -s /Applications/Xcode_26.4.app
-
       - name: Autobuild
         if: matrix.language != 'cpp'
         uses: github/codeql-action/autobuild@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4.35.4

@@ -9,6 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 name: Check Vendored Imports
+permissions:
+  contents: read
 jobs:
   check-imports:
     # Verify that packages vendored into Go's standard library only use

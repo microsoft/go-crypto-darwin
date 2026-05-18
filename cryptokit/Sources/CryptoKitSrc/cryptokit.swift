@@ -759,8 +759,8 @@ public func go_SHA1(
     hashData.copyBytes(to: outputPointer, count: hashData.count)
 }
 
-@_cdecl("go_SHA224")
-public func SHA224(
+@implementation @c
+public func go_SHA224(
     _ inputPointer: UnsafePointer<UInt8>,
     _ inputLength: Int,
     _ outputPointer: UnsafeMutablePointer<UInt8>
@@ -770,8 +770,8 @@ public func SHA224(
     Data(hash).copyBytes(to: outputPointer, count: hash.count)
 }
 
-@_cdecl("go_SHA256")
-public func SHA256(
+@implementation @c
+public func go_SHA256(
     _ inputPointer: UnsafePointer<UInt8>,
     _ inputLength: Int,
     _ outputPointer: UnsafeMutablePointer<UInt8>

@@ -134,16 +134,15 @@ func SupportsHash(h crypto.Hash) bool {
 }
 
 func newHash(ch crypto.Hash) *Hash {
-	alg := loadHash(ch, true)
+	return &Hash{alg: loadHash(ch, true)}
+}
 
-	h := &Hash{
-		ptr: cryptokit.HashNew(alg.id),
-		alg: alg,
+// init lazily allocates the native hash context on first use.
+func (h *Hash) init() {
+	if h.ptr == nil {
+		h.ptr = cryptokit.HashNew(h.alg.id)
+		runtime.SetFinalizer(h, (*Hash).finalize)
 	}
-
-	runtime.SetFinalizer(h, (*Hash).finalize)
-
-	return h
 }
 
 func (h *Hash) finalize() {
@@ -155,7 +154,8 @@ func (h *Hash) finalize() {
 
 func (h *Hash) Clone() (HashCloner, error) {
 	if h.ptr == nil {
-		panic("cryptokit: hash already finalized")
+		// Not yet initialized, just return a new uninitialized hash.
+		return &Hash{alg: h.alg}, nil
 	}
 
 	newHash := &Hash{
@@ -174,6 +174,7 @@ func (h *Hash) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, p)
 
 	runtime.KeepAlive(h)
@@ -185,6 +186,7 @@ func (h *Hash) WriteString(s string) (int, error) {
 	if len(s) == 0 {
 		return 0, nil
 	}
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(unsafe.StringData(s), len(s)))
 
 	runtime.KeepAlive(h)
@@ -193,6 +195,7 @@ func (h *Hash) WriteString(s string) (int, error) {
 }
 
 func (h *Hash) WriteByte(c byte) error {
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(&c, 1))
 
 	runtime.KeepAlive(h)
@@ -201,6 +204,7 @@ func (h *Hash) WriteByte(c byte) error {
 }
 
 func (h *Hash) Sum(b []byte) []byte {
+	h.init()
 	hashSlice := make([]byte, h.alg.size, 64) // explicit cap to allow stack allocation
 	cryptokit.HashSum(h.alg.id, h.ptr, hashSlice)
 	runtime.KeepAlive(h)
@@ -231,6 +235,9 @@ func (h *Hash) UnmarshalBinary(data []byte) error {
 }
 
 func (h *Hash) Reset() {
+	if h.ptr == nil {
+		return // not yet initialized, already in initial state
+	}
 	cryptokit.HashReset(h.alg.id, h.ptr)
 }
 
@@ -267,6 +274,11 @@ func MD5(p []byte) (sum [16]byte) {
 
 func SHA1(p []byte) (sum [20]byte) {
 	cryptokit.SHA1(p, sum[:])
+	return
+}
+
+func SHA224(p []byte) (sum [28]byte) {
+	cryptokit.SHA224(p, sum[:])
 	return
 }
 

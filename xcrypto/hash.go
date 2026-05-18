@@ -256,7 +256,7 @@ func FIPSApprovedHash(h hash.Hash) bool {
 		return false
 	}
 	switch xh.alg.ch {
-	case crypto.SHA256, crypto.SHA384, crypto.SHA512,
+	case crypto.SHA224, crypto.SHA256, crypto.SHA384, crypto.SHA512,
 		crypto.SHA3_256, crypto.SHA3_384, crypto.SHA3_512:
 		return true
 	default:

@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// stripforceload removes Swift FORCE_LOAD relocations and symbols from Mach-O
-// object files (.syso). These auto-linking hints cause Go's internal linker
+// stripforceload removes Swift FORCE_LOAD relocations from Mach-O object files
+// (.syso). These auto-linking hints cause Go's internal linker
 // (used when CGO_ENABLED=0) to fail with "unexpected reloc for dynamic symbol"
-// errors on Go versions before 1.27. The FORCE_LOAD symbols are not needed
-// because the required dynamic imports are already declared via
-// //go:cgo_import_dynamic directives in the generated Go files.
+// errors on Go versions before 1.27. The required dynamic imports are already
+// declared via //go:cgo_import_dynamic directives in the generated Go files,
+// so removing these relocations is sufficient.
 package main
 
 import (
@@ -114,6 +114,16 @@ func main() {
 	if nsyms == 0 {
 		fmt.Fprintf(os.Stderr, "no symbol table found\n")
 		return
+	}
+
+	// Validate symbol table and string table bounds.
+	if int64(stroff)+int64(strsize) > int64(len(data)) {
+		fmt.Fprintf(os.Stderr, "string table extends beyond file bounds\n")
+		os.Exit(1)
+	}
+	if int64(symoff)+int64(nsyms)*nlistSize64 > int64(len(data)) {
+		fmt.Fprintf(os.Stderr, "symbol table extends beyond file bounds\n")
+		os.Exit(1)
 	}
 
 	// Read string table and identify FORCE_LOAD symbol indices.

@@ -3,11 +3,11 @@
 
 import CommonCrypto
 import CryptoKit
+import CryptoKitC
 import Foundation
 import XCTest
 
 @testable import CryptoKitSrc
-import CryptoKitC
 
 // MARK: - Hash Function Configuration Structure (for C-Style Wrappers)
 // Placed outside the class for better organization, or could be nested inside.
@@ -102,10 +102,10 @@ final class CryptoKitTests: XCTestCase {
         let input = Array(simpleTestString.utf8)
         var output = [UInt8](repeating: 0, count: 28)  // SHA224 is 28 bytes
 
-        SHA224(
-            inputPointer: input,
-            inputLength: input.count,
-            outputPointer: &output
+        go_SHA224(
+            input,
+            input.count,
+            &output
         )
 
         // Known SHA224 hash for the test string
@@ -115,10 +115,10 @@ final class CryptoKitTests: XCTestCase {
         // Test empty string
         let emptyInput = Array(emptyString.utf8)
         var emptyOutput = [UInt8](repeating: 0, count: 28)
-        SHA224(
-            inputPointer: emptyInput,
-            inputLength: emptyInput.count,
-            outputPointer: &emptyOutput
+        go_SHA224(
+            emptyInput,
+            emptyInput.count,
+            &emptyOutput
         )
 
         // Known SHA224 hash for empty string
@@ -353,14 +353,14 @@ final class CryptoKitTests: XCTestCase {
             ),
             HashingFunctions(
                 name: "SHA224",
-                new: { hashNew(9) },
-                write: { ptr, data, length in hashWrite(9, ptr, data, length) },
-                sum: { ptr, out in hashSum(9, ptr, out) },
-                reset: { ptr in hashReset(9, ptr) },
-                copy: { ptr in hashCopy(9, ptr) },
-                free: { ptr in hashFree(9, ptr) },
-                size: { hashSize(9) },
-                blockSize: { hashBlockSize(9) },
+                new: { go_hashNew(9) },
+                write: { ptr, data, length in go_hashWrite(9, ptr, data, length) },
+                sum: { ptr, out in go_hashSum(9, ptr, out) },
+                reset: { ptr in go_hashReset(9, ptr) },
+                copy: { ptr in go_hashCopy(9, ptr) },
+                free: { ptr in go_hashFree(9, ptr) },
+                size: { go_hashSize(9) },
+                blockSize: { go_hashBlockSize(9) },
                 expectedSize: Int(CC_SHA224_DIGEST_LENGTH),
                 expectedBlockSize: 64,
                 knownEmptyHashHex: "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",

@@ -47,13 +47,6 @@ for arch in arm64 x86_64; do
         -import-bridging-header Sources/CryptoKitC/include/cryptokit.h \
         Sources/CryptoKitSrc/cryptokit.swift \
         -o "${dest}"
-
-    # TODO: remove this once go 1.26 is EOL.
-    # This is fixed in go 1.27 via https://go-review.googlesource.com/c/go/+/745220
-    # Strip Swift FORCE_LOAD relocations from the .syso file.
-    # These auto-linking hints cause Go's internal linker (CGO_ENABLED=0) to
-    # fail with "unexpected reloc for dynamic symbol" on Go < 1.27.
-    go run ../cmd/stripforceload "${dest}"
 done
 
 echo "Build complete."

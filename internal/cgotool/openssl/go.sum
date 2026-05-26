@@ -1,2 +1,2 @@
-github.com/golang-fips/openssl/v2 v2.0.4-0.20260304104649-dfdde545174a h1:+z4wM+V/fxNvfVl4DYXfOWYTCw/rTKCkI8VrxP12AU4=
-github.com/golang-fips/openssl/v2 v2.0.4-0.20260304104649-dfdde545174a/go.mod h1:E+yPtdllHdy5S8YLMfcIRcqjqQySyiexqxxaLK7+cQQ=
+github.com/microsoft/go-crypto-openssl v0.0.0-20260526093041-a7ca5d3c79e8 h1:TUamk5/ik8Onza/1FDVPd4b4FYNXzDp/ZiTwbHTeq6U=
+github.com/microsoft/go-crypto-openssl v0.0.0-20260526093041-a7ca5d3c79e8/go.mod h1:gJrjX+yWGi9pkbfPVDDh+ZbgjtQoRSXHjb/ZyjwKk34=

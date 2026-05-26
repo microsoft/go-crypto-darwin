@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// openSSLVersion returns the version of github.com/golang-fips/openssl/v2
+// openSSLVersion returns the version of github.com/microsoft/go-crypto-openssl
 // pinned in internal/cgotool/openssl/go.mod.
 func openSSLVersion() (string, error) {
 	gomod, err := exec.Command("go", "env", "GOMOD").Output()
@@ -23,7 +23,7 @@ func openSSLVersion() (string, error) {
 		return "", fmt.Errorf("finding module root: no go.mod found; run this command within the module")
 	}
 	toolDir := filepath.Join(filepath.Dir(gomodPath), "internal", "cgotool", "openssl")
-	out, err := exec.Command("go", "-C", toolDir, "list", "-m", "-f", "{{.Version}}", "github.com/golang-fips/openssl/v2").Output()
+	out, err := exec.Command("go", "-C", toolDir, "list", "-m", "-f", "{{.Version}}", "github.com/microsoft/go-crypto-openssl").Output()
 	if err != nil {
 		return "", fmt.Errorf("getting openssl version: %w", err)
 	}
@@ -36,7 +36,7 @@ func MkcgoPackage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return "github.com/golang-fips/openssl/v2/cmd/mkcgo@" + v, nil
+	return "github.com/microsoft/go-crypto-openssl/cmd/mkcgo@" + v, nil
 }
 
 // CheckheaderPackage returns the versioned package path for the checkheader tool.
@@ -45,5 +45,5 @@ func CheckheaderPackage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return "github.com/golang-fips/openssl/v2/cmd/checkheader@" + v, nil
+	return "github.com/microsoft/go-crypto-openssl/cmd/checkheader@" + v, nil
 }

@@ -199,11 +199,17 @@ func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) in
 }
 
 func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
+	if outLength != nil && int(*outLength) > len(out) {
+		panic("DecryptAESGCM: *outLength exceeds len(out)")
+	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
 	return int64(r0)
 }
 
 func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []uint8, out []uint8, outLength *int) int64 {
+	if outLength != nil && int(*outLength) > len(out) {
+		panic("DecryptChaChaPoly: *outLength exceeds len(out)")
+	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
 	return int64(r0)
 }
@@ -234,6 +240,9 @@ func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, shar
 }
 
 func EcdsaSign(curveID int32, d []uint8, message []uint8, signature []uint8, signatureLen *int64) int64 {
+	if signatureLen != nil && int(*signatureLen) > len(signature) {
+		panic("EcdsaSign: *signatureLen exceeds len(signature)")
+	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdsaSign)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
 	return int64(r0)
 }
@@ -377,11 +386,17 @@ func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
 }
 
 func SignMLDSA65(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	if signatureLen != nil && int(*signatureLen) > len(signature) {
+		panic("SignMLDSA65: *signatureLen exceeds len(signature)")
+	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
 	return int64(r0)
 }
 
 func SignMLDSA87(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64 {
+	if signatureLen != nil && int(*signatureLen) > len(signature) {
+		panic("SignMLDSA87: *signatureLen exceeds len(signature)")
+	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
 	return int64(r0)
 }

@@ -1,2 +1,6 @@
 # Default: normalize text files to LF in the repo and on checkout.
 * text=auto eol=lf
+
+# Always keep our version of prebuilt syso files during merges.
+internal/cryptokit/CryptoKit_amd64.syso binary merge=ours
+internal/cryptokit/CryptoKit_arm64.syso binary merge=ours

@@ -13,6 +13,8 @@ package cryptokit
 #cgo nocallback _mkcgo_go_MD5
 #cgo noescape _mkcgo_go_SHA1
 #cgo nocallback _mkcgo_go_SHA1
+#cgo noescape _mkcgo_go_SHA224
+#cgo nocallback _mkcgo_go_SHA224
 #cgo noescape _mkcgo_go_SHA256
 #cgo nocallback _mkcgo_go_SHA256
 #cgo noescape _mkcgo_go_SHA384
@@ -147,6 +149,10 @@ func MD5(inputPointer []uint8, outputPointer []uint8) {
 
 func SHA1(inputPointer []uint8, outputPointer []uint8) {
 	C._mkcgo_go_SHA1((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+}
+
+func SHA224(inputPointer []uint8, outputPointer []uint8) {
+	C._mkcgo_go_SHA224((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(inputPointer))), C.size_t(len(inputPointer)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(outputPointer))))
 }
 
 func SHA256(inputPointer []uint8, outputPointer []uint8) {

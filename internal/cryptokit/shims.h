@@ -68,6 +68,7 @@ void *go_copyHMAC(int32_t hashAlgorithm, void *ptr) __attribute__((noescape, noc
 void go_MD5(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 void go_SHA1(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 void go_SHA256(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
+void go_SHA224(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 void go_SHA384(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 void go_SHA512(const uint8_t *inputPointer, size_t inputLength, uint8_t *outputPointer) __attribute__((noescape, nocallback, static, slice(inputPointer, inputLength), slice(outputPointer)));
 long go_supportsSHA3() __attribute__((noescape, nocallback, static));

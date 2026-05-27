@@ -19,6 +19,7 @@ import (
 const (
 	md5     = 1
 	sha1    = 2
+	sha224  = 9
 	sha256  = 3
 	sha384  = 4
 	sha512  = 5
@@ -65,6 +66,10 @@ func loadHash(ch crypto.Hash, required bool) *hashAlgorithm {
 		hash.id = sha1
 		hash.size = int(cryptokit.HashSize(sha1))
 		hash.blockSize = int(cryptokit.HashBlockSize(sha1))
+	case crypto.SHA224:
+		hash.id = sha224
+		hash.size = int(cryptokit.HashSize(sha224))
+		hash.blockSize = int(cryptokit.HashBlockSize(sha224))
 	case crypto.SHA256:
 		hash.id = sha256
 		hash.size = int(cryptokit.HashSize(sha256))
@@ -129,16 +134,15 @@ func SupportsHash(h crypto.Hash) bool {
 }
 
 func newHash(ch crypto.Hash) *Hash {
-	alg := loadHash(ch, true)
+	return &Hash{alg: loadHash(ch, true)}
+}
 
-	h := &Hash{
-		ptr: cryptokit.HashNew(alg.id),
-		alg: alg,
+// init lazily allocates the native hash context on first use.
+func (h *Hash) init() {
+	if h.ptr == nil {
+		h.ptr = cryptokit.HashNew(h.alg.id)
+		runtime.SetFinalizer(h, (*Hash).finalize)
 	}
-
-	runtime.SetFinalizer(h, (*Hash).finalize)
-
-	return h
 }
 
 func (h *Hash) finalize() {
@@ -150,7 +154,8 @@ func (h *Hash) finalize() {
 
 func (h *Hash) Clone() (HashCloner, error) {
 	if h.ptr == nil {
-		panic("cryptokit: hash already finalized")
+		// Not yet initialized, just return a new uninitialized hash.
+		return &Hash{alg: h.alg}, nil
 	}
 
 	newHash := &Hash{
@@ -169,6 +174,7 @@ func (h *Hash) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, p)
 
 	runtime.KeepAlive(h)
@@ -180,6 +186,7 @@ func (h *Hash) WriteString(s string) (int, error) {
 	if len(s) == 0 {
 		return 0, nil
 	}
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(unsafe.StringData(s), len(s)))
 
 	runtime.KeepAlive(h)
@@ -188,6 +195,7 @@ func (h *Hash) WriteString(s string) (int, error) {
 }
 
 func (h *Hash) WriteByte(c byte) error {
+	h.init()
 	cryptokit.HashWrite(h.alg.id, h.ptr, unsafe.Slice(&c, 1))
 
 	runtime.KeepAlive(h)
@@ -196,6 +204,7 @@ func (h *Hash) WriteByte(c byte) error {
 }
 
 func (h *Hash) Sum(b []byte) []byte {
+	h.init()
 	hashSlice := make([]byte, h.alg.size, 64) // explicit cap to allow stack allocation
 	cryptokit.HashSum(h.alg.id, h.ptr, hashSlice)
 	runtime.KeepAlive(h)
@@ -226,6 +235,9 @@ func (h *Hash) UnmarshalBinary(data []byte) error {
 }
 
 func (h *Hash) Reset() {
+	if h.ptr == nil {
+		return // not yet initialized, already in initial state
+	}
 	cryptokit.HashReset(h.alg.id, h.ptr)
 }
 
@@ -244,7 +256,7 @@ func FIPSApprovedHash(h hash.Hash) bool {
 		return false
 	}
 	switch xh.alg.ch {
-	case crypto.SHA256, crypto.SHA384, crypto.SHA512,
+	case crypto.SHA224, crypto.SHA256, crypto.SHA384, crypto.SHA512,
 		crypto.SHA3_256, crypto.SHA3_384, crypto.SHA3_512:
 		return true
 	default:
@@ -262,6 +274,11 @@ func MD5(p []byte) (sum [16]byte) {
 
 func SHA1(p []byte) (sum [20]byte) {
 	cryptokit.SHA1(p, sum[:])
+	return
+}
+
+func SHA224(p []byte) (sum [28]byte) {
+	cryptokit.SHA224(p, sum[:])
 	return
 }
 
@@ -304,6 +321,11 @@ func NewMD5() hash.Hash {
 // NewSHA1 initializes a new SHA1 hasher.
 func NewSHA1() hash.Hash {
 	return newHash(crypto.SHA1)
+}
+
+// NewSHA224 initializes a new SHA224 hasher.
+func NewSHA224() hash.Hash {
+	return newHash(crypto.SHA224)
 }
 
 // NewSHA256 initializes a new SHA256 hasher.

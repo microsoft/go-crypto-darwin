@@ -80,14 +80,14 @@ func TestHMACUnsupportedHash(t *testing.T) {
 func TestHMACAllocations(t *testing.T) {
 	msg := []byte("hello world")
 	sum := make([]byte, xcrypto.NewSHA256().Size())
+	h := xcrypto.NewHMAC(xcrypto.NewSHA256, nil)
 	n := int(testing.AllocsPerRun(10, func() {
-		h := xcrypto.NewHMAC(xcrypto.NewSHA256, nil)
 		h.Write(msg)
 		h.Sum(sum[:0])
 		h.Reset()
 	}))
 
-	want := 2
+	want := 0
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)
 	}

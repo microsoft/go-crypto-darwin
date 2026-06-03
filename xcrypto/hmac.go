@@ -15,7 +15,7 @@ import (
 )
 
 var _ hash.Hash = (*cryptoKitHMAC)(nil)
-var _ HashCloner = (*cryptoKitHMAC)(nil)
+var _ hash.Cloner = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
 	ptr unsafe.Pointer
@@ -28,30 +28,26 @@ type cryptoKitHMAC struct {
 }
 
 // NewHMAC returns a new HMAC using xcrypto.
-// The function h must return a hash implemented by
-// CommonCrypto (for example, h could be xcrypto.NewSHA256).
-// If h is not recognized, NewHMAC returns nil.
-func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
-	h := fh()
-	if h == nil {
+// The function fh must return a hash implemented by
+// CommonCrypto (for example, [NewSHA256]).
+// If fh is not recognized, NewHMAC returns nil.
+func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
+	h, ok := any(fh()).(*Hash)
+	if !ok || h == nil {
 		return nil
 	}
 
 	// copying the key here to ensure that it is not modified
 	// while this algorithm is using it.
 	key = slices.Clone(key)
-	kind := hashToHMACEnum(h)
-	if kind == 0 {
-		// The hash function is not supported by the HMAC implementation.
-		return nil
-	}
+	kind := h.alg.id
 
 	hmac := &cryptoKitHMAC{
 		ptr:       cryptokit.InitHMAC(kind, key),
 		kind:      kind,
 		key:       key,
-		blockSize: h.BlockSize(),
-		size:      h.Size(),
+		blockSize: h.alg.blockSize,
+		size:      h.alg.size,
 	}
 
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
@@ -78,7 +74,7 @@ func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	return b
 }
 
-func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
+func (h *cryptoKitHMAC) Clone() (hash.Cloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}
@@ -107,13 +103,4 @@ func (h *cryptoKitHMAC) Size() int {
 
 func (h *cryptoKitHMAC) BlockSize() int {
 	return h.blockSize
-}
-
-func hashToHMACEnum(h hash.Hash) int32 {
-	switch h := h.(type) {
-	case *Hash:
-		return h.alg.id
-	default:
-		return 0
-	}
 }

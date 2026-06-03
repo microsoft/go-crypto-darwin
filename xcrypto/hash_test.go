@@ -6,7 +6,6 @@ package xcrypto_test
 import (
 	"bytes"
 	"crypto"
-	"encoding"
 	"errors"
 	"fmt"
 	"hash"
@@ -17,7 +16,7 @@ import (
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
 
-func cryptoToHash(h crypto.Hash) func() hash.Hash {
+func cryptoToHash(h crypto.Hash) func() *xcrypto.Hash {
 	switch h {
 	case crypto.MD5:
 		return xcrypto.NewMD5
@@ -30,13 +29,13 @@ func cryptoToHash(h crypto.Hash) func() hash.Hash {
 	case crypto.SHA512:
 		return xcrypto.NewSHA512
 	// case crypto.SHA3_224:
-	// 	return func() hash.Hash { return xcrypto.NewSHA3_224() }
+	// 	return xcrypto.NewSHA3_224
 	case crypto.SHA3_256:
-		return func() hash.Hash { return xcrypto.NewSHA3_256() }
+		return xcrypto.NewSHA3_256
 	case crypto.SHA3_384:
-		return func() hash.Hash { return xcrypto.NewSHA3_384() }
+		return xcrypto.NewSHA3_384
 	case crypto.SHA3_512:
-		return func() hash.Hash { return xcrypto.NewSHA3_512() }
+		return xcrypto.NewSHA3_512
 	}
 	return nil
 }
@@ -101,13 +100,7 @@ func TestHash_BinaryMarshaler(t *testing.T) {
 				t.Skip("hash not supported")
 			}
 
-			hashMarshaler, ok := cryptoToHash(ch)().(interface {
-				hash.Hash
-				encoding.BinaryMarshaler
-			})
-			if !ok {
-				t.Skip("BinaryMarshaler not supported")
-			}
+			hashMarshaler := cryptoToHash(ch)()
 
 			if _, err := hashMarshaler.Write(msg); err != nil {
 				t.Fatalf("Write failed: %v", err)
@@ -118,10 +111,7 @@ func TestHash_BinaryMarshaler(t *testing.T) {
 				t.Fatalf("MarshalBinary failed: %v", err)
 			}
 
-			hashUnmarshaler := cryptoToHash(ch)().(interface {
-				hash.Hash
-				encoding.BinaryUnmarshaler
-			})
+			hashUnmarshaler := cryptoToHash(ch)()
 			if err := hashUnmarshaler.UnmarshalBinary(state); err != nil {
 				t.Fatalf("UnmarshalBinary failed: %v", err)
 			}
@@ -141,10 +131,7 @@ func TestHash_BinaryAppender(t *testing.T) {
 				t.Skip("not supported")
 			}
 
-			hashWithBinaryAppender, ok := cryptoToHash(ch)().(interface {
-				hash.Hash
-				AppendBinary(b []byte) ([]byte, error)
-			})
+			hashWithBinaryAppender := cryptoToHash(ch)()
 
 			// Create a slice with 10 elements
 			prebuiltSlice := make([]byte, 10)
@@ -173,13 +160,7 @@ func TestHash_BinaryAppender(t *testing.T) {
 			// Use only the newly appended part of the slice
 			appendedState := state[10:]
 
-			h2, ok := cryptoToHash(ch)().(interface {
-				hash.Hash
-				encoding.BinaryUnmarshaler
-			})
-			if !ok {
-				t.Skip("not supported")
-			}
+			h2 := cryptoToHash(ch)()
 
 			if err := h2.UnmarshalBinary(appendedState); err != nil {
 				t.Errorf("could not unmarshal: %v", err)
@@ -199,7 +180,7 @@ func TestHash_Clone(t *testing.T) {
 			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
-			h := cryptoToHash(ch)().(xcrypto.HashCloner)
+			h := cryptoToHash(ch)()
 			_, err := h.Write(msg)
 			if err != nil {
 				t.Fatal(err)
@@ -248,10 +229,7 @@ func TestHash_ByteWriter(t *testing.T) {
 			if !xcrypto.SupportsHash(ch) {
 				t.Skip("not supported")
 			}
-			bwh := cryptoToHash(ch)().(interface {
-				hash.Hash
-				io.ByteWriter
-			})
+			bwh := cryptoToHash(ch)()
 			initSum := bwh.Sum(nil)
 			for i := range len(msg) {
 				bwh.WriteByte(msg[i])
@@ -275,7 +253,7 @@ func TestHash_StringWriter(t *testing.T) {
 			}
 			h := cryptoToHash(ch)()
 			initSum := h.Sum(nil)
-			h.(io.StringWriter).WriteString(string(msg))
+			h.WriteString(string(msg))
 			h.Reset()
 			sum := h.Sum(nil)
 			if !bytes.Equal(sum, initSum) {

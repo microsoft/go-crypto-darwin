@@ -12,7 +12,7 @@ import (
 )
 
 type hkdfTest struct {
-	hash   func() hash.Hash
+	hash   func() *xcrypto.Hash
 	master []byte
 	salt   []byte
 	prk    []byte
@@ -291,7 +291,7 @@ var hkdfTests = []hkdfTest{
 	},
 }
 
-func newHKDF(hash func() hash.Hash, secret, salt, info []byte) ([]byte, error) {
+func newHKDF[H hash.Hash](hash func() H, secret, salt, info []byte) ([]byte, error) {
 	prk, err := xcrypto.ExtractHKDF(hash, secret, salt)
 	if err != nil {
 		return nil, err

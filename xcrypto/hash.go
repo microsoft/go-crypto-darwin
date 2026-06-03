@@ -34,8 +34,6 @@ type hashAlgorithm struct {
 	blockSize int
 }
 
-type HashCloner = hash.Cloner
-
 var cacheHash sync.Map // map[crypto.Hash]*hashAlgorithm
 
 // supportsSHA3 returns true if SHA-3 is available on this macOS version.
@@ -148,7 +146,7 @@ func (h *Hash) finalize() {
 	}
 }
 
-func (h *Hash) Clone() (HashCloner, error) {
+func (h *Hash) Clone() (hash.Cloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}
@@ -253,7 +251,7 @@ func FIPSApprovedHash(h hash.Hash) bool {
 }
 
 var _ hash.Hash = (*Hash)(nil)
-var _ HashCloner = (*Hash)(nil)
+var _ hash.Cloner = (*Hash)(nil)
 
 func MD5(p []byte) (sum [16]byte) {
 	cryptokit.MD5(p, sum[:])
@@ -296,28 +294,28 @@ func SumSHA3_512(p []byte) (sum [64]byte) {
 }
 
 // NewMD5 initializes a new MD5 hasher.
-func NewMD5() hash.Hash {
+func NewMD5() *Hash {
 	return newHash(crypto.MD5)
 
 }
 
 // NewSHA1 initializes a new SHA1 hasher.
-func NewSHA1() hash.Hash {
+func NewSHA1() *Hash {
 	return newHash(crypto.SHA1)
 }
 
 // NewSHA256 initializes a new SHA256 hasher.
-func NewSHA256() hash.Hash {
+func NewSHA256() *Hash {
 	return newHash(crypto.SHA256)
 }
 
 // NewSHA384 initializes a new SHA384 hasher.
-func NewSHA384() hash.Hash {
+func NewSHA384() *Hash {
 	return newHash(crypto.SHA384)
 }
 
 // NewSHA512 initializes a new SHA512 hasher.
-func NewSHA512() hash.Hash {
+func NewSHA512() *Hash {
 	return newHash(crypto.SHA512)
 }
 

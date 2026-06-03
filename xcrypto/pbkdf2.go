@@ -14,7 +14,7 @@ import (
 	"github.com/microsoft/go-crypto-darwin/internal/commoncrypto"
 )
 
-func PBKDF2(password, salt []byte, iter, keyLen int, fh func() hash.Hash) ([]byte, error) {
+func PBKDF2[H hash.Hash](password, salt []byte, iter, keyLen int, fh func() H) ([]byte, error) {
 	// CommonCrypto's CCKeyDerivationPBKDF takes an unsigned 32-bit iteration
 	// count, so reject values that would overflow or wrap. In practice the
 	// recommended iteration count is around 300,000.

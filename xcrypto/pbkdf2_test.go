@@ -148,7 +148,7 @@ var sha256TestVectors = []testVector{
 	},
 }
 
-func testHash(t *testing.T, h func() hash.Hash, hashName string, vectors []testVector) {
+func testHash[H hash.Hash](t *testing.T, h func() H, hashName string, vectors []testVector) {
 	for i, v := range vectors {
 		o, err := xcrypto.PBKDF2([]byte(v.password), []byte(v.salt), v.iter, len(v.output), h)
 		if err != nil {
@@ -177,7 +177,7 @@ func TestPBKDF2WithUnsupportedHash(t *testing.T) {
 	}
 }
 
-func benchmark(b *testing.B, h func() hash.Hash) {
+func benchmark[H hash.Hash](b *testing.B, h func() H) {
 	password := make([]byte, h().Size())
 	salt := make([]byte, 8)
 	var err error

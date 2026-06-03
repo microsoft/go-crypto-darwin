@@ -32,23 +32,22 @@ type cryptoKitHMAC struct {
 // CommonCrypto (for example, [NewSHA256]).
 // If fh is not recognized, NewHMAC returns nil.
 func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
-	h := fh()
+	h, ok := any(fh()).(*Hash)
+	if !ok || h == nil {
+		return nil
+	}
 
 	// copying the key here to ensure that it is not modified
 	// while this algorithm is using it.
 	key = slices.Clone(key)
-	kind := hashToHMACEnum(h)
-	if kind == 0 {
-		// The hash function is not supported by the HMAC implementation.
-		return nil
-	}
+	kind := h.alg.id
 
 	hmac := &cryptoKitHMAC{
 		ptr:       cryptokit.InitHMAC(kind, key),
 		kind:      kind,
 		key:       key,
-		blockSize: h.BlockSize(),
-		size:      h.Size(),
+		blockSize: h.alg.blockSize,
+		size:      h.alg.size,
 	}
 
 	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
@@ -104,13 +103,4 @@ func (h *cryptoKitHMAC) Size() int {
 
 func (h *cryptoKitHMAC) BlockSize() int {
 	return h.blockSize
-}
-
-func hashToHMACEnum(h hash.Hash) int32 {
-	switch h := h.(type) {
-	case *Hash:
-		return h.alg.id
-	default:
-		return 0
-	}
 }

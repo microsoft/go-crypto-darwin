@@ -14,7 +14,7 @@ import (
 )
 
 // ExtractHKDF performs the extract step of HKDF using the specified hash function.
-func ExtractHKDF(h func() hash.Hash, secret, salt []byte) ([]byte, error) {
+func ExtractHKDF[H hash.Hash](h func() H, secret, salt []byte) ([]byte, error) {
 	// Handle empty secret
 	if len(secret) == 0 {
 		return nil, errors.New("secret cannot be empty")
@@ -47,7 +47,7 @@ func ExtractHKDF(h func() hash.Hash, secret, salt []byte) ([]byte, error) {
 }
 
 // ExpandHKDF performs the expand step of HKDF using the specified hash function.
-func ExpandHKDF(h func() hash.Hash, pseudorandomKey, info []byte, keyLength int) ([]byte, error) {
+func ExpandHKDF[H hash.Hash](h func() H, pseudorandomKey, info []byte, keyLength int) ([]byte, error) {
 	// Handle empty secret
 	if len(pseudorandomKey) == 0 {
 		return nil, errors.New("pseudorandom key cannot be empty")

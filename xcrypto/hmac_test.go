@@ -5,7 +5,6 @@ package xcrypto_test
 
 import (
 	"bytes"
-	"hash"
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
@@ -14,7 +13,7 @@ import (
 func TestHMAC(t *testing.T) {
 	var tests = []struct {
 		name string
-		fn   func() hash.Hash
+		fn   func() *xcrypto.Hash
 	}{
 		{"md5", xcrypto.NewMD5},
 		{"sha1", xcrypto.NewSHA1},

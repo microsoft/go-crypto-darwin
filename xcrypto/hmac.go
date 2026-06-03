@@ -15,7 +15,7 @@ import (
 )
 
 var _ hash.Hash = (*cryptoKitHMAC)(nil)
-var _ HashCloner = (*cryptoKitHMAC)(nil)
+var _ hash.Cloner = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
 	ptr unsafe.Pointer
@@ -28,14 +28,11 @@ type cryptoKitHMAC struct {
 }
 
 // NewHMAC returns a new HMAC using xcrypto.
-// The function h must return a hash implemented by
-// CommonCrypto (for example, h could be xcrypto.NewSHA256).
-// If h is not recognized, NewHMAC returns nil.
-func NewHMAC(fh func() hash.Hash, key []byte) hash.Hash {
+// The function fh must return a hash implemented by
+// CommonCrypto (for example, [NewSHA256]).
+// If fh is not recognized, NewHMAC returns nil.
+func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
 	h := fh()
-	if h == nil {
-		return nil
-	}
 
 	// copying the key here to ensure that it is not modified
 	// while this algorithm is using it.
@@ -78,7 +75,7 @@ func (h *cryptoKitHMAC) Sum(b []byte) []byte {
 	return b
 }
 
-func (h *cryptoKitHMAC) Clone() (HashCloner, error) {
+func (h *cryptoKitHMAC) Clone() (hash.Cloner, error) {
 	if h.ptr == nil {
 		panic("cryptokit: hash already finalized")
 	}

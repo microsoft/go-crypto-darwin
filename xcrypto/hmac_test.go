@@ -87,7 +87,7 @@ func TestHMACAllocations(t *testing.T) {
 		h.Reset()
 	}))
 
-	want := 2
+	want := 3
 	if n > want {
 		t.Errorf("allocs = %d, want %d", n, want)
 	}

@@ -6,6 +6,7 @@
 package xcrypto
 
 import (
+	"crypto/subtle"
 	"errors"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
@@ -131,6 +132,15 @@ func (key *PrivateKeyMLDSA) Bytes() []byte {
 	return key.seed[:]
 }
 
+// Equal reports whether key and other represent the same private key.
+func (key *PrivateKeyMLDSA) Equal(other *PrivateKeyMLDSA) bool {
+	if other == nil {
+		return false
+	}
+	return key.params.name == other.params.name &&
+		subtle.ConstantTimeCompare(key.seed[:], other.seed[:]) == 1
+}
+
 // Parameters returns the parameters associated with this private key.
 func (key *PrivateKeyMLDSA) Parameters() MLDSAParameters { return key.params }
 
@@ -190,6 +200,15 @@ func NewPublicKeyMLDSA(params MLDSAParameters, publicKey []byte) (*PublicKeyMLDS
 // Bytes returns the public key encoding.
 func (key *PublicKeyMLDSA) Bytes() []byte {
 	return key.bytes[:key.params.publicKeySize]
+}
+
+// Equal reports whether key and other represent the same public key.
+func (key *PublicKeyMLDSA) Equal(other *PublicKeyMLDSA) bool {
+	if other == nil {
+		return false
+	}
+	return key.params.name == other.params.name &&
+		subtle.ConstantTimeCompare(key.bytes[:key.params.publicKeySize], other.bytes[:other.params.publicKeySize]) == 1
 }
 
 // Parameters returns the parameters associated with this public key.

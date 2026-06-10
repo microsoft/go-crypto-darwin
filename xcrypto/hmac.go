@@ -37,10 +37,22 @@ func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
 		return nil
 	}
 
+	kind := h.alg.id
+	switch kind {
+	case md5, sha1, sha256, sha384, sha512:
+		// Supported by CryptoKit's HMAC.
+	default:
+		// CryptoKit's HMAC only supports MD5, SHA-1, SHA-256, SHA-384, and
+		// SHA-512 (see go_initHMAC in cryptokit.swift). In particular it does
+		// not support SHA-3 and aborts the process if asked. Report any other
+		// hash as unsupported so that NewHMAC returns nil and the caller can
+		// fall back to a pure Go HMAC.
+		return nil
+	}
+
 	// copying the key here to ensure that it is not modified
 	// while this algorithm is using it.
 	key = slices.Clone(key)
-	kind := h.alg.id
 
 	hmac := &cryptoKitHMAC{
 		ptr:       cryptokit.InitHMAC(kind, key),

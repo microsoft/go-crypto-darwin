@@ -5,6 +5,7 @@ package xcrypto_test
 
 import (
 	"bytes"
+	"crypto"
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
@@ -74,6 +75,32 @@ func TestHMACUnsupportedHash(t *testing.T) {
 	h := xcrypto.NewHMAC(newStubHash, nil)
 	if h != nil {
 		t.Errorf("returned non-nil for unsupported hash")
+	}
+}
+
+// TestHMACSHA3Unsupported is a regression test for
+// https://github.com/microsoft/go/issues/2356. SHA-3 is a recognized
+// xcrypto.Hash, but CryptoKit's HMAC cannot compute it and aborts the process
+// if asked (see go_initHMAC in cryptokit.swift). NewHMAC must report it as
+// unsupported by returning nil so the caller can fall back to a Go HMAC.
+func TestHMACSHA3Unsupported(t *testing.T) {
+	if !xcrypto.SupportsHash(crypto.SHA3_256) {
+		t.Skip("SHA-3 not supported on this macOS version")
+	}
+	tests := []struct {
+		name string
+		fn   func() *xcrypto.Hash
+	}{
+		{"sha3-256", xcrypto.NewSHA3_256},
+		{"sha3-384", xcrypto.NewSHA3_384},
+		{"sha3-512", xcrypto.NewSHA3_512},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if h := xcrypto.NewHMAC(tt.fn, nil); h != nil {
+				t.Errorf("NewHMAC = non-nil, want nil (CryptoKit cannot HMAC %s)", tt.name)
+			}
+		})
 	}
 }
 

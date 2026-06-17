@@ -8,14 +8,21 @@ import Foundation
 import CryptoKitC
 #endif
 
-// Runtime feature detection for SHA3 (available on macOS 26+ only)
+// Runtime feature detection for SHA3 (available on macOS 26+ only).
+// The SHA3_* APIs also require Swift 6.2+ to compile, so the SHA3
+// implementations throughout this file are guarded by #if compiler(>=6.2).
+// This detector must use the same guard so that a build with an older
+// toolchain (where those implementations are compiled out) reports SHA3
+// as unavailable instead of letting callers reach a missing symbol.
 @implementation @c
 public func go_supportsSHA3() -> Int {
+    #if compiler(>=6.2)
     if #available(macOS 26.0, *) {
         // SHA3 symbols are lazily bound, so if this returns true,
         // the runtime can safely call SHA3_* functions.
         return 1
     }
+    #endif
     return 0
 }
 
@@ -1373,6 +1380,32 @@ public func go_extractHKDF(
             inputKeyMaterial: secretData,
             salt: saltData
         )
+    #if compiler(>=6.2)
+    case 5:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        prk = HKDF<SHA3_256>.extract(
+            inputKeyMaterial: secretData,
+            salt: saltData
+        )
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        prk = HKDF<SHA3_384>.extract(
+            inputKeyMaterial: secretData,
+            salt: saltData
+        )
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        prk = HKDF<SHA3_512>.extract(
+            inputKeyMaterial: secretData,
+            salt: saltData
+        )
+    #endif
     default:
         return -1  // Unsupported hash function
     }
@@ -1426,6 +1459,35 @@ public func go_expandHKDF(
             info: infoData,
             outputByteCount: derivedKeyLength
         )
+    #if compiler(>=6.2)
+    case 5:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        derivedKey = HKDF<SHA3_256>.expand(
+            pseudoRandomKey: prkData,
+            info: infoData,
+            outputByteCount: derivedKeyLength
+        )
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        derivedKey = HKDF<SHA3_384>.expand(
+            pseudoRandomKey: prkData,
+            info: infoData,
+            outputByteCount: derivedKeyLength
+        )
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            return -1
+        }
+        derivedKey = HKDF<SHA3_512>.expand(
+            pseudoRandomKey: prkData,
+            info: infoData,
+            outputByteCount: derivedKeyLength
+        )
+    #endif
     default:
         return -1  // Unsupported hash function
     }
@@ -1471,6 +1533,29 @@ public func go_initHMAC(
         hmac.initialize(to: CryptoKit.HMAC<SHA512>(key: key))
 
         return UnsafeMutableRawPointer(hmac)
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = UnsafeMutablePointer<HMAC<SHA3_256>>.allocate(capacity: 1)
+        hmac.initialize(to: CryptoKit.HMAC<SHA3_256>(key: key))
+        return UnsafeMutableRawPointer(hmac)
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = UnsafeMutablePointer<HMAC<SHA3_384>>.allocate(capacity: 1)
+        hmac.initialize(to: CryptoKit.HMAC<SHA3_384>(key: key))
+        return UnsafeMutableRawPointer(hmac)
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = UnsafeMutablePointer<HMAC<SHA3_512>>.allocate(capacity: 1)
+        hmac.initialize(to: CryptoKit.HMAC<SHA3_512>(key: key))
+        return UnsafeMutableRawPointer(hmac)
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1494,6 +1579,26 @@ public func go_freeHMAC(_ hashFunction: Int32, _ ptr: UnsafeMutableRawPointer) {
     case 5:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
         hmac.deallocate()
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_256>.self)
+        hmac.deallocate()
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_384>.self)
+        hmac.deallocate()
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_512>.self)
+        hmac.deallocate()
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1524,6 +1629,26 @@ public func go_updateHMAC(
     case 5:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
         hmac.pointee.update(data: data)
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_256>.self)
+        hmac.pointee.update(data: data)
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_384>.self)
+        hmac.pointee.update(data: data)
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_512>.self)
+        hmac.pointee.update(data: data)
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1567,6 +1692,35 @@ public func go_copyHMAC(_ hashAlgorithm: Int32, _ ptr: UnsafeMutableRawPointer) 
         newHasher.initialize(to: copyOf)
 
         return UnsafeMutableRawPointer(newHasher)
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_256>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA3_256>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+        return UnsafeMutableRawPointer(newHasher)
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_384>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA3_384>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+        return UnsafeMutableRawPointer(newHasher)
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_512>.self)
+        let copyOf = hmac.pointee
+        let newHasher = UnsafeMutablePointer<HMAC<SHA3_512>>.allocate(capacity: 1)
+        newHasher.initialize(to: copyOf)
+        return UnsafeMutableRawPointer(newHasher)
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1599,6 +1753,29 @@ public func go_finalizeHMAC(
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
         let authenticationCode = hmac.pointee.finalize()
         Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA512.byteCount)
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_256>.self)
+        let authenticationCode = hmac.pointee.finalize()
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA3_256.byteCount)
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_384>.self)
+        let authenticationCode = hmac.pointee.finalize()
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA3_384.byteCount)
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_512>.self)
+        let authenticationCode = hmac.pointee.finalize()
+        Data(authenticationCode).copyBytes(to: outputPointer, count: CryptoKit.SHA3_512.byteCount)
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1616,6 +1793,23 @@ public func go_hmacSize(_ hashFunction: Int32) -> Int {
         return CryptoKit.SHA384.byteCount
     case 5:
         return CryptoKit.SHA512.byteCount
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        return CryptoKit.SHA3_256.byteCount
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        return CryptoKit.SHA3_384.byteCount
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        return CryptoKit.SHA3_512.byteCount
+    #endif
     default:
         fatalError("Unsupported hash function")
     }
@@ -1644,6 +1838,26 @@ public func go_resetHMAC(
     case 5:
         let hmac = ptr.assumingMemoryBound(to: HMAC<SHA512>.self)
         hmac.pointee = CryptoKit.HMAC<SHA512>(key: key)
+    #if compiler(>=6.2)
+    case 6:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_256>.self)
+        hmac.pointee = CryptoKit.HMAC<SHA3_256>(key: key)
+    case 7:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_384>.self)
+        hmac.pointee = CryptoKit.HMAC<SHA3_384>(key: key)
+    case 8:
+        guard #available(macOS 26.0, *) else {
+            fatalError("SHA-3 requires macOS 26 or later")
+        }
+        let hmac = ptr.assumingMemoryBound(to: HMAC<SHA3_512>.self)
+        hmac.pointee = CryptoKit.HMAC<SHA3_512>(key: key)
+    #endif
     default:
         fatalError("Unsupported hash function")
     }

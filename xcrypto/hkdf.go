@@ -97,6 +97,14 @@ func cryptoHashToSwift(hash crypto.Hash) (int32, error) {
 		return 3, nil
 	case crypto.SHA512:
 		return 4, nil
+	case crypto.SHA3_256:
+		// SHA-3 only reaches this point on macOS 26+, since loadHash refuses to
+		// construct a SHA-3 *Hash on older systems.
+		return 5, nil
+	case crypto.SHA3_384:
+		return 6, nil
+	case crypto.SHA3_512:
+		return 7, nil
 	default:
 		return 0, errors.New("unsupported hash function")
 	}

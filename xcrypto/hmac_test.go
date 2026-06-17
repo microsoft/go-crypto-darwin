@@ -78,9 +78,10 @@ func TestHMACUnsupportedHash(t *testing.T) {
 	}
 }
 
-// TestHMACSHA3 tests that SHA-3 HMAC works on macOS 26+.
-// On older macOS versions, NewHMAC returns nil and the caller
-// should fall back to pure Go HMAC.
+// TestHMACSHA3 tests that SHA-3 HMAC works on macOS 26+. On older macOS
+// versions xcrypto.SupportsHash reports SHA-3 as unsupported and the caller
+// should fall back to a pure Go HMAC. Callers must check SupportsHash first
+// because xcrypto.NewSHA3_* panics when SHA-3 is unavailable.
 func TestHMACSHA3(t *testing.T) {
 	if !xcrypto.SupportsHash(crypto.SHA3_256) {
 		t.Skip("SHA-3 not supported on this macOS version")
@@ -100,16 +101,20 @@ func TestHMACSHA3(t *testing.T) {
 				t.Fatalf("NewHMAC(%s) = nil, want non-nil on macOS 26+", tt.name)
 			}
 			h.Write([]byte("hello"))
-			sum := h.Sum(nil)
-			if len(sum) == 0 {
-				t.Errorf("Sum returned empty slice")
-			}
-			// Test Reset
+			sumHello := h.Sum(nil)
+
+			// Reset and re-hash the same message: the tag must be identical.
 			h.Reset()
 			h.Write([]byte("hello"))
-			sum2 := h.Sum(nil)
-			if !bytes.Equal(sum, sum2) {
-				t.Errorf("Sum after Reset = %x, want %x", sum2, sum)
+			if sum := h.Sum(nil); !bytes.Equal(sum, sumHello) {
+				t.Errorf("Sum after Reset = %x, want %x", sum, sumHello)
+			}
+
+			// A different message must produce a different tag.
+			h.Reset()
+			h.Write([]byte("hello world"))
+			if sum := h.Sum(nil); bytes.Equal(sum, sumHello) {
+				t.Errorf("Sum for \"hello world\" unexpectedly equals Sum for \"hello\": %x", sum)
 			}
 		})
 	}

@@ -78,12 +78,11 @@ func TestHMACUnsupportedHash(t *testing.T) {
 	}
 }
 
-// TestHMACSHA3Unsupported is a regression test for
-// https://github.com/microsoft/go/issues/2356. SHA-3 is a recognized
-// xcrypto.Hash, but CryptoKit's HMAC cannot compute it and aborts the process
-// if asked (see go_initHMAC in cryptokit.swift). NewHMAC must report it as
-// unsupported by returning nil so the caller can fall back to a Go HMAC.
-func TestHMACSHA3Unsupported(t *testing.T) {
+// TestHMACSHA3 tests that SHA-3 HMAC works on macOS 26+. On older macOS
+// versions xcrypto.SupportsHash reports SHA-3 as unsupported and the caller
+// should fall back to a pure Go HMAC. Callers must check SupportsHash first
+// because xcrypto.NewSHA3_* panics when SHA-3 is unavailable.
+func TestHMACSHA3(t *testing.T) {
 	if !xcrypto.SupportsHash(crypto.SHA3_256) {
 		t.Skip("SHA-3 not supported on this macOS version")
 	}
@@ -97,8 +96,25 @@ func TestHMACSHA3Unsupported(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if h := xcrypto.NewHMAC(tt.fn, nil); h != nil {
-				t.Errorf("NewHMAC = non-nil, want nil (CryptoKit cannot HMAC %s)", tt.name)
+			h := xcrypto.NewHMAC(tt.fn, nil)
+			if h == nil {
+				t.Fatalf("NewHMAC(%s) = nil, want non-nil on macOS 26+", tt.name)
+			}
+			h.Write([]byte("hello"))
+			sumHello := h.Sum(nil)
+
+			// Reset and re-hash the same message: the tag must be identical.
+			h.Reset()
+			h.Write([]byte("hello"))
+			if sum := h.Sum(nil); !bytes.Equal(sum, sumHello) {
+				t.Errorf("Sum after Reset = %x, want %x", sum, sumHello)
+			}
+
+			// A different message must produce a different tag.
+			h.Reset()
+			h.Write([]byte("hello world"))
+			if sum := h.Sum(nil); bytes.Equal(sum, sumHello) {
+				t.Errorf("Sum for \"hello world\" unexpectedly equals Sum for \"hello\": %x", sum)
 			}
 		})
 	}

@@ -39,14 +39,15 @@ func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
 
 	kind := h.alg.id
 	switch kind {
-	case md5, sha1, sha256, sha384, sha512:
-		// Supported by CryptoKit's HMAC.
+	case md5, sha1, sha256, sha384, sha512, sha3256, sha3384, sha3512:
+		// All supported by CryptoKit's HMAC. SHA-3 only reaches this point on
+		// macOS 26+, since loadHash refuses to construct a SHA-3 *Hash on older
+		// systems, so no extra version check is needed here.
 	default:
-		// CryptoKit's HMAC only supports MD5, SHA-1, SHA-256, SHA-384, and
-		// SHA-512 (see go_initHMAC in cryptokit.swift). In particular it does
-		// not support SHA-3 and aborts the process if asked. Report any other
-		// hash as unsupported so that NewHMAC returns nil and the caller can
-		// fall back to a pure Go HMAC.
+		// CryptoKit's HMAC only supports MD5, SHA-1, SHA-256, SHA-384, SHA-512,
+		// and SHA-3 variants (on macOS 26+). Report any other hash as
+		// unsupported so that NewHMAC returns nil and the caller can fall back
+		// to a pure Go HMAC.
 		return nil
 	}
 

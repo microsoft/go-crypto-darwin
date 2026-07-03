@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
-
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -12,3 +9,8 @@ updates:
       codeql-action:
         patterns:
         - "github/codeql-action/*"
+  - package-ecosystem: gomod
+    directory: "/internal/cgotool/openssl"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10

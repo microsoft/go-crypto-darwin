@@ -1,0 +1,88 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Update fakecgo dependencies
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: 'go.mod'
+          go-download-base-url: "https://aka.ms/golang/release/latest"
+
+      - name: Check current lock file
+        id: check-current
+        run: |
+          if [ -f internal/fakecgo/fakecgo.lock ]; then
+            echo "current_hash=$(jq -r .commit_hash internal/fakecgo/fakecgo.lock)" >> $GITHUB_OUTPUT
+          else
+            echo "current_hash=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete lock file to fetch latest
+        run: rm -f internal/fakecgo/fakecgo.lock
+
+      - name: Run go generate
+        run: go generate ./internal/fakecgo/
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Check new lock file
+        id: check-new
+        run: |
+          echo "new_hash=$(jq -r .commit_hash internal/fakecgo/fakecgo.lock)" >> $GITHUB_OUTPUT
+
+      - name: Check for changes
+        id: git-check
+        run: git diff --exit-code -- . ':!internal/fakecgo/fakecgo.lock' || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Create update branch
+        if: steps.git-check.outputs.has_changes == 'true'
+        env:
+          NEW_HASH: ${{ steps.check-new.outputs.new_hash }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add internal/fakecgo
+          git commit -m "chore: update fakecgo dependencies to ${NEW_HASH}"
+          git push --force origin HEAD:update-fakecgo-dependencies
+
+      - name: Create or update issue
+        if: steps.git-check.outputs.has_changes == 'true'
+        env:
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_HASH: ${{ steps.check-current.outputs.current_hash }}
+          NEW_HASH: ${{ steps.check-new.outputs.new_hash }}
+        run: |
+          title="chore: update fakecgo dependencies"
+          issue_number=$(gh issue list --state open --search "${title} in:title" --json number,title,author \
+            | jq -r --arg title "${title}" 'map(select(.title == $title and ((.author.login // "") == "app/github-actions"))) | first | .number // empty')
+          body=$(printf '%s\n' \
+            "An update to the fakecgo dependencies is ready." \
+            "" \
+            "**Previous commit**: \`${CURRENT_HASH}\`" \
+            "**New commit**: \`${NEW_HASH}\`" \
+            "" \
+            "Changes: https://github.com/ebitengine/purego/compare/${CURRENT_HASH}...${NEW_HASH}" \
+            "" \
+            "[Create the pull request](https://github.com/${GITHUB_REPOSITORY}/compare/${BASE_BRANCH}...update-fakecgo-dependencies?expand=1)")
+          if [ -n "${issue_number}" ]; then
+            gh issue edit "${issue_number}" --body "${body}"
+          else
+            gh issue create --title "${title}" --body "${body}"
+          fi

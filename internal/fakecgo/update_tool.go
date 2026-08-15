@@ -12,7 +12,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 )
 
 const (
@@ -157,9 +156,7 @@ func updateFile(name, commitHash string) error {
 		return fmt.Errorf("failed to read body: %w", err)
 	}
 
-	if !strings.Contains(name, "darwin") && !strings.Contains(name, "linux") {
-		content = modifyBuildTags(content)
-	}
+	content = modifyBuildTags(content)
 
 	content = prependGeneratedHeader(content)
 
@@ -180,7 +177,7 @@ func modifyBuildTags(content []byte) []byte {
 	lines := bytes.Split(content, []byte("\n"))
 	for i, line := range lines {
 		if bytes.HasPrefix(line, []byte("//go:build")) {
-			lines[i] = []byte("//go:build !cgo && darwin")
+			lines[i] = bytes.ReplaceAll(line, []byte("(darwin || freebsd || linux || netbsd)"), []byte("darwin"))
 		}
 	}
 	return bytes.Join(lines, []byte("\n"))

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//go:build !cgo && !(amd64 || arm64)
+//go:build !cgo && (!darwin || !(amd64 || arm64))
 
 package xsyscall
 

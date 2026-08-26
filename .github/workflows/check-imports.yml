@@ -28,10 +28,8 @@ jobs:
       - name: Check vendored package imports
         run: |
           CGO_ENABLED=0 go run github.com/microsoft/go-infra/cmd/check-imports@v0.0.12 \
-            -pkg ./internal/fakecgo \
-            -allow syscall,unsafe \
             -pkg ./internal/xsyscall \
-            -allow unsafe \
+            -allow syscall,unsafe \
             -pkg ./internal/commoncrypto \
             -allow runtime,unsafe \
             -pkg ./internal/cryptokit \

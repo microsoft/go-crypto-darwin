@@ -18,13 +18,23 @@ var _ hash.Hash = (*cryptoKitHMAC)(nil)
 var _ hash.Cloner = (*cryptoKitHMAC)(nil)
 
 type cryptoKitHMAC struct {
-	ptr unsafe.Pointer
+	ptr     unsafe.Pointer
+	cleanup runtime.Cleanup
 
 	kind int32
 	key  []byte
 
 	blockSize int
 	size      int
+}
+
+type hmacCleanup struct {
+	ptr  unsafe.Pointer
+	kind int32
+}
+
+func freeHMAC(state hmacCleanup) {
+	cryptokit.FreeHMAC(state.kind, state.ptr)
 }
 
 // NewHMAC returns a new HMAC using xcrypto.
@@ -63,9 +73,7 @@ func NewHMAC[H hash.Hash](fh func() H, key []byte) hash.Hash {
 		size:      h.alg.size,
 	}
 
-	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(h.kind, h.ptr)
-	})
+	hmac.cleanup = runtime.AddCleanup(hmac, freeHMAC, hmacCleanup{ptr: hmac.ptr, kind: hmac.kind})
 
 	return hmac
 }
@@ -96,17 +104,17 @@ func (h *cryptoKitHMAC) Clone() (hash.Cloner, error) {
 
 	runtime.KeepAlive(h)
 
-	runtime.SetFinalizer(hmac, func(h *cryptoKitHMAC) {
-		cryptokit.FreeHMAC(h.kind, h.ptr)
-	})
+	hmac.cleanup = runtime.AddCleanup(hmac, freeHMAC, hmacCleanup{ptr: hmac.ptr, kind: hmac.kind})
 
 	return hmac, nil
 }
 
 func (h *cryptoKitHMAC) Reset() {
+	h.cleanup.Stop()
 	cryptokit.FreeHMAC(h.kind, h.ptr)
 
 	h.ptr = cryptokit.InitHMAC(h.kind, h.key)
+	h.cleanup = runtime.AddCleanup(h, freeHMAC, hmacCleanup{ptr: h.ptr, kind: h.kind})
 	runtime.KeepAlive(h)
 }
 

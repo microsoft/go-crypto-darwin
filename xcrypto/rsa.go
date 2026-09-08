@@ -32,9 +32,9 @@ type PublicKeyRSA struct {
 	_pkey security.SecKeyRef
 }
 
-func (k *PublicKeyRSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
+func releaseRSAKey(key security.SecKeyRef) {
+	if key != nil {
+		security.CFRelease(security.CFTypeRef(key))
 	}
 }
 
@@ -46,14 +46,14 @@ func NewPublicKeyRSA(asn1Data []byte) (*PublicKeyRSA, error) {
 	}
 
 	key := &PublicKeyRSA{_pkey: pubKeyRef}
-	runtime.SetFinalizer(key, (*PublicKeyRSA).finalize)
+	runtime.AddCleanup(key, releaseRSAKey, pubKeyRef)
 	return key, nil
 }
 
 func (k *PublicKeyRSA) withKey(f func(security.SecKeyRef) error) error {
-	// Because of the finalizer, any time key is passed to cgo, that call must
+	// Because of the cleanup, any time key is passed to cgo, that call must
 	// be followed by a call to runtime.KeepAlive, to make sure k is not
-	// collected (and finalized) before the cgo call returns.
+	// collected (and cleaned up) before the cgo call returns.
 	defer runtime.KeepAlive(k)
 	return f(k._pkey)
 }
@@ -61,12 +61,6 @@ func (k *PublicKeyRSA) withKey(f func(security.SecKeyRef) error) error {
 type PrivateKeyRSA struct {
 	// _pkey MUST NOT be accessed directly. Instead, use the withKey method.
 	_pkey security.SecKeyRef
-}
-
-func (k *PrivateKeyRSA) finalize() {
-	if k._pkey != nil {
-		security.CFRelease(security.CFTypeRef(k._pkey))
-	}
 }
 
 // NewPrivateKeyRSA creates a new RSA private key from ASN1 DER encoded data.
@@ -77,7 +71,7 @@ func NewPrivateKeyRSA(asn1Data []byte) (*PrivateKeyRSA, error) {
 	}
 
 	key := &PrivateKeyRSA{_pkey: privKeyRef}
-	runtime.SetFinalizer(key, (*PrivateKeyRSA).finalize)
+	runtime.AddCleanup(key, releaseRSAKey, privKeyRef)
 	return key, nil
 }
 
@@ -88,14 +82,14 @@ func (k *PrivateKeyRSA) PublicKey() *PublicKeyRSA {
 		return nil
 	})
 	pubKey := &PublicKeyRSA{_pkey: pubKeyRef}
-	runtime.SetFinalizer(pubKey, (*PublicKeyRSA).finalize)
+	runtime.AddCleanup(pubKey, releaseRSAKey, pubKeyRef)
 	return pubKey
 }
 
 func (k *PrivateKeyRSA) withKey(f func(security.SecKeyRef) error) error {
-	// Because of the finalizer, any time _pkey is passed to cgo, that call must
+	// Because of the cleanup, any time _pkey is passed to cgo, that call must
 	// be followed by a call to runtime.KeepAlive, to make sure k is not
-	// collected (and finalized) before the cgo call returns.
+	// collected (and cleaned up) before the cgo call returns.
 	defer runtime.KeepAlive(k)
 	return f(k._pkey)
 }

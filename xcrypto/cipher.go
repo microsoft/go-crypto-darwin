@@ -47,15 +47,14 @@ func newCBC(operation commoncrypto.CCOperation, kind commoncrypto.CCAlgorithm, k
 		panic("crypto/des: CCCryptorCreateWithMode failed")
 	}
 
-	runtime.SetFinalizer(x, (*cbcCipher).finalize)
+	runtime.AddCleanup(x, releaseCryptor, x.cryptor)
 	return x
 
 }
 
-func (x *cbcCipher) finalize() {
-	if x.cryptor != nil {
-		commoncrypto.CCCryptorRelease(x.cryptor)
-		x.cryptor = nil
+func releaseCryptor(cryptor commoncrypto.CCCryptorRef) {
+	if cryptor != nil {
+		commoncrypto.CCCryptorRelease(cryptor)
 	}
 }
 

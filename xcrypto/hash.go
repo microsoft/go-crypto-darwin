@@ -121,6 +121,15 @@ type Hash struct {
 	alg *hashAlgorithm
 }
 
+type hashCleanup struct {
+	ptr  unsafe.Pointer
+	kind int32
+}
+
+func freeHash(state hashCleanup) {
+	cryptokit.HashFree(state.kind, state.ptr)
+}
+
 // SupportsHash returns true if a hash.Hash implementation is supported for h.
 func SupportsHash(h crypto.Hash) bool {
 	return loadHash(h, false) != nil
@@ -134,16 +143,9 @@ func newHash(ch crypto.Hash) *Hash {
 		alg: alg,
 	}
 
-	runtime.SetFinalizer(h, (*Hash).finalize)
+	runtime.AddCleanup(h, freeHash, hashCleanup{ptr: h.ptr, kind: h.alg.id})
 
 	return h
-}
-
-func (h *Hash) finalize() {
-	if h.ptr != nil {
-		cryptokit.HashFree(h.alg.id, h.ptr)
-		h.ptr = nil
-	}
 }
 
 func (h *Hash) Clone() (hash.Cloner, error) {
@@ -156,7 +158,7 @@ func (h *Hash) Clone() (hash.Cloner, error) {
 		alg: h.alg,
 	}
 
-	runtime.SetFinalizer(newHash, (*Hash).finalize)
+	runtime.AddCleanup(newHash, freeHash, hashCleanup{ptr: newHash.ptr, kind: newHash.alg.id})
 
 	runtime.KeepAlive(h)
 
@@ -225,6 +227,7 @@ func (h *Hash) UnmarshalBinary(data []byte) error {
 
 func (h *Hash) Reset() {
 	cryptokit.HashReset(h.alg.id, h.ptr)
+	runtime.KeepAlive(h)
 }
 
 func (h *Hash) BlockSize() int {

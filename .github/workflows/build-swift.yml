@@ -3,6 +3,8 @@
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
   pull_request:
     types: [labeled]
   push:
@@ -20,8 +22,6 @@ jobs:
       'generate-bindings'
     permissions:
       contents: write
-      pull-requests: write
-      issues: write
       actions: write
     runs-on: macos-26
     steps:
@@ -44,8 +44,10 @@ jobs:
           MS_GO_NOSYSTEMCRYPTO: "1" # Disable systemcrypto to avoid duplicate-symbol/object-file linker errors during go generate
 
       - name: Commit and Push Changes
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           git config --local user.email "action@github.com"
           git config --global user.name "GitHub Actions"
@@ -53,50 +55,70 @@ jobs:
           git add internal/cryptokit/CryptoKit*.syso
           git add internal/cryptokit/zcryptokit_swift_*.go
           git add internal/cryptokit/xcodebuild_version.txt
-
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            git add internal/cryptokit/zcryptokit.h
-            COMMIT_MSG="Regenerate bindings"
-          else
-            COMMIT_MSG="Update CryptoKit Object files"
-          fi
+          git add internal/cryptokit/zcryptokit.h
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "$COMMIT_MSG"
+          git commit -m "Regenerate bindings"
+          git push
+          echo "Triggering test workflow..."
+          gh workflow run test.yml --ref "$HEAD_REF"
 
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            git push
-            echo "Triggering test workflow..."
-            gh workflow run test.yml --ref ${{ github.head_ref }}
-          else
-            BRANCH=autogen/update-cryptokit-obj-$(date +%s)
-            git checkout -b $BRANCH
-            git push origin $BRANCH
+      - name: Generate GitHub App token
+        if: github.event_name != 'pull_request'
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: Iv23ctjZVuLU9yK8RQ6s
+          private-key: ${{ secrets.GHMANAGER_GITHUBAPP_MICROSOFT_CRYPTO_UPDATER_FOR_GO_PRIVATE_KEY_PEM }}
+          permission-contents: write
+          permission-pull-requests: write
 
-            REPO_URL="${{ github.server_url }}/${{ github.repository }}"
-            ENCODED_BRANCH=$(printf '%s' "$BRANCH" | sed 's/\//%2F/g')
-            PR_URL="${REPO_URL}/compare/main...${ENCODED_BRANCH}?expand=1&title=Update%20CryptoKit%20Object%20files"
+      - name: Create or update pull request
+        if: github.event_name != 'pull_request'
+        env:
+          BRANCH: autogen/update-cryptokit-obj
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config --local user.name "microsoft-crypto-updater-for-go[bot]"
+          git config --local user.email "336483805+microsoft-crypto-updater-for-go[bot]@users.noreply.github.com"
 
-            ISSUE_BODY=$(cat <<EOF
-          CryptoKit object files have been updated and pushed to branch \`${BRANCH}\`.
+          git add internal/cryptokit/CryptoKit*.syso
+          git add internal/cryptokit/zcryptokit_swift_*.go
+          git add internal/cryptokit/xcodebuild_version.txt
 
-          **[Click here to create the PR](${PR_URL})**
-
-          This issue will be closed automatically when the PR is merged.
-
-          ---
-          _Automated by the Build Swift workflow, run [#${{ github.run_number }}](${REPO_URL}/actions/runs/${{ github.run_id }})._
-          EOF
-            )
-
-            ISSUE_URL=$(gh issue create \
-              --title "Update CryptoKit Object files (${BRANCH})" \
-              --body "$ISSUE_BODY" \
-              --label "automated")
-
-            echo "Created issue: $ISSUE_URL"
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
           fi
+
+          git commit -m "Update CryptoKit Object files"
+
+          # Keep one automation branch and update its open PR on later runs.
+          git fetch origin "$BRANCH:refs/remotes/origin/$BRANCH" || true
+          git branch --force "$BRANCH" HEAD
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force-with-lease origin "$BRANCH"
+
+          PR_URL=$(gh pr list \
+            --base main \
+            --head "$BRANCH" \
+            --state open \
+            --json url \
+            --jq '.[0].url')
+          if [ -n "$PR_URL" ]; then
+            echo "Updated pull request: $PR_URL"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Update CryptoKit Object files" \
+            --body "Update generated CryptoKit object files and bindings.
+
+          Automated by the Build Swift workflow, run [#${GITHUB_RUN_NUMBER}](${RUN_URL})."

@@ -6,6 +6,7 @@ package xcrypto_test
 import (
 	"bytes"
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
@@ -30,6 +31,16 @@ var mldsaParameterTests = []struct {
 }{
 	{"65", xcrypto.MLDSA65()},
 	{"87", xcrypto.MLDSA87()},
+}
+
+var mldsaContextTests = []struct {
+	name  string
+	value string
+}{
+	{"empty", ""},
+	{"literal", "context"},
+	{"binary", "\x00context\xff\x00"},
+	{"maximum", strings.Repeat("c", 255)},
 }
 
 var mldsaACVPTestCases = []mldsaTestCase{
@@ -239,6 +250,129 @@ func testMLDSARoundTrip(t *testing.T, params xcrypto.MLDSAParameters) {
 	}
 }
 
+func TestMLDSAContexts(t *testing.T) {
+	t.Parallel()
+	for _, test := range mldsaParameterTests {
+		t.Run(test.name, func(t *testing.T) {
+			if !xcrypto.SupportsMLDSA(test.params) {
+				t.Skip("ML-DSA not supported on this platform")
+			}
+			t.Parallel()
+			privateKey, err := xcrypto.GenerateKeyMLDSA(test.params)
+			if err != nil {
+				t.Fatal(err)
+			}
+			publicKey := privateKey.PublicKey()
+			message := []byte("message")
+			for _, context := range mldsaContextTests {
+				t.Run(context.name, func(t *testing.T) {
+					signature, err := privateKey.Sign(message, context.value)
+					if err != nil {
+						t.Fatalf("Sign: %v", err)
+					}
+					if len(signature) != test.params.SignatureSize() {
+						t.Fatalf("signature length = %d, want %d", len(signature), test.params.SignatureSize())
+					}
+					if err := publicKey.Verify(message, signature, context.value); err != nil {
+						t.Fatalf("Verify: %v", err)
+					}
+					wrongContext := "wrong"
+					if context.value != "" {
+						wrongContext = context.value[:len(context.value)-1]
+					}
+					if err := publicKey.Verify(message, signature, wrongContext); err == nil {
+						t.Error("Verify accepted a different context")
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestMLDSAAllocations(t *testing.T) {
+	if Asan() {
+		t.Skip("skipping allocations test with sanitizers")
+	}
+	for _, test := range mldsaParameterTests {
+		t.Run(test.name, func(t *testing.T) {
+			if !xcrypto.SupportsMLDSA(test.params) {
+				t.Skip("ML-DSA not supported on this platform")
+			}
+			privateKey, err := xcrypto.GenerateKeyMLDSA(test.params)
+			if err != nil {
+				t.Fatal(err)
+			}
+			publicKey := privateKey.PublicKey()
+			samePrivateKey, err := xcrypto.NewPrivateKeyMLDSA(test.params, privateKey.Bytes())
+			if err != nil {
+				t.Fatal(err)
+			}
+			samePublicKey, err := xcrypto.NewPublicKeyMLDSA(test.params, publicKey.Bytes())
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Run("Equal", func(t *testing.T) {
+				allocs := testing.AllocsPerRun(100, func() {
+					if !privateKey.Equal(samePrivateKey) || !publicKey.Equal(samePublicKey) {
+						t.Fatal("keys are not equal")
+					}
+				})
+				if allocs > 0 {
+					t.Errorf("allocs = %v, want 0", allocs)
+				}
+			})
+			message := []byte("message")
+			for _, context := range mldsaContextTests {
+				t.Run(context.name, func(t *testing.T) {
+					signature, err := privateKey.Sign(message, context.value)
+					if err != nil {
+						t.Fatal(err)
+					}
+					t.Run("Sign", func(t *testing.T) {
+						allocs := testing.AllocsPerRun(100, func() {
+							signature, err := privateKey.Sign(message, context.value)
+							if err != nil {
+								t.Fatal(err)
+							}
+							sink ^= signature[0]
+						})
+						if allocs > 1 {
+							t.Errorf("allocs = %v, want at most 1", allocs)
+						}
+					})
+					t.Run("Verify", func(t *testing.T) {
+						allocs := testing.AllocsPerRun(100, func() {
+							if err := publicKey.Verify(message, signature, context.value); err != nil {
+								t.Fatal(err)
+							}
+						})
+						if allocs > 0 {
+							t.Errorf("allocs = %v, want 0", allocs)
+						}
+					})
+				})
+			}
+		})
+	}
+}
+
+func TestMLDSAInvalidParameters(t *testing.T) {
+	t.Parallel()
+	var params xcrypto.MLDSAParameters
+	if xcrypto.SupportsMLDSA(params) {
+		t.Error("SupportsMLDSA accepted invalid parameters")
+	}
+	if _, err := xcrypto.GenerateKeyMLDSA(params); err == nil {
+		t.Error("GenerateKeyMLDSA accepted invalid parameters")
+	}
+	if _, err := xcrypto.NewPrivateKeyMLDSA(params, make([]byte, 32)); err == nil {
+		t.Error("NewPrivateKeyMLDSA accepted invalid parameters")
+	}
+	if _, err := xcrypto.NewPublicKeyMLDSA(params, nil); err == nil {
+		t.Error("NewPublicKeyMLDSA accepted invalid parameters")
+	}
+}
+
 func TestMLDSABadLengths(t *testing.T) {
 	t.Parallel()
 	for _, test := range mldsaParameterTests {
@@ -324,11 +458,26 @@ func testMLDSABadLengths(t *testing.T, params xcrypto.MLDSAParameters) {
 	if _, err := privateKey.Sign(message, string(make([]byte, 256))); err == nil {
 		t.Error("Sign accepted a long context")
 	}
+	if err := publicKey.Verify(message, signature, string(make([]byte, 256))); err == nil {
+		t.Error("Verify accepted a long context")
+	}
 	if _, err := privateKey.SignExternalMu(make([]byte, 63)); err == nil {
 		t.Error("SignExternalMu accepted a short mu")
 	}
+	if _, err := privateKey.SignExternalMu(make([]byte, 65)); err == nil {
+		t.Error("SignExternalMu accepted a long mu")
+	}
 	if err := publicKey.VerifyExternalMu(make([]byte, 63), signature); err == nil {
 		t.Error("VerifyExternalMu accepted a short mu")
+	}
+	if err := publicKey.VerifyExternalMu(make([]byte, 65), signature); err == nil {
+		t.Error("VerifyExternalMu accepted a long mu")
+	}
+	if err := publicKey.VerifyExternalMu(make([]byte, 64), signature[:params.SignatureSize()-1]); err == nil {
+		t.Error("VerifyExternalMu accepted a short signature")
+	}
+	if err := publicKey.VerifyExternalMu(make([]byte, 64), append(signature, 0)); err == nil {
+		t.Error("VerifyExternalMu accepted a long signature")
 	}
 }
 

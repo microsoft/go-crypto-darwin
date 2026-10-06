@@ -8,6 +8,7 @@ package xcrypto
 import (
 	"crypto/subtle"
 	"errors"
+	"unsafe"
 
 	"github.com/microsoft/go-crypto-darwin/internal/cryptokit"
 )
@@ -45,11 +46,6 @@ type MLDSAParameters struct {
 	name          string
 	publicKeySize int
 	signatureSize int
-	generateKey   func(seed []uint8) int64
-	derivePublic  func(seed []uint8, publicKey []uint8) int64
-	sign          func(seed []uint8, message []uint8, context []uint8, signature []uint8, signatureLen *int64) int64
-	verify        func(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64
-	validatePub   func(publicKey []uint8) int64
 }
 
 var (
@@ -57,21 +53,11 @@ var (
 		name:          "ML-DSA-65",
 		publicKeySize: publicKeySizeMLDSA65,
 		signatureSize: signatureSizeMLDSA65,
-		generateKey:   cryptokit.GenerateKeyMLDSA65,
-		derivePublic:  cryptokit.DerivePublicKeyMLDSA65,
-		sign:          cryptokit.SignMLDSA65,
-		verify:        cryptokit.VerifyMLDSA65,
-		validatePub:   cryptokit.ValidatePublicKeyMLDSA65,
 	}
 	mldsa87 = MLDSAParameters{
 		name:          "ML-DSA-87",
 		publicKeySize: publicKeySizeMLDSA87,
 		signatureSize: signatureSizeMLDSA87,
-		generateKey:   cryptokit.GenerateKeyMLDSA87,
-		derivePublic:  cryptokit.DerivePublicKeyMLDSA87,
-		sign:          cryptokit.SignMLDSA87,
-		verify:        cryptokit.VerifyMLDSA87,
-		validatePub:   cryptokit.ValidatePublicKeyMLDSA87,
 	}
 )
 
@@ -82,7 +68,64 @@ func MLDSA65() MLDSAParameters { return mldsa65 }
 func MLDSA87() MLDSAParameters { return mldsa87 }
 
 func (params MLDSAParameters) valid() bool {
-	return params.generateKey != nil
+	return params.publicKeySize == publicKeySizeMLDSA65 || params.publicKeySize == publicKeySizeMLDSA87
+}
+
+// Dispatch directly to the bindings so escape analysis can see their
+// noescape guarantees. Calls through function fields would hide them.
+func (params MLDSAParameters) generateKey(seed []byte) int64 {
+	switch params.publicKeySize {
+	case publicKeySizeMLDSA65:
+		return cryptokit.GenerateKeyMLDSA65(seed)
+	case publicKeySizeMLDSA87:
+		return cryptokit.GenerateKeyMLDSA87(seed)
+	default:
+		return 1
+	}
+}
+
+func (params MLDSAParameters) derivePublic(seed, publicKey []byte) int64 {
+	switch params.publicKeySize {
+	case publicKeySizeMLDSA65:
+		return cryptokit.DerivePublicKeyMLDSA65(seed, publicKey)
+	case publicKeySizeMLDSA87:
+		return cryptokit.DerivePublicKeyMLDSA87(seed, publicKey)
+	default:
+		return 1
+	}
+}
+
+func (params MLDSAParameters) sign(seed, message, context, signature []byte, signatureLen *int64) int64 {
+	switch params.publicKeySize {
+	case publicKeySizeMLDSA65:
+		return cryptokit.SignMLDSA65(seed, message, context, signature, signatureLen)
+	case publicKeySizeMLDSA87:
+		return cryptokit.SignMLDSA87(seed, message, context, signature, signatureLen)
+	default:
+		return 1
+	}
+}
+
+func (params MLDSAParameters) verify(publicKey, message, context, signature []byte) int64 {
+	switch params.publicKeySize {
+	case publicKeySizeMLDSA65:
+		return cryptokit.VerifyMLDSA65(publicKey, message, context, signature)
+	case publicKeySizeMLDSA87:
+		return cryptokit.VerifyMLDSA87(publicKey, message, context, signature)
+	default:
+		return 1
+	}
+}
+
+func (params MLDSAParameters) validatePub(publicKey []byte) int64 {
+	switch params.publicKeySize {
+	case publicKeySizeMLDSA65:
+		return cryptokit.ValidatePublicKeyMLDSA65(publicKey)
+	case publicKeySizeMLDSA87:
+		return cryptokit.ValidatePublicKeyMLDSA87(publicKey)
+	default:
+		return 1
+	}
 }
 
 // PublicKeySize returns the size of public keys for this parameter set, in bytes.
@@ -160,7 +203,9 @@ func (key *PrivateKeyMLDSA) Sign(message []byte, context string) ([]byte, error)
 	}
 	signature := make([]byte, key.params.signatureSize)
 	sigLen := int64(key.params.signatureSize)
-	contextBytes := []byte(context)
+	// Swift copies the context into Data during the synchronous call.
+	// These borrowed string bytes must not be mutated or retained.
+	contextBytes := unsafe.Slice(unsafe.StringData(context), len(context))
 	if ret := key.params.sign(key.seed[:], message, contextBytes, signature, &sigLen); ret != 0 {
 		return nil, errors.New("mldsa: signing failed")
 	}
@@ -222,7 +267,9 @@ func (key *PublicKeyMLDSA) Verify(message, signature []byte, context string) err
 	if len(context) > 255 {
 		return errors.New("mldsa: context too long")
 	}
-	contextBytes := []byte(context)
+	// Swift copies the context into Data during the synchronous call.
+	// These borrowed string bytes must not be mutated or retained.
+	contextBytes := unsafe.Slice(unsafe.StringData(context), len(context))
 	if ret := key.params.verify(key.bytes[:key.params.publicKeySize], message, contextBytes, signature); ret != 0 {
 		return errors.New("mldsa: verification failed")
 	}

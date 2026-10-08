@@ -389,7 +389,7 @@ func ValidatePublicKeyMLDSA87(publicKey []uint8) int64 {
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
-	return int64(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sig)))))
+	return int64(C._mkcgo_go_verifyEd25519((*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(publicKey))), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(message))), C.size_t(len(message)), (*C.uint8_t)(unsafe.Pointer(unsafe.SliceData(sig))), C.size_t(len(sig))))
 }
 
 func VerifyMLDSA65(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {

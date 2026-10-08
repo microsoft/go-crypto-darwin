@@ -53,7 +53,7 @@ void go_generateKeyEd25519(uint8_t *key) __attribute__((noescape, nocallback, st
 long go_newPrivateKeyEd25519FromSeed(uint8_t *key, const uint8_t *seed) __attribute__((noescape, nocallback, static, slice(key), slice(seed)));
 long go_newPublicKeyEd25519(uint8_t *key, const uint8_t *pub) __attribute__((noescape, nocallback, static, slice(key), slice(pub)));
 long go_signEd25519(const uint8_t *privateKey, const uint8_t *message, size_t messageLength, uint8_t *sigBuffer) __attribute__((noescape, nocallback, static, slice(privateKey), slice(message, messageLength), slice(sigBuffer)));
-long go_verifyEd25519(const uint8_t *publicKey, const uint8_t *message, size_t messageLength, const uint8_t *sig) __attribute__((noescape, nocallback, static, slice(publicKey), slice(message, messageLength), slice(sig)));
+long go_verifyEd25519(const uint8_t *publicKey, const uint8_t *message, size_t messageLength, const uint8_t *sig, size_t sigLength) __attribute__((noescape, nocallback, static, slice(publicKey), slice(message, messageLength), slice(sig, sigLength)));
 
 // HKDF key derivation
 long go_extractHKDF(int32_t hashFunction, const uint8_t *secret, size_t secretLength, const uint8_t *salt, size_t saltLength, uint8_t *prk, size_t prkLength) __attribute__((noescape, nocallback, static, slice(secret, secretLength), slice(salt, saltLength), slice(prk, prkLength)));

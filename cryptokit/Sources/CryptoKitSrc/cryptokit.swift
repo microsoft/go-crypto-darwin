@@ -286,7 +286,8 @@ public func go_verifyEd25519(
     _ publicKeyPointer: UnsafePointer<UInt8>,
     _ messagePointer: UnsafePointer<UInt8>,
     _ messageLength: Int,
-    _ sigPointer: UnsafePointer<UInt8>
+    _ sigPointer: UnsafePointer<UInt8>,
+    _ sigLength: Int
 ) -> Int {
     // Convert the raw public key back to a Data object
     let publicKeyData = Data(bytes: publicKeyPointer, count: publicKeySizeEd25519)
@@ -303,7 +304,7 @@ public func go_verifyEd25519(
     } else {
         rawMessage = Data()  // Empty message
     }
-    let signatureData = Data(bytes: sigPointer, count: signatureSizeEd25519)
+    let signatureData = Data(bytes: sigPointer, count: sigLength)
 
     // Verify the signature
     let isValid = publicKey.isValidSignature(signatureData, for: rawMessage)

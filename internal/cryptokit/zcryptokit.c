@@ -67,7 +67,7 @@ long go_validatePrivateKeyECDH(int32_t, const uint8_t*, long);
 long go_validatePublicKeyECDH(int32_t, const uint8_t*, long);
 long go_validatePublicKeyMLDSA65(const uint8_t*, long);
 long go_validatePublicKeyMLDSA87(const uint8_t*, long);
-long go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
+long go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*, size_t);
 long go_verifyMLDSA65(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
 long go_verifyMLDSA87(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
 
@@ -303,8 +303,8 @@ long _mkcgo_go_validatePublicKeyMLDSA87(const uint8_t* _arg0, long _arg1) {
 	return go_validatePublicKeyMLDSA87(_arg0, _arg1);
 }
 
-long _mkcgo_go_verifyEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, const uint8_t* _arg3) {
-	return go_verifyEd25519(_arg0, _arg1, _arg2, _arg3);
+long _mkcgo_go_verifyEd25519(const uint8_t* _arg0, const uint8_t* _arg1, size_t _arg2, const uint8_t* _arg3, size_t _arg4) {
+	return go_verifyEd25519(_arg0, _arg1, _arg2, _arg3, _arg4);
 }
 
 long _mkcgo_go_verifyMLDSA65(const uint8_t* _arg0, long _arg1, const uint8_t* _arg2, long _arg3, const uint8_t* _arg4, long _arg5, const uint8_t* _arg6, long _arg7) {

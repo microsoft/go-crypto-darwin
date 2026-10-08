@@ -441,7 +441,7 @@ func ValidatePublicKeyMLDSA87(publicKey []uint8) int64 {
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
-	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))))
+	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))), uintptr(len(sig)))
 	return int64(r0)
 }
 

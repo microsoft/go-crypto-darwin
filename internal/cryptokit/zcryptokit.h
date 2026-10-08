@@ -70,7 +70,7 @@ long _mkcgo_go_validatePrivateKeyECDH(int32_t, const uint8_t*, long);
 long _mkcgo_go_validatePublicKeyECDH(int32_t, const uint8_t*, long);
 long _mkcgo_go_validatePublicKeyMLDSA65(const uint8_t*, long);
 long _mkcgo_go_validatePublicKeyMLDSA87(const uint8_t*, long);
-long _mkcgo_go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*);
+long _mkcgo_go_verifyEd25519(const uint8_t*, const uint8_t*, size_t, const uint8_t*, size_t);
 long _mkcgo_go_verifyMLDSA65(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
 long _mkcgo_go_verifyMLDSA87(const uint8_t*, long, const uint8_t*, long, const uint8_t*, long, const uint8_t*, long);
 

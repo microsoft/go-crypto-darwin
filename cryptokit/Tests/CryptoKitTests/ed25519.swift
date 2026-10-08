@@ -80,14 +80,34 @@ final class Ed25519CryptoTests: XCTestCase {
                         sigPointer.baseAddress!
                     )
                     XCTAssertGreaterThan(signResult, 0, "Expected signature to be generated successfully.")
+                }
 
+                sigBuffer.withUnsafeBufferPointer { sigPointer in
                     let verifyResult = go_verifyEd25519(
                         publicKeyPointer,
                         messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
                         message.count,
-                        sigPointer.baseAddress!
+                        sigPointer.baseAddress!,
+                        sigBuffer.count
                     )
                     XCTAssertEqual(verifyResult, 1, "Expected the signature to be valid.")
+                }
+
+                let invalidSignatureLengths = [
+                    Array(sigBuffer.dropLast()),
+                    sigBuffer + [0],
+                ]
+                for signature in invalidSignatureLengths {
+                    signature.withUnsafeBufferPointer { invalidSigPointer in
+                        let invalidResult = go_verifyEd25519(
+                            publicKeyPointer,
+                            messagePointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                            message.count,
+                            invalidSigPointer.baseAddress!,
+                            signature.count
+                        )
+                        XCTAssertEqual(invalidResult, 0, "Expected an invalid signature length to be rejected.")
+                    }
                 }
             }
         }

@@ -55,6 +55,34 @@ func TestEd25519SignVerify(t *testing.T) {
 	}
 }
 
+func TestEd25519VerifyInvalidSignatureLength(t *testing.T) {
+	private := xcrypto.GenerateKeyEd25519()
+	public := private.Public()
+	message := []byte("test message")
+	signature, err := xcrypto.SignEd25519(private, message)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name      string
+		signature []byte
+	}{
+		{name: "nil", signature: nil},
+		{name: "empty", signature: []byte{}},
+		{name: "short subslice", signature: signature[:len(signature)-2]},
+		{name: "short allocation", signature: append([]byte(nil), signature[:len(signature)-2]...)},
+		{name: "oversized", signature: append(append([]byte(nil), signature...), 0)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := xcrypto.VerifyEd25519(public, message, tt.signature); err == nil {
+				t.Fatal("invalid signature length accepted")
+			}
+		})
+	}
+}
+
 func TestEd25519Malleability(t *testing.T) {
 	// https://tools.ietf.org/html/rfc8032#section-5.1.7 adds an additional test
 	// that s be in [0, order). This prevents someone from adding a multiple of

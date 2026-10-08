@@ -1,2 +1,2 @@
-Xcode 27.0
-Build version 27A266a
+Xcode 26.6
+Build version 17F113

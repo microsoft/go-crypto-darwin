@@ -790,9 +790,7 @@ public func go_SHA224(
     _ inputLength: Int,
     _ outputPointer: UnsafeMutablePointer<UInt8>
 ) -> Void {
-    var hash = [UInt8](repeating: 0, count: Int(CC_SHA224_DIGEST_LENGTH))
-    CC_SHA224(inputPointer, CC_LONG(inputLength), &hash)
-    Data(hash).copyBytes(to: outputPointer, count: hash.count)
+    CC_SHA224(inputPointer, CC_LONG(inputLength), outputPointer)
 }
 
 @implementation @c

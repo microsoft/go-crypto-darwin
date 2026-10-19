@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/microsoft/go-crypto-darwin/xcrypto"
 )
@@ -106,8 +107,7 @@ func decodeHex(t *testing.T, s string) []byte {
 }
 
 // fetchModule fetches the module at the given version and returns the directory
-// containing its source tree. It skips the test if fetching modules is not
-// possible in this environment.
+// containing its source tree. Downloads are attempted up to three times.
 func fetchModule(t *testing.T, module, version string) string {
 	goTool := "go"
 
@@ -131,9 +131,21 @@ func fetchModule(t *testing.T, module, version string) string {
 
 	t.Logf("fetching %s@%s\n", module, version)
 
-	output, err := exec.Command(goTool, "mod", "download", "-json", module+"@"+version).CombinedOutput()
+	const maxAttempts = 3
+	var output []byte
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		output, err = exec.Command(goTool, "mod", "download", "-json", module+"@"+version).CombinedOutput()
+		if err == nil {
+			break
+		}
+		if attempt < maxAttempts {
+			delay := time.Duration(attempt) * time.Second
+			t.Logf("download attempt %d/%d failed: %v; retrying in %s\n%s", attempt, maxAttempts, err, delay, output)
+			time.Sleep(delay)
+		}
+	}
 	if err != nil {
-		t.Fatalf("failed to download %s@%s: %s\n%s\n", module, version, err, output)
+		t.Fatalf("failed to download %s@%s after %d attempts: %s\n%s\n", module, version, maxAttempts, err, output)
 	}
 	var j struct {
 		Dir string

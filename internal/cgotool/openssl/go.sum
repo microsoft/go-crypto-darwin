@@ -1,2 +1,2 @@
-github.com/microsoft/go-crypto-openssl v0.0.0-20260526093041-a7ca5d3c79e8 h1:TUamk5/ik8Onza/1FDVPd4b4FYNXzDp/ZiTwbHTeq6U=
-github.com/microsoft/go-crypto-openssl v0.0.0-20260526093041-a7ca5d3c79e8/go.mod h1:gJrjX+yWGi9pkbfPVDDh+ZbgjtQoRSXHjb/ZyjwKk34=
+github.com/microsoft/go-crypto-openssl v0.5.1-0.20261022182405-57f4fea8a5b3 h1:i4oCiQQq+eC5K/eqZnVA49FuanZE7EEjQ8zv9/OOUis=
+github.com/microsoft/go-crypto-openssl v0.5.1-0.20261022182405-57f4fea8a5b3/go.mod h1:rdSY8BhWs3fySEKPnwYbTbCAWxnXQAfrE8qBibXNU/M=

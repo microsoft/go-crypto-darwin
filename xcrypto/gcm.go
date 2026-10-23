@@ -113,6 +113,7 @@ func (g *aesGCM) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
 	return ret
 }
 
+// SealWithRandomNonce panics if nonce generation or encryption fails.
 func (g *aesGCM) SealWithRandomNonce(out, nonce, plaintext, additionalData []byte) {
 	if uint64(len(plaintext)) > uint64((1<<32)-2)*aesBlockSize {
 		panic("crypto/cipher: message too large for GCM")
@@ -134,8 +135,9 @@ func (g *aesGCM) SealWithRandomNonce(out, nonce, plaintext, additionalData []byt
 		panic("cipher: TLS 1.2 and 1.3 modes do not support random nonce")
 	}
 
-	// Generate a random nonce
-	RandReader.Read(nonce)
+	if _, err := RandReader.Read(nonce); err != nil {
+		panic(err)
+	}
 	err := cryptokit.EncryptAESGCM(
 		g.key,
 		plaintext,

@@ -53,8 +53,8 @@ const maxSyscallArgs = 32
 
 type libcCallInfo struct {
 	fn   uintptr
-	n    uintptr // number of parameters
-	args uintptr // parameters
+	n    uintptr        // number of parameters
+	args unsafe.Pointer // keeps the argument storage reachable
 }
 
 var syscallNSystemStack_trampoline byte
@@ -64,10 +64,9 @@ var syscallNSystemStackABIInternal = uintptr(unsafe.Pointer(&syscallNSystemStack
 // errType parameter used by generated wrappers is intentionally ignored because
 // these framework calls return errors directly rather than through libc errno.
 //
-// All its parameters and return values must be uintptr in order
-// for the Go compiler to automatically set the //go:uintptrkeepalive
-// directive (which we can't set manually here).
-// See https://github.com/golang/go/blob/9a5a1202f4c4d5a7048b149b65c3e5b82a2de9aa/src/cmd/compile/internal/escape/call.go#L275.
+// Callers must keep the original pointer arguments alive until this call returns.
+// The bodyless syscall_syscall6 declaration protects the call record, not
+// pointers already encoded as uintptr values inside it.
 //
 //go:nosplit
 func SyscallN(_ uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
@@ -79,7 +78,7 @@ func SyscallN(_ uintptr, fn uintptr, args ...uintptr) (r1, r2 uintptr) {
 		n:  uintptr(len(args)),
 	}
 	if libcArgs.n != 0 {
-		libcArgs.args = uintptr(noescape(unsafe.Pointer(&args[0])))
+		libcArgs.args = noescape(unsafe.Pointer(&args[0]))
 	}
 	r1, r2, _ = syscall_syscall6(syscallNSystemStackABIInternal, uintptr(unsafe.Pointer(&libcArgs)), 0, 0, 0, 0, 0)
 	return r1, r2

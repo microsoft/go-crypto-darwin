@@ -29,6 +29,7 @@ func main() {
 	}
 	args := []string{"go", "run", pkg}
 	args = append(args, "-copyright", tempFile.Name())
+	args = append(args, "-ppc64le=false")
 	args = append(args, os.Args[1:]...)
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stderr = os.Stderr

@@ -169,4 +169,3 @@ TEXT _mkcgo_SecRandomCopyBytes_trampoline<>(SB), NOSPLIT, $0-0
 
 GLOBL ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB), RODATA, $_GOPTRSIZE
 DATA ·_mkcgo_SecRandomCopyBytes_trampoline_addr(SB)/_GOPTRSIZE, $_mkcgo_SecRandomCopyBytes_trampoline<>(SB)
-

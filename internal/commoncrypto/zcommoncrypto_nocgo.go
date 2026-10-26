@@ -51,6 +51,11 @@ var _mkcgo_CCCrypt_trampoline_addr uintptr
 
 func CCCrypt(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCCrypt_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(iv))), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(iv)
+	runtime.KeepAlive(dataIn)
+	runtime.KeepAlive(dataOut)
+	runtime.KeepAlive(dataOutMoved)
 	return CCCryptorStatus(r0)
 }
 
@@ -58,6 +63,9 @@ var _mkcgo_CCCryptorCreate_trampoline_addr uintptr
 
 func CCCryptorCreate(op CCOperation, alg CCAlgorithm, options CCOptions, key []byte, iv []byte, cryptorRef *CCCryptorRef) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCCryptorCreate_trampoline_addr, uintptr(op), uintptr(alg), uintptr(options), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(cryptorRef))))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(iv)
+	runtime.KeepAlive(cryptorRef)
 	return CCCryptorStatus(r0)
 }
 
@@ -70,6 +78,10 @@ func CCCryptorCreateWithMode(op CCOperation, mode CCMode, alg CCAlgorithm, paddi
 	} else {
 		r0, _ = syscallN(0, _mkcgo_CCCryptorCreateWithMode_trampoline_addr, uintptr(op), uintptr(mode), uintptr(alg), uintptr(padding), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(iv)))), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(key)))), uintptr(len(key)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(tweak)))), uintptr(len(tweak)), uintptr(numRounds), uintptr(options), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(cryptorRef))))
 	}
+	runtime.KeepAlive(iv)
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(tweak)
+	runtime.KeepAlive(cryptorRef)
 	return CCCryptorStatus(r0)
 }
 
@@ -77,6 +89,7 @@ var _mkcgo_CCCryptorRelease_trampoline_addr uintptr
 
 func CCCryptorRelease(cryptorRef CCCryptorRef) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCCryptorRelease_trampoline_addr, uintptr(cryptorRef))
+	runtime.KeepAlive(cryptorRef)
 	return CCCryptorStatus(r0)
 }
 
@@ -84,6 +97,8 @@ var _mkcgo_CCCryptorReset_trampoline_addr uintptr
 
 func CCCryptorReset(cryptorRef CCCryptorRef, iv []byte) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCCryptorReset_trampoline_addr, uintptr(cryptorRef), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(iv)))))
+	runtime.KeepAlive(cryptorRef)
+	runtime.KeepAlive(iv)
 	return CCCryptorStatus(r0)
 }
 
@@ -91,6 +106,10 @@ var _mkcgo_CCCryptorUpdate_trampoline_addr uintptr
 
 func CCCryptorUpdate(cryptorRef CCCryptorRef, dataIn []byte, dataOut []byte, dataOutMoved *int) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCCryptorUpdate_trampoline_addr, uintptr(cryptorRef), uintptr(unsafe.Pointer(unsafe.SliceData(dataIn))), uintptr(len(dataIn)), uintptr(unsafe.Pointer(unsafe.SliceData(dataOut))), uintptr(len(dataOut)), uintptr(unsafe.Pointer(dataOutMoved)))
+	runtime.KeepAlive(cryptorRef)
+	runtime.KeepAlive(dataIn)
+	runtime.KeepAlive(dataOut)
+	runtime.KeepAlive(dataOutMoved)
 	return CCCryptorStatus(r0)
 }
 
@@ -98,5 +117,8 @@ var _mkcgo_CCKeyDerivationPBKDF_trampoline_addr uintptr
 
 func CCKeyDerivationPBKDF(algorithm CCPBKDFAlgorithm, password []byte, salt []uint8, prf CCPseudoRandomAlgorithm, rounds uint32, derivedKey []uint8) CCCryptorStatus {
 	r0, _ := syscallN(0, _mkcgo_CCKeyDerivationPBKDF_trampoline_addr, uintptr(algorithm), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(password)))), uintptr(len(password)), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(salt)))), uintptr(len(salt)), uintptr(prf), uintptr(rounds), uintptr(mkcgoEscapePtrCommoncrypto(unsafe.Pointer(unsafe.SliceData(derivedKey)))), uintptr(len(derivedKey)))
+	runtime.KeepAlive(password)
+	runtime.KeepAlive(salt)
+	runtime.KeepAlive(derivedKey)
 	return CCCryptorStatus(r0)
 }

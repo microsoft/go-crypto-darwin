@@ -153,48 +153,71 @@ var go_verifyMLDSA87 byte
 
 func MD5(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_MD5)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA1(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA1)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA256(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA256)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA384(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA384)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA3_256(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_256)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA3_384(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_384)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA3_512(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA3_512)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func SHA512(inputPointer []uint8, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_SHA512)), uintptr(unsafe.Pointer(unsafe.SliceData(inputPointer))), uintptr(len(inputPointer)), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(inputPointer)
+	runtime.KeepAlive(outputPointer)
 }
 
 func CopyHMAC(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_copyHMAC)), uintptr(hashAlgorithm), uintptr(ptr))
+	runtime.KeepAlive(ptr)
 	return unsafe.Pointer(r0)
 }
 
 func DecapsulateMLKEM1024(seed []uint8, ciphertext []uint8, sharedKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decapsulateMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(ciphertext)
+	runtime.KeepAlive(sharedKey)
 	return int64(r0)
 }
 
 func DecapsulateMLKEM768(seed []uint8, ciphertext []uint8, sharedKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decapsulateMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(ciphertext)
+	runtime.KeepAlive(sharedKey)
 	return int64(r0)
 }
 
@@ -203,6 +226,13 @@ func DecryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, tag []
 		panic("DecryptAESGCM: *outLength exceeds len(out)")
 	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(data)
+	runtime.KeepAlive(nonce)
+	runtime.KeepAlive(aad)
+	runtime.KeepAlive(tag)
+	runtime.KeepAlive(out)
+	runtime.KeepAlive(outLength)
 	return int64(r0)
 }
 
@@ -211,31 +241,49 @@ func DecryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, ta
 		panic("DecryptChaChaPoly: *outLength exceeds len(out)")
 	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_decryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))), uintptr(len(tag)), uintptr(unsafe.Pointer(unsafe.SliceData(out))), uintptr(unsafe.Pointer(outLength)))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(data)
+	runtime.KeepAlive(nonce)
+	runtime.KeepAlive(aad)
+	runtime.KeepAlive(tag)
+	runtime.KeepAlive(out)
+	runtime.KeepAlive(outLength)
 	return int64(r0)
 }
 
 func DeriveEncapsulationKeyMLKEM1024(seed []uint8, encapKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(encapKey)
 	return int64(r0)
 }
 
 func DeriveEncapsulationKeyMLKEM768(seed []uint8, encapKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_deriveEncapsulationKeyMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(encapKey)
 	return int64(r0)
 }
 
 func DerivePublicKeyMLDSA65(seed []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_derivePublicKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func DerivePublicKeyMLDSA87(seed []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_derivePublicKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func EcdhSharedSecret(curveID int32, privateKey []uint8, publicKey []uint8, sharedSecret []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdhSharedSecret)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedSecret))), uintptr(len(sharedSecret)))
+	runtime.KeepAlive(privateKey)
+	runtime.KeepAlive(publicKey)
+	runtime.KeepAlive(sharedSecret)
 	return int64(r0)
 }
 
@@ -244,83 +292,128 @@ func EcdsaSign(curveID int32, d []uint8, message []uint8, signature []uint8, sig
 		panic("EcdsaSign: *signatureLen exceeds len(signature)")
 	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdsaSign)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
+	runtime.KeepAlive(d)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(signature)
+	runtime.KeepAlive(signatureLen)
 	return int64(r0)
 }
 
 func EcdsaVerify(curveID int32, x []uint8, y []uint8, message []uint8, signature []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_ecdsaVerify)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(len(x)), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(len(y)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
+	runtime.KeepAlive(x)
+	runtime.KeepAlive(y)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(signature)
 	return int64(r0)
 }
 
 func EncapsulateMLKEM1024(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encapsulateMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)))
+	runtime.KeepAlive(encapKey)
+	runtime.KeepAlive(sharedKey)
+	runtime.KeepAlive(ciphertext)
 	return int64(r0)
 }
 
 func EncapsulateMLKEM768(encapKey []uint8, sharedKey []uint8, ciphertext []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encapsulateMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(encapKey))), uintptr(len(encapKey)), uintptr(unsafe.Pointer(unsafe.SliceData(sharedKey))), uintptr(len(sharedKey)), uintptr(unsafe.Pointer(unsafe.SliceData(ciphertext))), uintptr(len(ciphertext)))
+	runtime.KeepAlive(encapKey)
+	runtime.KeepAlive(sharedKey)
+	runtime.KeepAlive(ciphertext)
 	return int64(r0)
 }
 
 func EncryptAESGCM(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptAESGCM)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(data)
+	runtime.KeepAlive(nonce)
+	runtime.KeepAlive(aad)
+	runtime.KeepAlive(cipherText)
+	runtime.KeepAlive(tag)
 	return int64(r0)
 }
 
 func EncryptChaChaPoly(key []uint8, data []uint8, nonce []uint8, aad []uint8, cipherText []uint8, tag []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_encryptChaChaPoly)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)), uintptr(unsafe.Pointer(unsafe.SliceData(nonce))), uintptr(len(nonce)), uintptr(unsafe.Pointer(unsafe.SliceData(aad))), uintptr(len(aad)), uintptr(unsafe.Pointer(unsafe.SliceData(cipherText))), uintptr(len(cipherText)), uintptr(unsafe.Pointer(unsafe.SliceData(tag))))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(data)
+	runtime.KeepAlive(nonce)
+	runtime.KeepAlive(aad)
+	runtime.KeepAlive(cipherText)
+	runtime.KeepAlive(tag)
 	return int64(r0)
 }
 
 func ExpandHKDF(hashFunction int32, prk []uint8, info []uint8, okm []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_expandHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)), uintptr(unsafe.Pointer(unsafe.SliceData(info))), uintptr(len(info)), uintptr(unsafe.Pointer(unsafe.SliceData(okm))), uintptr(len(okm)))
+	runtime.KeepAlive(prk)
+	runtime.KeepAlive(info)
+	runtime.KeepAlive(okm)
 	return int64(r0)
 }
 
 func ExtractHKDF(hashFunction int32, secret []uint8, salt []uint8, prk []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_extractHKDF)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(secret))), uintptr(len(secret)), uintptr(unsafe.Pointer(unsafe.SliceData(salt))), uintptr(len(salt)), uintptr(unsafe.Pointer(unsafe.SliceData(prk))), uintptr(len(prk)))
+	runtime.KeepAlive(secret)
+	runtime.KeepAlive(salt)
+	runtime.KeepAlive(prk)
 	return int64(r0)
 }
 
 func FinalizeHMAC(hashFunction int32, ptr unsafe.Pointer, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_finalizeHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(ptr)
+	runtime.KeepAlive(outputPointer)
 }
 
 func FreeHMAC(hashFunction int32, ptr unsafe.Pointer) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_freeHMAC)), uintptr(hashFunction), uintptr(ptr))
+	runtime.KeepAlive(ptr)
 }
 
 func GenerateKeyECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(privateKey)
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func GenerateKeyECDSA(curveID int32, x []uint8, y []uint8, d []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyECDSA)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(x))), uintptr(len(x)), uintptr(unsafe.Pointer(unsafe.SliceData(y))), uintptr(len(y)), uintptr(unsafe.Pointer(unsafe.SliceData(d))), uintptr(len(d)))
+	runtime.KeepAlive(x)
+	runtime.KeepAlive(y)
+	runtime.KeepAlive(d)
 	return int64(r0)
 }
 
 func GenerateKeyEd25519(key []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))))
+	runtime.KeepAlive(key)
 }
 
 func GenerateKeyMLDSA65(seed []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	runtime.KeepAlive(seed)
 	return int64(r0)
 }
 
 func GenerateKeyMLDSA87(seed []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	runtime.KeepAlive(seed)
 	return int64(r0)
 }
 
 func GenerateKeyMLKEM1024(seed []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLKEM1024)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	runtime.KeepAlive(seed)
 	return int64(r0)
 }
 
 func GenerateKeyMLKEM768(seed []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_generateKeyMLKEM768)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)))
+	runtime.KeepAlive(seed)
 	return int64(r0)
 }
 
@@ -331,11 +424,13 @@ func HashBlockSize(hashAlgorithm int32) int64 {
 
 func HashCopy(hashAlgorithm int32, ptr unsafe.Pointer) unsafe.Pointer {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_hashCopy)), uintptr(hashAlgorithm), uintptr(ptr))
+	runtime.KeepAlive(ptr)
 	return unsafe.Pointer(r0)
 }
 
 func HashFree(hashAlgorithm int32, ptr unsafe.Pointer) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_hashFree)), uintptr(hashAlgorithm), uintptr(ptr))
+	runtime.KeepAlive(ptr)
 }
 
 func HashNew(hashAlgorithm int32) unsafe.Pointer {
@@ -345,6 +440,7 @@ func HashNew(hashAlgorithm int32) unsafe.Pointer {
 
 func HashReset(hashAlgorithm int32, ptr unsafe.Pointer) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_hashReset)), uintptr(hashAlgorithm), uintptr(ptr))
+	runtime.KeepAlive(ptr)
 }
 
 func HashSize(hashAlgorithm int32) int64 {
@@ -354,34 +450,48 @@ func HashSize(hashAlgorithm int32) int64 {
 
 func HashSum(hashAlgorithm int32, ptr unsafe.Pointer, outputPointer []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_hashSum)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(outputPointer))))
+	runtime.KeepAlive(ptr)
+	runtime.KeepAlive(outputPointer)
 }
 
 func HashWrite(hashAlgorithm int32, ptr unsafe.Pointer, data []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_hashWrite)), uintptr(hashAlgorithm), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)))
+	runtime.KeepAlive(ptr)
+	runtime.KeepAlive(data)
 }
 
 func InitHMAC(hashFunction int32, key []uint8) unsafe.Pointer {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_initHMAC)), uintptr(hashFunction), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(len(key)))
+	runtime.KeepAlive(key)
 	return unsafe.Pointer(r0)
 }
 
 func NewPrivateKeyEd25519FromSeed(key []uint8, seed []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPrivateKeyEd25519FromSeed)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(seed))))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(seed)
 	return int64(r0)
 }
 
 func NewPublicKeyEd25519(key []uint8, pub []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_newPublicKeyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(key))), uintptr(unsafe.Pointer(unsafe.SliceData(pub))))
+	runtime.KeepAlive(key)
+	runtime.KeepAlive(pub)
 	return int64(r0)
 }
 
 func PublicKeyFromPrivateECDH(curveID int32, privateKey []uint8, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_publicKeyFromPrivateECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(privateKey)
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func SignEd25519(privateKey []uint8, message []uint8, sigBuffer []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sigBuffer))))
+	runtime.KeepAlive(privateKey)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(sigBuffer)
 	return int64(r0)
 }
 
@@ -390,6 +500,11 @@ func SignMLDSA65(seed []uint8, message []uint8, context []uint8, signature []uin
 		panic("SignMLDSA65: *signatureLen exceeds len(signature)")
 	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(signature)
+	runtime.KeepAlive(signatureLen)
 	return int64(r0)
 }
 
@@ -398,6 +513,11 @@ func SignMLDSA87(seed []uint8, message []uint8, context []uint8, signature []uin
 		panic("SignMLDSA87: *signatureLen exceeds len(signature)")
 	}
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_signMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(seed))), uintptr(len(seed)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(unsafe.Pointer(signatureLen)))
+	runtime.KeepAlive(seed)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(signature)
+	runtime.KeepAlive(signatureLen)
 	return int64(r0)
 }
 
@@ -418,39 +538,56 @@ func SupportsSHA3() int64 {
 
 func UpdateHMAC(hashFunction int32, ptr unsafe.Pointer, data []uint8) {
 	syscallN(0, uintptr(unsafe.Pointer(&go_updateHMAC)), uintptr(hashFunction), uintptr(ptr), uintptr(unsafe.Pointer(unsafe.SliceData(data))), uintptr(len(data)))
+	runtime.KeepAlive(ptr)
+	runtime.KeepAlive(data)
 }
 
 func ValidatePrivateKeyECDH(curveID int32, privateKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePrivateKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(privateKey))), uintptr(len(privateKey)))
+	runtime.KeepAlive(privateKey)
 	return int64(r0)
 }
 
 func ValidatePublicKeyECDH(curveID int32, publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyECDH)), uintptr(curveID), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func ValidatePublicKeyMLDSA65(publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func ValidatePublicKeyMLDSA87(publicKey []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_validatePublicKeyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)))
+	runtime.KeepAlive(publicKey)
 	return int64(r0)
 }
 
 func VerifyEd25519(publicKey []uint8, message []uint8, sig []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyEd25519)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(sig))), uintptr(len(sig)))
+	runtime.KeepAlive(publicKey)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(sig)
 	return int64(r0)
 }
 
 func VerifyMLDSA65(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyMLDSA65)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
+	runtime.KeepAlive(publicKey)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(signature)
 	return int64(r0)
 }
 
 func VerifyMLDSA87(publicKey []uint8, message []uint8, context []uint8, signature []uint8) int64 {
 	r0, _ := syscallN(0, uintptr(unsafe.Pointer(&go_verifyMLDSA87)), uintptr(unsafe.Pointer(unsafe.SliceData(publicKey))), uintptr(len(publicKey)), uintptr(unsafe.Pointer(unsafe.SliceData(message))), uintptr(len(message)), uintptr(unsafe.Pointer(unsafe.SliceData(context))), uintptr(len(context)), uintptr(unsafe.Pointer(unsafe.SliceData(signature))), uintptr(len(signature)))
+	runtime.KeepAlive(publicKey)
+	runtime.KeepAlive(message)
+	runtime.KeepAlive(context)
+	runtime.KeepAlive(signature)
 	return int64(r0)
 }

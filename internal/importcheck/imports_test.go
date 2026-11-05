@@ -4,13 +4,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
 
 const checker = "github.com/microsoft/go-infra/cmd/check-imports@v0.0.12"
 
+// Run with CGO_ENABLED=0 go test -count=1 ./internal/importcheck because the
+// checker reads backend sources in a subprocess, which Go's test cache does not track.
 func TestBackendImportsAllowed(t *testing.T) {
 	runChecker(t,
 		"-pkg", "./internal/xsyscall", "-allow", "syscall,unsafe",
@@ -47,12 +48,15 @@ func runCheckerExpectError(t *testing.T, args ...string) []byte {
 }
 
 func runCheckerCommand(args ...string) ([]byte, error) {
-	_, testFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return nil, os.ErrNotExist
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return nil, err
 	}
 
-	repoRoot := filepath.Clean(filepath.Join(filepath.Dir(testFile), "../.."))
+	repoRoot, err := filepath.Abs(filepath.Join(workingDir, "../.."))
+	if err != nil {
+		return nil, err
+	}
 	commandArgs := append([]string{"run", checker}, args...)
 	cmd := exec.Command("go", commandArgs...)
 	cmd.Dir = repoRoot

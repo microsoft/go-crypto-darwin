@@ -26,4 +26,4 @@ jobs:
           go-download-base-url: "https://aka.ms/golang/release/latest"
 
       - name: Check vendored package imports
-        run: CGO_ENABLED=0 go test ./internal/importcheck
+        run: CGO_ENABLED=0 go test -count=1 ./internal/importcheck

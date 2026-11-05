@@ -8,8 +8,6 @@ import (
 	"testing"
 )
 
-const checker = "github.com/microsoft/go-infra/cmd/check-imports@v0.0.12"
-
 // Run with CGO_ENABLED=0 go test -count=1 ./internal/importcheck because the
 // checker reads backend sources in a subprocess, which Go's test cache does not track.
 func TestBackendImportsAllowed(t *testing.T) {
@@ -57,7 +55,7 @@ func runCheckerCommand(args ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	commandArgs := append([]string{"run", checker}, args...)
+	commandArgs := append([]string{"tool", "check-imports"}, args...)
 	cmd := exec.Command("go", commandArgs...)
 	cmd.Dir = repoRoot
 	cmd.Env = withEnv(os.Environ(), "CGO_ENABLED", "0")
